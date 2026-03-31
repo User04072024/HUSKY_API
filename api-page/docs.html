@@ -1,1537 +1,787 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Browse through our collection of code snippets, scripts, and tools. Find what you need or discover something new.">
-    <meta name="theme-color" content="#ffffff">
-    <title>Husky API.</title>
-    <link rel="icon" href="/src/icon.png" type="image/png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/json.min.js"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'mono': ['Ubuntu Mono', 'monospace'],
-                        'sans': ['Inter', 'system-ui', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Husky API documentation" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>Husky API Docs</title>
 
-    <style>
-        ::-webkit-scrollbar {
-            display: none !important;
-        }
-        
-        .glass {
-            backdrop-filter: blur(16px) saturate(180%);
-            background: rgba(255, 255, 255, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.125);
-        }
-        
-        .loader {
-            width: 28px;
-            height: 28px;
-            border: 2px solid #e2e8f0;
-            border-top: 2px solid #4a5568;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #334155 0%, #0f172a 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .btn-gradient {
-            background: linear-gradient(135deg, #e2e8f0 0%, #4a5568 100%);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-gradient:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 25px -5px rgba(235, 235, 235, 0.4);
-        }
-        
-        .copy-btn {
-            @apply text-gray-500 hover:text-black p-1 rounded-md hover:bg-gray-200 transition-colors duration-150;
-        }
-        
-        .block-title {
-            @apply text-sm font-semibold text-gray-700 mb-2 flex items-center justify-between;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(5px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .will-fade-in {
-            opacity: 0;
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
-        
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-                transform: scale(1);
-            }
-            to {
-                opacity: 0;
-                transform: scale(0.98);
-            }
-        }
-        
-        .fade-out {
-            animation: fadeOut 0.2s ease-out forwards;
-        }
-        .endpoint-dialog {
-    max-width: 42rem;
-    width: 94%;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 14px;
-    padding: 0;
-    margin: auto;
-    background: #111111;
-    color: #e0e0e0;
-    box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.03),
-        0 32px 64px rgba(0, 0, 0, 0.6);
-    opacity: 1;
-    scale: 1;
-    transition:
-        display 0.3s allow-discrete,
-        overlay 0.3s allow-discrete,
-        opacity 0.3s ease,
-        scale 0.3s ease;
-}
+  <link rel="icon" href="/src/icon.png" type="image/png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
-@starting-style {
-    .endpoint-dialog[open] {
-        opacity: 0;
-        scale: 0.96;
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['Ubuntu Mono', 'monospace'],
+            sans: ['Inter', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body { font-family: 'Ubuntu Mono', monospace; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { scrollbar-width: none; }
+    .break-anywhere { overflow-wrap: anywhere; word-break: break-word; }
+    .glass {
+      backdrop-filter: blur(14px) saturate(180%);
+      background: rgba(255,255,255,0.88);
     }
-}
-
-.endpoint-dialog:not([open]) {
-    opacity: 0;
-    scale: 0.96;
-}
-
-.endpoint-dialog::backdrop {
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
-    opacity: 1;
-    transition:
-        display 0.3s allow-discrete,
-        overlay 0.3s allow-discrete,
-        opacity 0.3s ease;
-}
-
-@starting-style {
-    .endpoint-dialog[open]::backdrop {
-        opacity: 0;
-    }
-}
-
-.endpoint-dialog:not([open])::backdrop {
-    opacity: 0;
-}
-
-html:has(.endpoint-dialog[open]) {
-    overflow: hidden;
-}
-
-.endpoint-dialog .dialog-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.endpoint-dialog .dialog-header h2 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.88);
-    letter-spacing: 0.02em;
-}
-
-.endpoint-dialog .close-btn {
-    appearance: none;
-    border: none;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 1.25rem;
-    cursor: pointer;
-    padding: 0.25rem 0.4rem;
-    line-height: 1;
-    border-radius: 6px;
-    transition: color 0.15s, background 0.15s;
-}
-
-.endpoint-dialog .close-btn:hover {
-    color: #fff;
-    background: rgba(255,255,255,0.06);
-}
-
-.endpoint-dialog .dialog-body {
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.endpoint-dialog .endpoint-description {
-    font-size: 0.84rem;
-    line-height: 1.7;
-    color: rgba(255,255,255,0.68);
-}
-
-.endpoint-dialog .dialog-field {
-    margin-bottom: 0.95rem;
-}
-
-.endpoint-dialog .dialog-field label {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.78);
-    margin-bottom: 0.35rem;
-    display: block;
-}
-
-.endpoint-dialog .dialog-field .helper {
-    font-size: 0.7rem;
-    color: rgba(255,255,255,0.4);
-    margin-top: 0.35rem;
-}
-
-.endpoint-dialog .required {
-    color: #ef4444;
-}
-
-.endpoint-dialog input,
-.endpoint-dialog select,
-.endpoint-dialog textarea {
-    width: 100%;
-    padding: 0.85rem 0.95rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    background: rgba(255,255,255,0.04);
-    color: #fff;
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 0.9rem;
-    outline: none;
-}
-
-.endpoint-dialog input::placeholder,
-.endpoint-dialog textarea::placeholder {
-    color: rgba(255,255,255,0.28);
-}
-
-.endpoint-dialog input:focus,
-.endpoint-dialog select:focus,
-.endpoint-dialog textarea:focus {
-    border-color: rgba(255,255,255,0.18);
-    background: rgba(255,255,255,0.06);
-}
-
-.endpoint-dialog .dialog-actions {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.endpoint-dialog .execute-btn,
-.endpoint-dialog .clear-btn {
-    padding: 0.75rem 1rem;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-family: inherit;
-    font-weight: 600;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-
-.endpoint-dialog .execute-btn {
-    background: #ffffff;
-    color: #111111;
-}
-
-.endpoint-dialog .execute-btn:hover {
-    background: #eaeaea;
-}
-
-.endpoint-dialog .clear-btn {
-    background: rgba(255,255,255,0.04);
-    color: rgba(255,255,255,0.75);
-}
-
-.endpoint-dialog .clear-btn:hover {
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-}
-
-.endpoint-dialog .response-box,
-.endpoint-dialog .code-block {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.endpoint-dialog .code-bar {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.625rem 0.875rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.endpoint-dialog .code-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.14);
-}
-
-.endpoint-dialog .code-bar span {
-    margin-left: auto;
-    font-size: 0.6875rem;
-    color: rgba(255, 255, 255, 0.28);
-    font-family: 'Ubuntu Mono', monospace;
-}
-
-.endpoint-dialog pre {
-    margin: 0;
-    padding: 1rem;
-    overflow-x: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255,255,255,0.08) transparent;
-}
-
-.endpoint-dialog pre code,
-.endpoint-dialog pre {
-    font-family: 'Ubuntu Mono', monospace;
-    font-size: 0.75rem;
-    line-height: 1.7;
-    tab-size: 2;
-    color: rgba(255, 255, 255, 0.82);
-}
-
-.endpoint-dialog .dialog-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    padding: 1rem 1.25rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.endpoint-dialog img {
-    max-width: 100%;
-    border-radius: 12px;
-    display: block;
-    }
-    </style>
+  </style>
 </head>
+<body class="bg-slate-50 text-slate-800 min-h-screen overflow-x-hidden">
+  <div id="backdrop" class="fixed inset-0 bg-black/50 hidden z-40"></div>
 
-    <dialog id="endpointDialog" class="endpoint-dialog">
-    <div class="dialog-header">
-        <h2 id="dialogTitle">Endpoint</h2>
-        <button class="close-btn" id="closeBtn" aria-label="Close">&times;</button>
+  <aside id="sidebar" class="fixed top-0 right-0 h-full w-[88vw] max-w-xs bg-white border-l border-slate-200 translate-x-full transition-transform duration-300 z-50">
+    <div class="px-4 sm:px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+      <div>
+        <p class="text-sm font-semibold text-slate-900">Menu</p>
+        <p class="text-xs text-slate-500">Husky API</p>
+      </div>
+      <button id="sidebarClose" class="border border-slate-200 px-3 py-2 text-slate-700 hover:border-slate-400">
+        <span class="material-icons text-base">close</span>
+      </button>
     </div>
 
-    <div class="dialog-body">
-        <div id="dialogContent"></div>
-    </div>
+    <div class="p-4 sm:p-6 space-y-6">
+      <div class="space-y-2">
+        <a href="/" class="flex items-center gap-3 border border-slate-200 px-4 py-3 text-sm text-slate-700 hover:border-slate-500">
+          <span class="material-icons text-lg">dashboard</span>
+          Dashboard
+        </a>
+        <a href="/docs" class="flex items-center gap-3 border border-slate-200 px-4 py-3 text-sm text-slate-700 hover:border-slate-500">
+          <span class="material-icons text-lg">description</span>
+          Docs
+        </a>
+      </div>
 
-    <div class="dialog-footer">
-        <button id="dismissBtn" type="button" class="clear-btn">Cerrar</button>
-    </div>
-    </dialog>
-<body class="bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-800 antialiased font-mono min-h-screen">
-
-    <aside id="sidebar" class="fixed top-0 right-0 h-full w-64 bg-white text-slate-800 border-l border-gray-200 transform translate-x-full duration-300 ease-in-out z-[100]">
-        <div class="px-8 py-4 border-b border-gray-200 flex items-center justify-end">
-            <button id="sidebarClose" class="py-2 px-3 border border-gray-200 text-slate-800 hover:border-gray-600 flex items-center justify-center">
-                <i class="material-icons text-xl">close</i>
-            </button>
-        </div>
-<div class="p-8">
-    <nav>
+      <div>
+        <p class="text-xs text-slate-500 mb-2">LINKS</p>
         <div class="space-y-2">
-            <a href="/" class="flex items-center py-2 px-4 text-sm border border-gray-200 text-gray-600 hover:border-gray-600">
-                <i class="material-icons text-lg mr-3">dashboard</i> Dashboard
-            </a>
+          <a href="https://wa.me/6282313745397" target="_blank" class="flex items-center gap-3 border border-slate-200 px-4 py-3 text-sm text-slate-700 hover:border-slate-500">
+            <span class="material-icons text-lg">arrow_outward</span>
+            Contact
+          </a>
+          <a href="https://whatsapp.com/channel/0029Vb6pfuzJf05iZHfkli44" target="_blank" class="flex items-center gap-3 border border-slate-200 px-4 py-3 text-sm text-slate-700 hover:border-slate-500">
+            <span class="material-icons text-lg">arrow_outward</span>
+            Channel
+          </a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <header class="glass sticky top-0 z-30 border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
+      <div class="min-w-0 flex items-center gap-3 sm:gap-4">
+        <a href="/" class="border border-slate-200 p-2 text-slate-700 hover:border-slate-500 shrink-0">
+          <span class="material-icons text-lg">home</span>
+        </a>
+
+        <div class="min-w-0">
+          <h1 class="text-base sm:text-lg font-semibold text-slate-900 leading-none truncate">Husky API</h1>
+          <p class="text-xs text-slate-500 mt-1 truncate">API Documentation</p>
         </div>
 
-        <p class="text-xs text-slate-700 my-4">LINKS.</p>
-        <div class="space-y-2">
-            <a href="https://wa.me/6282313745397" target="_blank" class="flex items-center py-2 px-4 text-sm border border-gray-200 text-gray-600 hover:border-gray-600">
-                <i class="material-icons text-lg mr-3">arrow_outward</i> Contact
-            </a>
-            <a href="https://whatsapp.com/channel/0029Vb6pfuzJf05iZHfkli44" target="_blank" class="flex items-center py-2 px-4 text-sm border border-gray-200 text-gray-600 hover:border-gray-600">
-                <i class="material-icons text-lg mr-3">arrow_outward</i> Channel
-            </a>
+        <div class="hidden sm:inline-flex px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold shrink-0">
+          v1.0
         </div>
-    </nav>
-</div>
-</aside>
+      </div>
 
-    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 opacity-0 invisible duration-300 ease-in-out z-[90]"></div>
-
-    <header class="glass sticky top-0 z-50 border-b border-gray-200">
-        <div class="max-w-2xl mx-auto px-8 py-4 flex items-center justify-between">
-            <div class="flex gap-4 items-center">
-                <div class="flex flex-col gap-1">
-                    <h2 class="text-lg text-gray-800 font-semibold leading-none">Husky API</h2>
-                    <p class="text-xs text-gray-500 leading-none">API Documentation</p>
-                </div>
-                <div class="px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold">
-                v1.0
-            </div>
-            </div>
-            <button id="sidebarToggle" class="py-2 px-3 text-sm border border-gray-200 text-gray-500 hover:border-gray-600 flex items-center justify-center">
-                <i class="material-icons text-xl">menu</i>
-            </button>
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="sm:hidden inline-flex px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold">
+          v1.0
         </div>
-    </header>
+        <button id="sidebarToggle" class="border border-slate-200 px-3 py-2 text-slate-700 hover:border-slate-500">
+          <span class="material-icons text-lg">menu</span>
+        </button>
+      </div>
+    </div>
+  </header>
 
-    <main class="max-w-2xl mx-auto px-8 py-16">
-
-        <!-- Notifications Panel -->
-<div class="mb-8">
-    <div class="flex items-center justify-between mb-3">
-        <h2 class="text-lg font-semibold text-slate-900 flex items-center">
-            <span class="material-icons text-xl mr-2 text-slate-500">notifications</span>
-            Informasi
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+    <section class="mb-6 sm:mb-8">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <h2 class="text-lg font-semibold text-slate-900 flex items-center gap-2">
+          <span class="material-icons text-slate-500">notifications</span>
+          Informasi
         </h2>
-        <span id="unread-count" class="text-xs bg-slate-900 text-white px-2 py-1 hidden"></span>
-    </div>
-    <div id="notifications-list" class="space-y-2">
-    </div>
-</div>
+        <span id="unreadCount" class="hidden bg-slate-900 text-white text-xs px-2 py-1"></span>
+      </div>
 
-<div class="flex items-center justify-between mb-4">
-    <div class="flex-1 relative">
-        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-            <span class="material-icons text-gray-400 text-lg">search</span>
+      <div id="notificationsList" class="space-y-3">
+        <div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">Loading notifications...</div>
+      </div>
+    </section>
+
+    <section class="mb-6 sm:mb-8">
+      <div class="relative">
+        <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+          <span class="material-icons text-slate-400 text-lg">search</span>
         </div>
-        <input type="text" id="searchInput" placeholder="Search API endpoints..." class="w-full pl-12 pr-5 py-4 text-sm border border-gray-200 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:border-gray-600">
-    </div>
-</div>
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Search API endpoints..."
+          class="w-full border border-slate-200 bg-white pl-12 pr-4 py-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-500"
+        />
+      </div>
+    </section>
 
-<div id="content" class="space-y-4">
-    <div id="noResults" class="text-center py-16" style="display: none;">
-        <div class="max-w-md mx-auto">
-            <h3 class="text-xs text-slate-600 mb-2">No result found.</h3>
+    <section id="emptyState" class="hidden border border-slate-200 bg-white p-8 text-center text-slate-500">
+      No matching endpoint found.
+    </section>
+
+    <section id="apiList" class="space-y-4">
+      <div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">Loading API docs...</div>
+    </section>
+
+    <footer class="pt-8 sm:pt-10 text-center">
+      <p class="text-xs text-slate-500">© 2025 Husky API. | All Rights Reserved.</p>
+    </footer>
+  </main>
+
+  <div id="endpointModal" class="fixed inset-0 z-[60] hidden">
+    <div class="absolute inset-0 bg-black/60"></div>
+
+    <div class="relative z-10 min-h-full flex items-start sm:items-center justify-center p-3 sm:p-6">
+      <div class="w-full max-w-3xl max-h-[92vh] overflow-y-auto hide-scrollbar bg-white border border-slate-200 shadow-2xl">
+        <div class="sticky top-0 bg-white border-b border-slate-200 px-4 sm:px-6 py-4 flex items-start justify-between gap-4">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2 mb-2">
+              <span id="modalMethod" class="px-2.5 py-1 text-xs font-semibold text-white bg-slate-900"></span>
+              <span id="modalPath" class="text-sm sm:text-base font-semibold text-slate-900 break-anywhere"></span>
+            </div>
+            <p id="modalSummary" class="text-xs sm:text-sm text-slate-500 break-anywhere"></p>
+          </div>
+
+          <button id="modalClose" class="border border-slate-200 px-3 py-2 text-slate-700 hover:border-slate-500 shrink-0">
+            <span class="material-icons text-base">close</span>
+          </button>
         </div>
+
+        <div class="px-4 sm:px-6 py-5">
+          <div class="mb-5">
+            <h3 class="text-xs font-semibold text-slate-700 mb-2">DESCRIPTION</h3>
+            <div id="modalDescription" class="border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 break-anywhere"></div>
+          </div>
+
+          <form id="endpointForm" class="space-y-4">
+            <div id="formFields" class="space-y-4"></div>
+
+            <div class="flex flex-wrap gap-2 pt-2">
+              <button type="submit" class="bg-slate-900 text-white px-5 py-2.5 text-sm font-semibold hover:bg-slate-800">Execute</button>
+              <button type="button" id="clearResponseBtn" class="border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-800 hover:border-slate-500">Clear</button>
+            </div>
+          </form>
+
+          <div id="responseSection" class="hidden mt-6 space-y-4">
+            <div class="border border-slate-200">
+              <div class="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-700">REQUEST URL</div>
+              <pre id="requestUrlBox" class="p-4 text-xs overflow-x-auto break-anywhere whitespace-pre-wrap"></pre>
+            </div>
+
+            <div class="border border-slate-200">
+              <div class="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-700">CURL</div>
+              <pre id="curlBox" class="p-4 text-xs overflow-x-auto break-anywhere whitespace-pre-wrap"></pre>
+            </div>
+
+            <div class="border border-slate-200">
+              <div class="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-700">RESPONSE</div>
+              <div id="responseBox" class="p-4 text-xs overflow-x-auto"></div>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <h3 class="text-xs font-semibold text-slate-700 mb-2">COMMON STATUS CODES</h3>
+            <div class="border border-slate-200 overflow-x-auto">
+              <table class="w-full text-xs min-w-[340px]">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th class="px-4 py-2 text-left text-slate-700">Code</th>
+                    <th class="px-4 py-2 text-left text-slate-700">Description</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                  <tr><td class="px-4 py-2 font-semibold text-green-700">200</td><td class="px-4 py-2 text-slate-600">OK - Request successful</td></tr>
+                  <tr><td class="px-4 py-2 font-semibold text-red-700">400</td><td class="px-4 py-2 text-slate-600">Bad Request - Invalid parameters or body</td></tr>
+                  <tr><td class="px-4 py-2 font-semibold text-red-700">401</td><td class="px-4 py-2 text-slate-600">Unauthorized - Invalid auth or token</td></tr>
+                  <tr><td class="px-4 py-2 font-semibold text-red-700">403</td><td class="px-4 py-2 text-slate-600">Forbidden - Access denied</td></tr>
+                  <tr><td class="px-4 py-2 font-semibold text-red-700">404</td><td class="px-4 py-2 text-slate-600">Not Found - Resource not found</td></tr>
+                  <tr><td class="px-4 py-2 font-semibold text-orange-700">429</td><td class="px-4 py-2 text-slate-600">Too Many Requests - Rate limited</td></tr>
+                  <tr><td class="px-4 py-2 font-semibold text-red-700">500</td><td class="px-4 py-2 text-slate-600">Internal Server Error</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div id="apiList" class="space-y-3">
-        <!-- API list will be loaded here dynamically -->
-    </div>
-</div>
+  <script>
+    const state = {
+      categories: [],
+      currentEndpoint: null
+    };
 
-<div class="flex flex-col mt-6 text-center">
-    <p class="text-slate-600 text-xs">© 2025 Husky API. | All Rights Reserved.</p>
-</div>
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('backdrop');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarClose = document.getElementById('sidebarClose');
 
-<script>
-async function loadNotifications() {
-    try {
-        // Ambil file notifications.json di folder yang sama dengan HTML
-        const res = await fetch('notifications.json');
-        const notifications = await res.json();
-        const listEl = document.getElementById('notifications-list');
-        listEl.innerHTML = ''; // Clear loader
+    const endpointModal = document.getElementById('endpointModal');
+    const modalClose = document.getElementById('modalClose');
+    const endpointForm = document.getElementById('endpointForm');
+    const formFields = document.getElementById('formFields');
+    const responseSection = document.getElementById('responseSection');
+    const requestUrlBox = document.getElementById('requestUrlBox');
+    const curlBox = document.getElementById('curlBox');
+    const responseBox = document.getElementById('responseBox');
+    const clearResponseBtn = document.getElementById('clearResponseBtn');
 
-        if (!notifications.length) {
-            listEl.innerHTML = '<p class="text-xs text-slate-500">No notifications.</p>';
-            return;
-        }
+    function escapeHtml(value = '') {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
-        let unreadCount = 0;
+    function escapeAttr(value = '') {
+      return escapeHtml(value);
+    }
 
-        notifications.forEach(notif => {
-            const notifEl = document.createElement('div');
-            notifEl.className = 'p-3 border border-gray-200 rounded text-sm text-slate-800 bg-gray-50';
-            notifEl.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <span>${notif.message}</span>
-                    <span class="text-xs text-gray-400">${notif.date || ''}</span>
-                </div>
-            `;
-            if (!notif.read) unreadCount++;
-            listEl.appendChild(notifEl);
+    function openSidebar() {
+      sidebar.classList.remove('translate-x-full');
+      backdrop.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeSidebar() {
+      sidebar.classList.add('translate-x-full');
+      backdrop.classList.add('hidden');
+      if (endpointModal.classList.contains('hidden')) {
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    function openModal(endpoint) {
+      state.currentEndpoint = endpoint;
+
+      document.getElementById('modalMethod').textContent = endpoint.method;
+      document.getElementById('modalPath').textContent = endpoint.path;
+      document.getElementById('modalSummary').textContent = endpoint.summary || 'No summary';
+      document.getElementById('modalDescription').textContent = endpoint.description || 'No description';
+
+      formFields.innerHTML = buildFields(endpoint);
+      clearResponse();
+
+      endpointModal.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeModal() {
+      endpointModal.classList.add('hidden');
+      state.currentEndpoint = null;
+      if (backdrop.classList.contains('hidden')) {
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    function clearResponse() {
+      responseSection.classList.add('hidden');
+      requestUrlBox.textContent = '';
+      curlBox.textContent = '';
+      responseBox.innerHTML = '';
+    }
+
+    function normalizeCategories(spec) {
+      const map = {};
+
+      (spec.tags || []).forEach(tag => {
+        map[tag.name] = { name: tag.name, items: [], open: false };
+      });
+
+      Object.entries(spec.paths || {}).forEach(([path, methods]) => {
+        Object.entries(methods || {}).forEach(([method, endpoint]) => {
+          const tagName = endpoint.tags && endpoint.tags.length ? endpoint.tags[0] : 'Uncategorized';
+          if (!map[tagName]) {
+            map[tagName] = { name: tagName, items: [], open: false };
+          }
+
+          map[tagName].items.push({
+            path,
+            method: String(method).toUpperCase(),
+            summary: endpoint.summary || 'No summary',
+            description: endpoint.description || 'No description',
+            parameters: endpoint.parameters || [],
+            requestBody: endpoint.requestBody || null,
+            deprecated: !!endpoint.deprecated
+          });
         });
+      });
 
-        const unreadEl = document.getElementById('unread-count');
-        if (unreadCount > 0) {
-            unreadEl.textContent = unreadCount;
-            unreadEl.classList.remove('hidden');
-        } else {
-            unreadEl.classList.add('hidden');
-        }
-
-    } catch(err) {
-        console.error('Failed to load notifications:', err);
-        document.getElementById('notifications-list').innerHTML =
-            '<p class="text-xs text-red-500">Gagal memuat notifikasi.</p>';
+      return Object.values(map)
+        .map(category => ({
+          ...category,
+          items: category.items.sort((a, b) => a.path.localeCompare(b.path))
+        }))
+        .filter(category => category.items.length > 0)
+        .sort((a, b) => a.name.localeCompare(b.name));
     }
-}
 
-// Load on page ready
-document.addEventListener('DOMContentLoaded', loadNotifications);
-</script>
+    function renderApiList() {
+      const apiList = document.getElementById('apiList');
+      const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+      const emptyState = document.getElementById('emptyState');
 
-    <script>
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebarClose = document.getElementById('sidebarClose');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
+      const filteredCategories = state.categories
+        .map(category => ({
+          ...category,
+          items: category.items.filter(item => {
+            const text = [
+              category.name,
+              item.path,
+              item.summary,
+              item.description,
+              item.method
+            ].join(' ').toLowerCase();
+            return text.includes(searchTerm);
+          })
+        }))
+        .filter(category => category.items.length > 0);
 
-        const endpointDialog = document.getElementById("endpointDialog");
-const dialogTitle = document.getElementById("dialogTitle");
-const dialogContent = document.getElementById("dialogContent");
-const closeBtn = document.getElementById("closeBtn");
-const dismissBtn = document.getElementById("dismissBtn");
+      if (!filteredCategories.length) {
+        apiList.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
 
-let watcher = null;
-let currentDialogEndpoint = null;
-window.loadedCategories = [];
+      emptyState.classList.add('hidden');
 
-function escapeAttr(value = "") {
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/"/g, "&quot;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-}
+      apiList.innerHTML = filteredCategories.map((category) => {
+        const total = category.items.length;
 
-function openEndpointDialog(catIndex, endpointIndex) {
-    currentDialogEndpoint = window.loadedCategories?.[catIndex]?.items?.[endpointIndex];
-    if (!currentDialogEndpoint) return;
+        return `
+          <div class="border border-slate-200 bg-white overflow-hidden">
+            <button
+              type="button"
+              onclick="toggleCategory('${escapeAttr(category.name)}')"
+              class="w-full px-4 sm:px-5 py-4 flex items-center justify-between gap-4 hover:bg-slate-50 text-left"
+            >
+              <div class="min-w-0 flex items-center gap-3">
+                <span class="material-icons bg-slate-900 text-white p-2 shrink-0">folder</span>
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold text-slate-900 break-anywhere">${escapeHtml(category.name)}</p>
+                  <p class="text-xs text-slate-500">${total} endpoint${total > 1 ? 's' : ''}</p>
+                </div>
+              </div>
+              <span class="material-icons text-slate-600 shrink-0">${category.open ? 'expand_less' : 'expand_more'}</span>
+            </button>
 
-    dialogTitle.textContent = `${currentDialogEndpoint.method} ${currentDialogEndpoint.path}`;
-    dialogContent.innerHTML = renderDialogEndpoint(currentDialogEndpoint);
-    endpointDialog.showModal();
+            <div class="${category.open ? 'block' : 'hidden'} border-t border-slate-200">
+              ${category.items.map((item, endpointIndex) => `
+                <button
+                  type="button"
+                  onclick="openEndpointByFilter('${escapeAttr(category.name)}', ${endpointIndex})"
+                  class="w-full px-4 sm:px-5 py-4 border-b border-slate-200 last:border-b-0 hover:bg-slate-50 text-left"
+                >
+                  <div class="flex items-start justify-between gap-4">
+                    <div class="min-w-0 flex-1">
+                      <div class="flex flex-wrap items-center gap-2 mb-2">
+                        <span class="px-2.5 py-1 text-[11px] font-semibold text-white ${item.method === 'DELETE' ? 'bg-red-700' : item.method === 'PUT' ? 'bg-amber-700' : 'bg-slate-900'}">${escapeHtml(item.method)}</span>
+                        ${item.deprecated ? '<span class="px-2 py-1 text-[11px] bg-amber-100 text-amber-800 font-semibold">deprecated</span>' : '<span class="px-2 py-1 text-[11px] bg-green-100 text-green-800 font-semibold">ready</span>'}
+                      </div>
+                      <p class="text-sm font-semibold text-slate-900 break-anywhere">${escapeHtml(item.path)}</p>
+                      <p class="text-xs text-slate-500 mt-1 break-anywhere">${escapeHtml(item.summary)}</p>
+                    </div>
 
-    if ("CloseWatcher" in window) {
-        watcher?.destroy?.();
-        watcher = new CloseWatcher();
-        watcher.onclose = () => endpointDialog.close();
+                    <span class="material-icons text-slate-500 shrink-0 mt-1">open_in_new</span>
+                  </div>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
-}
 
-function closeEndpointDialog() {
-    if (watcher) watcher.close();
-    else endpointDialog.close();
-}
+    function toggleCategory(categoryName) {
+      const category = state.categories.find(item => item.name === categoryName);
+      if (!category) return;
+      category.open = !category.open;
+      renderApiList();
+    }
 
-closeBtn.addEventListener("click", closeEndpointDialog);
-dismissBtn.addEventListener("click", closeEndpointDialog);
+    function openEndpointByFilter(categoryName, filteredIndex) {
+      const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+      const category = state.categories.find(item => item.name === categoryName);
+      if (!category) return;
 
-endpointDialog.addEventListener("click", (e) => {
-    if (e.target === endpointDialog) closeEndpointDialog();
-});
+      const filteredItems = category.items.filter(item => {
+        const text = [
+          category.name,
+          item.path,
+          item.summary,
+          item.description,
+          item.method
+        ].join(' ').toLowerCase();
+        return text.includes(searchTerm);
+      });
 
-endpointDialog.addEventListener("close", () => {
-    watcher?.destroy?.();
-    watcher = null;
-    dialogContent.innerHTML = "";
-});
+      const endpoint = filteredItems[filteredIndex];
+      if (endpoint) openModal(endpoint);
+    }
 
-function renderParamFields(item) {
-    let html = "";
+    function buildFields(endpoint) {
+      const parts = [];
 
-    (item.parameters || []).forEach(param => {
+      (endpoint.parameters || []).forEach(param => {
         const schema = param.schema || {};
-        const required = param.required ? "required" : "";
-        const requiredLabel = param.required ? '<span class="required">*</span>' : '';
-        const helper = param.description ? `<div class="helper">${param.description}</div>` : '';
-        const placeholder = escapeAttr(schema.example ?? schema.default ?? "");
+        const required = !!param.required;
+        const label = `${escapeHtml(param.name)}${required ? ' <span class="text-red-600">*</span>' : ''}`;
+        const helper = param.description ? `<p class="text-[11px] text-slate-500 mt-1 break-anywhere">${escapeHtml(param.description)}</p>` : '';
+        const placeholder = escapeAttr(schema.example ?? schema.default ?? '');
 
         if (Array.isArray(schema.enum) && schema.enum.length) {
-            html += `
-                <div class="dialog-field">
-                    <label>${param.name} ${requiredLabel}</label>
-                    <select name="${param.name}" ${required}>
-                        ${schema.enum.map(v => `<option value="${escapeAttr(v)}">${v}</option>`).join('')}
-                    </select>
-                    ${helper}
-                </div>
-            `;
-        } else if (schema.type === "boolean") {
-            html += `
-                <div class="dialog-field">
-                    <label>${param.name} ${requiredLabel}</label>
-                    <select name="${param.name}" ${required}>
-                        <option value="true">true</option>
-                        <option value="false">false</option>
-                    </select>
-                    ${helper}
-                </div>
-            `;
+          parts.push(`
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-2">${label}</label>
+              <select name="${escapeAttr(param.name)}" class="w-full border border-slate-200 bg-white px-3 py-3 text-sm focus:outline-none focus:border-slate-500" ${required ? 'required' : ''}>
+                ${schema.enum.map(value => `<option value="${escapeAttr(value)}">${escapeHtml(value)}</option>`).join('')}
+              </select>
+              ${helper}
+            </div>
+          `);
+        } else if (schema.type === 'boolean') {
+          parts.push(`
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-2">${label}</label>
+              <select name="${escapeAttr(param.name)}" class="w-full border border-slate-200 bg-white px-3 py-3 text-sm focus:outline-none focus:border-slate-500" ${required ? 'required' : ''}>
+                <option value="true">true</option>
+                <option value="false">false</option>
+              </select>
+              ${helper}
+            </div>
+          `);
         } else {
-            let type = "text";
-            if (schema.type === "number" || schema.type === "integer") type = "number";
-
-            html += `
-                <div class="dialog-field">
-                    <label>${param.name} ${requiredLabel}</label>
-                    <input type="${type}" name="${param.name}" placeholder="${placeholder}" ${required}>
-                    ${helper}
-                </div>
-            `;
+          const inputType = (schema.type === 'number' || schema.type === 'integer') ? 'number' : 'text';
+          parts.push(`
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-2">${label}</label>
+              <input
+                type="${inputType}"
+                name="${escapeAttr(param.name)}"
+                placeholder="${placeholder}"
+                class="w-full border border-slate-200 bg-white px-3 py-3 text-sm focus:outline-none focus:border-slate-500 placeholder:text-slate-400"
+                ${required ? 'required' : ''}
+              />
+              ${helper}
+            </div>
+          `);
         }
-    });
+      });
 
-    return html;
-}
+      const content = endpoint.requestBody?.content || {};
 
-function renderBodyFields(item) {
-    let html = "";
-    const content = item.requestBody?.content || {};
-
-    if (content["multipart/form-data"]) {
-        const schema = content["multipart/form-data"].schema || { properties: {} };
+      if (content['multipart/form-data']) {
+        const schema = content['multipart/form-data'].schema || {};
         const requiredFields = schema.required || [];
+        const properties = schema.properties || {};
 
-        Object.keys(schema.properties || {}).forEach(propName => {
-            const prop = schema.properties[propName] || {};
-            const isRequired = requiredFields.includes(propName) ? "required" : "";
-            const requiredLabel = requiredFields.includes(propName) ? '<span class="required">*</span>' : '';
-            const helper = prop.description ? `<div class="helper">${prop.description}</div>` : '';
-            const placeholder = escapeAttr(prop.example ?? prop.default ?? "");
+        Object.entries(properties).forEach(([name, prop]) => {
+          const required = requiredFields.includes(name);
+          const label = `${escapeHtml(name)}${required ? ' <span class="text-red-600">*</span>' : ''}`;
+          const helper = prop.description ? `<p class="text-[11px] text-slate-500 mt-1 break-anywhere">${escapeHtml(prop.description)}</p>` : '';
+          const placeholder = escapeAttr(prop.example ?? prop.default ?? '');
 
-            if (prop.format === "binary") {
-                html += `
-                    <div class="dialog-field">
-                        <label>${propName} ${requiredLabel}</label>
-                        <input type="file" name="${propName}" ${isRequired}>
-                        ${helper}
-                    </div>
-                `;
-            } else if (Array.isArray(prop.enum) && prop.enum.length) {
-                html += `
-                    <div class="dialog-field">
-                        <label>${propName} ${requiredLabel}</label>
-                        <select name="${propName}" ${isRequired}>
-                            ${prop.enum.map(v => `<option value="${escapeAttr(v)}">${v}</option>`).join('')}
-                        </select>
-                        ${helper}
-                    </div>
-                `;
-            } else if (prop.type === "boolean") {
-                html += `
-                    <div class="dialog-field">
-                        <label>${propName} ${requiredLabel}</label>
-                        <select name="${propName}" ${isRequired}>
-                            <option value="true">true</option>
-                            <option value="false">false</option>
-                        </select>
-                        ${helper}
-                    </div>
-                `;
-            } else {
-                let type = "text";
-                if (prop.type === "number" || prop.type === "integer") type = "number";
-
-                html += `
-                    <div class="dialog-field">
-                        <label>${propName} ${requiredLabel}</label>
-                        <input type="${type}" name="${propName}" placeholder="${placeholder}" ${isRequired}>
-                        ${helper}
-                    </div>
-                `;
-            }
+          if (prop.format === 'binary') {
+            parts.push(`
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-2">${label}</label>
+                <input
+                  type="file"
+                  name="${escapeAttr(name)}"
+                  class="w-full border border-slate-200 bg-white px-3 py-3 text-sm focus:outline-none focus:border-slate-500"
+                  ${required ? 'required' : ''}
+                />
+                ${helper}
+              </div>
+            `);
+          } else if (Array.isArray(prop.enum) && prop.enum.length) {
+            parts.push(`
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-2">${label}</label>
+                <select name="${escapeAttr(name)}" class="w-full border border-slate-200 bg-white px-3 py-3 text-sm focus:outline-none focus:border-slate-500" ${required ? 'required' : ''}>
+                  ${prop.enum.map(value => `<option value="${escapeAttr(value)}">${escapeHtml(value)}</option>`).join('')}
+                </select>
+                ${helper}
+              </div>
+            `);
+          } else if (prop.type === 'boolean') {
+            parts.push(`
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-2">${label}</label>
+                <select name="${escapeAttr(name)}" class="w-full border border-slate-200 bg-white px-3 py-3 text-sm focus:outline-none focus:border-slate-500" ${required ? 'required' : ''}>
+                  <option value="true">true</option>
+                  <option value="false">false</option>
+                </select>
+                ${helper}
+              </div>
+            `);
+          } else {
+            const inputType = (prop.type === 'number' || prop.type === 'integer') ? 'number' : 'text';
+            parts.push(`
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-2">${label}</label>
+                <input
+                  type="${inputType}"
+                  name="${escapeAttr(name)}"
+                  placeholder="${placeholder}"
+                  class="w-full border border-slate-200 bg-white px-3 py-3 text-sm focus:outline-none focus:border-slate-500 placeholder:text-slate-400"
+                  ${required ? 'required' : ''}
+                />
+                ${helper}
+              </div>
+            `);
+          }
         });
-    }
+      }
 
-    if (content["application/json"]) {
-        html += `
-            <div class="dialog-field">
-                <label>Body (application/json)</label>
-                <textarea name="__raw_json__" rows="6" placeholder='{"key":"value"}'></textarea>
-                <div class="helper">Si llenas este campo, se enviará como JSON.</div>
-            </div>
+      if (content['application/json']) {
+        parts.push(`
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-2">Body (application/json)</label>
+            <textarea
+              name="__raw_json__"
+              rows="7"
+              placeholder='{"key":"value"}'
+              class="w-full border border-slate-200 bg-white px-3 py-3 text-sm font-mono focus:outline-none focus:border-slate-500 placeholder:text-slate-400"
+            ></textarea>
+            <p class="text-[11px] text-slate-500 mt-1">If this field is filled, the request will be sent as JSON.</p>
+          </div>
+        `);
+      }
+
+      if (!parts.length) {
+        return `
+          <div class="border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+            This endpoint does not require any parameter.
+          </div>
         `;
+      }
+
+      return parts.join('');
     }
 
-    return html;
-}
+    function buildCurl(method, url, formData, rawJson) {
+      let curl = `curl -X ${method} "${url}"`;
 
-function renderDialogEndpoint(item) {
-    const fields = renderParamFields(item) + renderBodyFields(item);
-
-    return `
-        <div class="endpoint-description">${item.desc || "No description"}</div>
-
-        <form id="dialogExecuteForm" onsubmit="executeDialogRequest(event)">
-            ${fields || `<div class="endpoint-description">Este endpoint no requiere parámetros.</div>`}
-
-            <div class="dialog-actions">
-                <button type="submit" class="execute-btn">Execute</button>
-                <button type="button" class="clear-btn" onclick="clearDialogResponse()">Clear</button>
-            </div>
-        </form>
-
-        <div id="dialogResponseBox" class="response-box hidden" style="margin-top: 1rem;">
-            <div class="code-block">
-                <div class="code-bar">
-                    <div class="code-dot"></div>
-                    <div class="code-dot"></div>
-                    <div class="code-dot"></div>
-                    <span>REQUEST URL</span>
-                </div>
-                <pre id="dialogRequestUrl"></pre>
-            </div>
-
-            <div class="code-block" style="margin-top: 0.75rem;">
-                <div class="code-bar">
-                    <div class="code-dot"></div>
-                    <div class="code-dot"></div>
-                    <div class="code-dot"></div>
-                    <span>CURL</span>
-                </div>
-                <pre id="dialogCurl"></pre>
-            </div>
-
-            <div class="code-block" style="margin-top: 0.75rem;">
-                <div class="code-bar">
-                    <div class="code-dot"></div>
-                    <div class="code-dot"></div>
-                    <div class="code-dot"></div>
-                    <span>RESPONSE</span>
-                </div>
-                <div id="dialogResponseBody"></div>
-            </div>
-        </div>
-    `;
-}
-
-function buildCurlCommand(method, fullPath, formData, rawJson) {
-    let curl = `curl -X ${method} "${window.location.origin}${fullPath}"`;
-
-    if (rawJson && rawJson.trim() && ["POST", "PUT", "PATCH"].includes(method)) {
-        curl += ` -H "Content-Type: application/json" -d '${rawJson.replace(/'/g, `'\"'\"'`)}'`;
+      if (rawJson && ['POST', 'PUT', 'PATCH'].includes(method)) {
+        const safeJson = rawJson.replace(/'/g, `'\\''`);
+        curl += ` -H "Content-Type: application/json" -d '${safeJson}'`;
         return curl;
-    }
+      }
 
-    if (["POST", "PUT", "PATCH"].includes(method)) {
+      if (['POST', 'PUT', 'PATCH'].includes(method)) {
         for (const [key, value] of formData.entries()) {
-            if (key === "__raw_json__") continue;
-            if (typeof value === "string" && !value) continue;
-
-            if (value instanceof File && value.name) {
-                curl += ` -F "${key}=@${value.name}"`;
-            } else {
-                curl += ` -F "${key}=${value}"`;
-            }
+          if (key === '__raw_json__') continue;
+          if (typeof value === 'string') {
+            if (!value) continue;
+            curl += ` -F "${key}=${value.replace(/"/g, '\\"')}"`;
+          } else if (value instanceof File && value.name) {
+            curl += ` -F "${key}=@${value.name}"`;
+          }
         }
+      }
+
+      return curl;
     }
 
-    return curl;
-}
+    async function executeEndpoint(event) {
+      event.preventDefault();
 
-async function executeDialogRequest(event) {
-    event.preventDefault();
+      const endpoint = state.currentEndpoint;
+      if (!endpoint) return;
 
-    if (!currentDialogEndpoint) return;
+      const formData = new FormData(endpointForm);
+      const method = endpoint.method.toUpperCase();
+      const rawJson = String(formData.get('__raw_json__') || '').trim();
 
-    const form = event.target;
-    const responseBox = document.getElementById("dialogResponseBox");
-    const requestUrlEl = document.getElementById("dialogRequestUrl");
-    const curlEl = document.getElementById("dialogCurl");
-    const responseBodyEl = document.getElementById("dialogResponseBody");
+      let path = endpoint.path;
+      const options = { method };
 
-    const method = currentDialogEndpoint.method.toUpperCase();
-    let fullPath = currentDialogEndpoint.path;
-    const formData = new FormData(form);
-    const fetchOptions = { method };
-
-    const rawJson = (formData.get("__raw_json__") || "").toString().trim();
-
-    if (["POST", "PUT", "PATCH"].includes(method)) {
+      if (['POST', 'PUT', 'PATCH'].includes(method)) {
         if (rawJson) {
-            fetchOptions.headers = { "Content-Type": "application/json" };
-            fetchOptions.body = rawJson;
+          options.headers = { 'Content-Type': 'application/json' };
+          options.body = rawJson;
         } else {
-            const cleaned = new FormData();
-            for (const [key, value] of formData.entries()) {
-                if (key === "__raw_json__") continue;
-                if (typeof value === "string" && !value) continue;
-                cleaned.append(key, value);
-            }
-            fetchOptions.body = cleaned;
+          const cleaned = new FormData();
+          for (const [key, value] of formData.entries()) {
+            if (key === '__raw_json__') continue;
+            if (typeof value === 'string' && !value) continue;
+            cleaned.append(key, value);
+          }
+          options.body = cleaned;
         }
-    } else {
+      } else {
         const params = new URLSearchParams();
         for (const [key, value] of formData.entries()) {
-            if (key === "__raw_json__") continue;
-            if (typeof value === "string" && value) params.append(key, value);
+          if (key === '__raw_json__') continue;
+          if (typeof value === 'string' && value) params.append(key, value);
         }
-        const qs = params.toString();
-        if (qs) {
-            fullPath += (fullPath.includes("?") ? "&" : "?") + qs;
-        }
-    }
+        const query = params.toString();
+        if (query) path += (path.includes('?') ? '&' : '?') + query;
+      }
 
-    responseBox.classList.remove("hidden");
-    requestUrlEl.textContent = `${window.location.origin}${fullPath}`;
-    curlEl.textContent = buildCurlCommand(method, fullPath, formData, rawJson);
-    responseBodyEl.innerHTML = `<pre>Loading...</pre>`;
+      const fullUrl = `${window.location.origin}${path}`;
+      requestUrlBox.textContent = fullUrl;
+      curlBox.textContent = buildCurl(method, fullUrl, formData, rawJson);
+      responseBox.innerHTML = '<pre class="whitespace-pre-wrap break-anywhere">Loading...</pre>';
+      responseSection.classList.remove('hidden');
 
-    try {
-        const response = await fetch(fullPath, fetchOptions);
-        const contentType = response.headers.get("content-type") || "";
+      try {
+        const response = await fetch(path, options);
+        const contentType = response.headers.get('content-type') || '';
 
         if (!response.ok) {
-            const errText = await response.text().catch(() => "");
-            throw new Error(`${response.status} ${response.statusText}\n${errText}`);
+          const errText = await response.text().catch(() => '');
+          throw new Error(`${response.status} ${response.statusText}${errText ? '\n\n' + errText : ''}`);
         }
 
-        if (contentType.includes("application/json")) {
-            const data = await response.json();
-            responseBodyEl.innerHTML = `<pre><code>${JSON.stringify(data, null, 2)}</code></pre>`;
-        } else if (contentType.startsWith("image/")) {
-            const blob = await response.blob();
-            const imageUrl = URL.createObjectURL(blob);
-            responseBodyEl.innerHTML = `<div style="padding:1rem;"><img src="${imageUrl}" alt="response image"></div>`;
+        if (contentType.includes('application/json')) {
+          const data = await response.json();
+          responseBox.innerHTML = `<pre class="whitespace-pre-wrap break-anywhere">${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
+        } else if (contentType.startsWith('image/')) {
+          const blob = await response.blob();
+          const imageUrl = URL.createObjectURL(blob);
+          responseBox.innerHTML = `<img src="${imageUrl}" alt="Response image" class="max-w-full h-auto border border-slate-200" />`;
         } else {
-            const text = await response.text();
-            responseBodyEl.innerHTML = `<pre>${escapeAttr(text)}</pre>`;
+          const text = await response.text();
+          responseBox.innerHTML = `<pre class="whitespace-pre-wrap break-anywhere">${escapeHtml(text)}</pre>`;
         }
-    } catch (err) {
-        responseBodyEl.innerHTML = `<pre style="color:#f87171;">${escapeAttr(err.message || String(err))}</pre>`;
+      } catch (error) {
+        responseBox.innerHTML = `<pre class="whitespace-pre-wrap break-anywhere text-red-600">${escapeHtml(error.message || String(error))}</pre>`;
+      }
     }
-}
 
-function clearDialogResponse() {
-    const responseBox = document.getElementById("dialogResponseBox");
-    const requestUrlEl = document.getElementById("dialogRequestUrl");
-    const curlEl = document.getElementById("dialogCurl");
-    const responseBodyEl = document.getElementById("dialogResponseBody");
+    async function fetchFirstJson(paths) {
+      for (const path of paths) {
+        try {
+          const res = await fetch(`${path}${path.includes('?') ? '&' : '?'}t=${Date.now()}`, { cache: 'no-store' });
+          if (!res.ok) continue;
+          return await res.json();
+        } catch (_) {}
+      }
+      throw new Error('No valid JSON source found');
+    }
 
-    if (responseBox) responseBox.classList.add("hidden");
-    if (requestUrlEl) requestUrlEl.textContent = "";
-    if (curlEl) curlEl.textContent = "";
-    if (responseBodyEl) responseBodyEl.innerHTML = "";
-        }
-        function openSidebar() {
-            sidebar.classList.remove('translate-x-full');
-            overlay.classList.remove('opacity-0', 'invisible');
-            document.body.classList.add('overflow-hidden');
-        }
+    async function loadNotifications() {
+      const container = document.getElementById('notificationsList');
+      const unreadCount = document.getElementById('unreadCount');
 
-        function closeSidebar() {
-            sidebar.classList.add('translate-x-full');
-            overlay.classList.add('opacity-0', 'invisible');
-            document.body.classList.remove('overflow-hidden');
-        }
+      try {
+        const data = await fetchFirstJson(['/src/notifications.json', '/notifications.json']);
+        const notifications = Array.isArray(data) ? data : (data ? [data] : []);
 
-        sidebarToggle.addEventListener('click', openSidebar);
-        sidebarClose.addEventListener('click', closeSidebar);
-        overlay.addEventListener('click', closeSidebar);
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeSidebar();
-            }
-        });
-
-        async function copyToClipboard(text, buttonElement) {
-            if (!buttonElement) return;
-            const originalHTML = buttonElement.innerHTML;
-            try {
-                await navigator.clipboard.writeText(text);
-                buttonElement.textContent = 'Copied!';
-                setTimeout(() => {
-                    buttonElement.innerHTML = originalHTML;
-                }, 1500);
-            } catch (e) {
-                console.error('Copy failed', e);
-                buttonElement.textContent = 'Failed!';
-                setTimeout(() => {
-                    buttonElement.innerHTML = originalHTML;
-                }, 1500);
-            }
+        if (!notifications.length) {
+          container.innerHTML = '<div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">No notifications.</div>';
+          unreadCount.classList.add('hidden');
+          return;
         }
 
-        function hlJSON(el) {
-            if (window.hljs) {
-                hljs.highlightElement(el);
-            }
-        }
+        const sorted = notifications.slice().sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+        let unread = 0;
 
-        function toggleCategory(index) {
-            const category = document.getElementById(`category-${index}`);
-            const icon = document.getElementById(`category-icon-${index}`);
-            const isHidden = category.classList.toggle('hidden');
-            icon.textContent = isHidden ? 'expand_more' : 'expand_less';
-        }
+        container.innerHTML = sorted.map(item => {
+          if (!item.read) unread++;
 
-        function toggleEndpoint(catIndex, endpointIndex) {
-            const endpoint = document.getElementById(`endpoint-${catIndex}-${endpointIndex}`);
-            const icon = document.getElementById(`endpoint-icon-${catIndex}-${endpointIndex}`);
-            const isHidden = endpoint.classList.toggle('hidden');
-            icon.textContent = isHidden ? 'expand_more' : 'expand_less';
-        }
+          const dateText = item.date
+            ? new Date(item.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })
+            : '-';
 
-        async function executeRequest(event, catIndex, endpointIndex, method, path) {
-            event.preventDefault();
-            const form = document.getElementById(`form-${catIndex}-${endpointIndex}`);
-            const responseDiv = document.getElementById(`response-${catIndex}-${endpointIndex}`);
-            const responseContent = document.getElementById(`response-content-${catIndex}-${endpointIndex}`);
-            const clearButton = document.getElementById(`clear-${catIndex}-${endpointIndex}`);
-
-            responseDiv.classList.remove('hidden');
-
-            const formData = new FormData(form);
-            const fetchOptions = {
-                method: method.toUpperCase()
-            };
-
-            let fullPath = path;
-            let curlCommand = `curl -X ${fetchOptions.method} "${window.location.origin}${path}"`;
-
-            if (fetchOptions.method === 'POST' || fetchOptions.method === 'PUT' || fetchOptions.method === 'PATCH') {
-                fetchOptions.body = formData;
-                for (const [key, value] of formData.entries()) {
-                    if (value instanceof File && value.name) {
-                        curlCommand += ` -F "${key}=@${value.name}"`;
-                    } else if (typeof value === 'string') {
-                        curlCommand += ` -F "${key}=${value}"`;
-                    }
-                }
-            } else { // GET/DELETE
-                const params = new URLSearchParams();
-                for (const [key, value] of formData.entries()) {
-                    if (typeof value === 'string' && value) {
-                        params.append(key, value);
-                    }
-                }
-                const queryString = params.toString();
-                if (queryString) {
-                    fullPath += (path.includes('?') ? '&' : '?') + queryString;
-                }
-                curlCommand = `curl -X ${fetchOptions.method} "${window.location.origin}${fullPath}"`;
-            }
-
-            const escapedFullPath = fullPath.replace(/"/g, '&quot;').replace(/'/g, "'");
-            const escapedCurlCommand = curlCommand.replace(/"/g, '&quot;').replace(/'/g, "'");
-
-            responseContent.innerHTML = `
-                <div class="space-y-4">
-                    <div>
-                        <h4 class="block-title">
-                            <span><span class="material-icons text-sm mr-2 align-middle">link</span>REQUEST URL</span>
-                            <button onclick="copyToClipboard('${window.location.origin}${escapedFullPath}', this)" class="copy-btn"><span class="material-icons text-base align-middle">content_copy</span></button>
-                        </h4>
-                        <pre class="bg-gray-900 text-white p-2 text-xs overflow-auto"><code>${window.location.origin}${fullPath}</code></pre>
-                    </div>
-                    <div>
-                        <h4 class="block-title">
-                            <span><span class="material-icons text-sm mr-2 align-middle">terminal</span>CURL COMMAND</span>
-                            <button onclick="copyToClipboard(this.parentElement.nextElementSibling.innerText, this)" class="copy-btn"><span class="material-icons text-base align-middle">content_copy</span></button>
-                        </h4>
-                        <pre class="bg-gray-900 text-white p-2 text-xs overflow-auto"><code>${curlCommand}</code></pre>
-                    </div>
-                    <div>
-                        <h4 class="block-title">
-                             <span><span class="material-icons text-sm mr-2 align-middle">storage</span>SERVER RESPONSE</span>
-                             <button onclick="copyToClipboard(document.getElementById('response-body-${catIndex}-${endpointIndex}').innerText, this)" class="copy-btn"><span class="material-icons text-base align-middle">content_copy</span></button>
-                        </h4>
-                        <div id="response-body-${catIndex}-${endpointIndex}" class="bg-gray-900 text-white p-2 text-xs">
-                            Loading...
-                        </div>
-                    </div>
+          return `
+            <div class="border border-slate-200 bg-white p-4">
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div class="min-w-0 flex-1">
+                  <p class="text-sm font-semibold text-slate-900 break-anywhere">${escapeHtml(item.title || 'Tanpa Judul')}</p>
+                  <p class="text-sm text-slate-600 mt-1 break-anywhere">${escapeHtml(item.message || '-')}</p>
                 </div>
-              `;
-
-            const responseBodyDiv = document.getElementById(`response-body-${catIndex}-${endpointIndex}`);
-
-            try {
-                const response = await fetch(fullPath, fetchOptions);
-                const contentType = response.headers.get('content-type') || '';
-
-                let responseBodyContent = '';
-                if (!response.ok) {
-                    const errText = await response.text().catch(() => '');
-                    throw new Error(`${response.status} ${response.statusText}\n${errText}`);
-                }
-
-                if (contentType.includes('application/json')) {
-                    const data = await response.json();
-                    responseBodyContent = `<pre class="max-h-80 overflow-auto"><code class="language-json">${JSON.stringify(data, null, 2)}</code></pre>`;
-                    setTimeout(() => hlJSON(responseBodyDiv.querySelector('code')), 0);
-                } else if (contentType.startsWith('image/')) {
-                    const blob = await response.blob();
-                    const imageUrl = URL.createObjectURL(blob);
-                    responseBodyContent = `<img src="${imageUrl}" class="max-w-full h-auto rounded-md">`;
-                } else {
-                    const text = await response.text();
-                    responseBodyContent = `<pre class="max-h-80 overflow-auto">${text}</pre>`;
-                }
-                responseBodyDiv.innerHTML = responseBodyContent;
-
-            } catch (err) {
-                let errMessage = String(err);
-                if (err.message && err.message.startsWith('404')) {
-                    errMessage = `Error 404: Not Found.\n\nEndpoint tidak ditemukan. Pastikan URL dan parameter sudah benar. Jika Anda yakin ini adalah kesalahan, silakan hubungi owner.`;
-                }
-                responseBodyDiv.innerHTML = `<pre class="text-red-400 max-h-80 overflow-auto">${errMessage}</pre>`;
-            }
-            clearButton.classList.remove('hidden');
-        }
-
-        function clearResponse(catIndex, endpointIndex) {
-            const responseDiv = document.getElementById(`response-${catIndex}-${endpointIndex}`);
-            const responseContent = document.getElementById(`response-content-${catIndex}-${endpointIndex}`);
-            const clearButton = document.getElementById(`clear-${catIndex}-${endpointIndex}`);
-
-            responseDiv.classList.add('fade-out');
-            clearButton.classList.add('hidden');
-
-            setTimeout(() => {
-                responseContent.innerHTML = '';
-                responseDiv.classList.add('hidden');
-                responseDiv.classList.remove('fade-out');
-            }, 200);
-        }
-
-        // Function to load and render APIs from OpenAPI spec
-        async function loadApis() {
-            const apiList = document.getElementById('apiList');
-            try {
-                const response = await fetch('/src/openapi.json');
-                const data = await response.json();
-
-                // Group endpoints by tags
-                const categories = {};
-                if (data.tags) {
-                    data.tags.forEach(tag => {
-                        categories[tag.name] = {
-                            name: tag.name,
-                            items: []
-                        };
-                    });
-                }
-
-                Object.keys(data.paths).forEach(path => {
-                    const pathItem = data.paths[path];
-                    Object.keys(pathItem).forEach(method => {
-                        const endpoint = pathItem[method];
-                        const tagName = endpoint.tags && endpoint.tags.length > 0 ? endpoint.tags[0] : 'Uncategorized';
-
-                        if (!categories[tagName]) {
-                            categories[tagName] = {
-                                name: tagName,
-                                items: []
-                            };
-                        }
-
-                        categories[tagName].items.push({
-                            path: path,
-                            method: method.toUpperCase(),
-                            name: endpoint.summary || 'No summary',
-                            desc: endpoint.description || 'No description',
-                            status: endpoint.deprecated ? 'deprecated' : 'ready',
-                            parameters: endpoint.parameters,
-                            requestBody: endpoint.requestBody
-                        });
-                    });
-                });
-
-                let html = '';
-                const categoriesArray = Object.values(categories); window.loadedCategories = categoriesArray;
-                categoriesArray.forEach((category, catIndex) => {
-                    if (category.items.length === 0) return;
-
-                    html += `
-                    <div class="category-group" data-category="${category.name}">
-                        <div class="mb-2">
-                            <div class="bg-white border border-gray-200 hover:border-gray-600 transition-colors duration-150">
-                                <button onclick="toggleCategory(${catIndex})" class="w-full px-4 py-3 text-left flex items-center justify-between transition-colors duration-150">
-                                    <h2 class="font-bold flex items-center text-slate-800">
-                                        <span class="material-icons text-xl mr-4 text-white bg-slate-900 py-1 px-2">folder</span>
-                                        <span class="truncate max-w-xs text-sm text-slate-900">${category.name}</span>
-                                        <span class="ml-2 text-xs text-gray-600">(${category.items.length})</span>
-                                    </h2>
-                                    <span class="material-icons transition-transform duration-150" id="category-icon-${catIndex}">expand_more</span>
-                                </button>
-                                
-                                <div id="category-${catIndex}" class="hidden">`;
-
-                    category.items.forEach((item, endpointIndex) => {
-                        const method = item.method;
-                        const path = item.path;
-
-                        const statusClasses = {
-                            'ready': 'bg-green-200 text-green',
-                            'deprecated': 'bg-yellow-500/20 text-yellow-400',
-                        };
-                        const statusClass = statusClasses[item.status] || 'bg-gray-600';
-
-                        const methodClasses = {
-                            'GET': 'bg-slate-900',
-                            'POST': 'bg-slate-900',
-                            'PUT': 'bg-yellow-600',
-                            'DELETE': 'bg-red-600'
-                        };
-                        const methodClass = methodClasses[method] || 'bg-gray-600';
-
-                        html += `
-                                    <div id="${item.path.split('/').pop()}" class="border-t border-gray-200 api-item" 
-                                         data-method="${method}"
-                                         data-path="${path}"
-                                         data-alias="${item.name}"
-                                         data-description="${item.desc}"
-                                         data-category="${category.name}">
-                                        <button onclick="openEndpointDialog(${catIndex}, ${endpointIndex})" class="w-full px-4 py-3 text-left flex items-center justify-between transition-colors duration-150">
-                                            <div class="flex items-center min-w-0 flex-1">
-                                                <span class="inline-block px-3 py-1 text-xs font-semibold text-white mr-3 flex-shrink-0 ${methodClass}">
-                                                    ${method}
-                                                </span>
-                                                <div class="flex flex-col min-w-0 flex-1">
-                                                    <span class="font-semibold truncate max-w-[90%] font-mono text-sm text-slate-800" title="${path}">${path}</span>
-                                                    <div class="flex items-center">
-                                                        <span class="text-xs text-slate-600 truncate max-w-[90%]" title="${item.name}">${item.name}</span>
-                                                        <span class="ml-2 px-2 py-0.5 text-xs rounded ${statusClass}">${item.status}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <span class="material-icons transition-transform duration-150 flex-shrink-0">open_in_new</span>
-                                        </button>
-                                        
-                                        <div id="endpoint-${catIndex}-${endpointIndex}" class="hidden bg-gray-50 p-4 border-t border-gray-200 space-y-4">
-                                            <div class="mb-3">
-                                                <div class="text-slate-600 text-xs">${item.desc}</div>
-                                            </div>
-                                            `;
-                        if (item.status !== 'deprecated') {
-                            html += `
-                                                <div>
-                                                    <div class="text-gray-700 font-bold text-xs mb-2 flex items-center">
-                                                        <span class="material-icons text-sm mr-1">play_arrow</span>
-                                                        TRY IT OUT
-                                                    </div>
-                                                    <div>
-                                                        <form id="form-${catIndex}-${endpointIndex}" onsubmit="executeRequest(event, ${catIndex}, ${endpointIndex}, '${method}', '${path}')">
-                                                            <div class="mb-4 space-y-2">`;
-                            // Query parameters
-                            if (item.parameters) {
-                                item.parameters.forEach(param => {
-                                    const schema = param.schema || {};
-                                    const isReq = !!param.required;
-                                    const label = `${param.name} ${isReq ? '<span class="text-red-500">*</span>' : ''}`;
-                                    const desc = param.description ? `<div class="text-[10px] text-gray-500 mt-1">${param.description}</div>` : '';
-                                    const placeholder = (schema.example ?? schema.default ?? '') + '';
-
-                                    // enum => select
-                                    if (Array.isArray(schema.enum) && schema.enum.length) {
-                                        html += `
-                                            <div>
-                                              <label class="block text-xs font-medium text-slate-700 mb-2">${label}</label>
-                                              <select name="${param.name}" class="w-full px-3 py-2 border border-gray-200 text-sm focus:outline-none focus:border-gray-600 bg-white" ${isReq ? 'required' : ''}>
-                                                ${schema.enum.map(v => `<option value="${String(v)}">${String(v)}</option>`).join('')}
-                                              </select>
-                                              ${desc}
-                                            </div>`;
-                                    } else {
-                                        // type-aware inputs
-                                        let type = 'text';
-                                        if (schema.type === 'number' || schema.type === 'integer') type = 'number';
-                                        if (schema.type === 'boolean') {
-                                            html += `
-                                              <div>
-                                                <label class="block text-xs font-medium text-slate-700 mb-2">${label}</label>
-                                                <select name="${param.name}" class="w-full px-3 py-2 border border-gray-200 text-sm focus:outline-none focus:border-gray-600 bg-white" ${isReq ? 'required' : ''}>
-                                                  <option value="true">true</option>
-                                                  <option value="false">false</option>
-                                                </select>
-                                                ${desc}
-                                              </div>`;
-                                        } else {
-                                            html += `
-                                              <div>
-                                                <label class="block text-xs font-medium text-slate-700 mb-2">${label}</label>
-                                                <input type="${type}" name="${param.name}"
-                                                  class="w-full px-3 py-2 border border-gray-200 text-sm focus:outline-none focus:border-gray-600 bg-white placeholder:text-slate-400"
-                                                  placeholder="${placeholder.replace(/"/g,'&quot;')}" ${isReq ? 'required' : ''}>
-                                                ${desc}
-                                              </div>`;
-                                        }
-                                    }
-                                });
-                            }
-
-                            // Request body
-                            if (item.requestBody && item.requestBody.content) {
-                                const content = item.requestBody.content;
-
-                                // multipart/form-data
-                                if (content['multipart/form-data']) {
-                                    const schema = content['multipart/form-data'].schema || {
-                                        properties: {}
-                                    };
-                                    const required = schema.required || [];
-                                    Object.keys(schema.properties || {}).forEach(propName => {
-                                        const prop = schema.properties[propName] || {};
-                                        const isRequired = required.includes(propName);
-                                        const label = `${propName} ${isRequired ? '<span class="text-red-500">*</span>' : ''}`;
-                                        const desc = prop.description ? `<div class="text-[10px] text-slate-500 mt-1">${prop.description}</div>` : '';
-                                        const placeholder = (prop.example ?? prop.default ?? '') + '';
-                                        const isFile = prop.format === 'binary';
-
-                                        if (isFile) {
-                                            let accept = '';
-                                            const propDesc = (prop.description || '').toLowerCase();
-                                            if (propName.toLowerCase().includes('image') || propDesc.includes('gambar')) {
-                                                accept = 'accept="image/*"';
-                                            } else if (propName.toLowerCase().includes('video') || propDesc.includes('vidio')) {
-                                                accept = 'accept="video/*"';
-                                            }
-                                            html += `
-                                                <div>
-                                                    <label class="block text-xs font-medium text-slate-700 mb-2">${label}</label>
-                                                    <input type="file" name="${propName}" ${accept}
-                                                        class="w-full px-3 py-2 border border-gray-200 text-sm focus:outline-none focus:border-gray-600 bg-white"
-                                                        ${isRequired ? 'required' : ''}>
-                                                    ${desc}
-                                                </div>`;
-                                        } else if (Array.isArray(prop.enum) && prop.enum.length) {
-                                            html += `
-                                                <div>
-                                                    <label class="block text-xs font-medium text-slate-700 mb-2">${label}</label>
-                                                    <select name="${propName}" class="w-full px-3 py-2 border border-gray-200 text-sm focus:outline-none focus:border-gray-600 bg-white" ${isRequired ? 'required' : ''}>
-                                                        ${prop.enum.map(v => `<option value="${String(v)}">${String(v)}</option>`).join('')}
-                                                    </select>
-                                                    ${desc}
-                                                </div>`;
-                                        } else if (prop.type === 'boolean') {
-                                            html += `
-                                                <div>
-                                                    <label class="block text-xs font-medium text-slate-700 mb-2">${label}</label>
-                                                    <select name="${propName}" class="w-full px-3 py-2 border border-gray-200 text-sm focus:outline-none focus:border-gray-600 bg-white" ${isRequired ? 'required' : ''}>
-                                                        <option value="true">true</option>
-                                                        <option value="false">false</option>
-                                                    </select>
-                                                    ${desc}
-                                                </div>`;
-                                        } else {
-                                            let inputType = 'text';
-                                            if (prop.type === 'number' || prop.type === 'integer') {
-                                                inputType = 'number';
-                                            }
-                                            html += `
-                                                <div>
-                                                    <label class="block text-xs font-medium text-slate-700 mb-2">${label}</label>
-                                                    <input type="${inputType}" name="${propName}"
-                                                        class="w-full px-3 py-2 border border-gray-200 text-sm focus:outline-none focus:border-gray-600 bg-white placeholder:text-slate-400"
-                                                        placeholder="${placeholder.replace(/"/g, '&quot;')}" ${isRequired ? 'required' : ''}>
-                                                    ${desc}
-                                                </div>`;
-                                        }
-                                    });
-                                }
-
-                                // RAW JSON
-                                if (content['application/json']) {
-                                    html += `
-                                          <div>
-                                            <label class="block text-xs font-medium text-slate-700 mb-2">Body (application/json)</label>
-                                            <textarea name="__raw_json__" rows="6" class="w-full px-3 py-2 border border-gray-200 text-sm focus:outline-none focus:border-gray-600 bg-white font-mono placeholder:text-slate-400" placeholder='{"key":"value"}'></textarea>
-                                            <div class="text-[10px] text-slate-500 mt-1">Masukkan JSON valid. Jika diisi, body lain akan diabaikan.</div>
-                                          </div>`;
-                                }
-                            }
-
-                            html += `
-                                                            </div>
-                                                            <button type="submit" class="bg-gray-800 hover:bg-gray-700 font-semibold text-white px-6 py-2 text-xs font-medium transition-colors duration-150">
-                                                                Execute
-                                                            </button>
-                                                            <button type="button" id="clear-${catIndex}-${endpointIndex}" onclick="clearResponse(${catIndex}, ${endpointIndex})" class="hidden bg-white border border-gray-200 hover:border-gray-600 font-semibold text-slate-900 px-6 py-2 text-xs font-medium transition-colors duration-150 ml-2">
-                                                                Clear
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>`;
-                        } else {
-                            html += `<div class="text-yellow-400 text-xs p-3 bg-yellow-500/20 border border-yellow-500/30">Endpoint ini tidak digunakan lagi.</div>`;
-                        }
-
-                        html += `
-                                            <div id="response-${catIndex}-${endpointIndex}" class="hidden mt-4">
-                                                <div class="text-gray-700 font-bold text-xs mb-2 flex items-center">
-                                                    <span class="material-icons text-sm mr-1">code</span>
-                                                    RESPONSE
-                                                </div>
-                                                <div id="response-content-${catIndex}-${endpointIndex}" class="bg-gray-50 text-xs p-4 border border-gray-200">
-                                                    <!-- Response will be rendered here by executeRequest -->
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="mt-4">
-                                                <div class="text-gray-700 font-bold text-xs mb-2 flex items-center">
-                                                    <span class="material-icons text-sm mr-1">list</span>
-                                                    HTTP STATUS CODES
-                                                </div>
-                                                <div class="bg-white border border-gray-200">
-                                                    <div class="overflow-x-auto">
-                                                        <table class="w-full text-xs">
-                                                            <thead class="bg-gray-50 border-b border-gray-200">
-                                                                <tr>
-                                                                    <th class="px-4 py-2 text-left font-semibold text-slate-700">Code</th>
-                                                                    <th class="px-4 py-2 text-left font-semibold text-slate-700">Description</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody class="divide-y divide-gray-200">
-                                                                <tr class="hover:bg-gray-50">
-                                                                    <td class="px-4 py-2">
-                                                                        <div class="flex items-center">
-                                                                            <span class="material-icons text-green-600 text-sm mr-2">check_circle</span>
-                                                                            <span class="font-mono font-semibold text-green-600">200</span>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td class="px-4 py-2 text-slate-600">OK - Request successful</td>
-                                                                </tr>
-                                                                <tr class="hover:bg-gray-50">
-                                                                    <td class="px-4 py-2">
-                                                                        <div class="flex items-center">
-                                                                            <span class="material-icons text-red-600 text-sm mr-2">error</span>
-                                                                            <span class="font-mono font-semibold text-red-600">400</span>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td class="px-4 py-2 text-slate-600">Bad Request - Invalid parameters or missing required fields</td>
-                                                                </tr>
-                                                                <tr class="hover:bg-gray-50">
-                                                                    <td class="px-4 py-2">
-                                                                        <div class="flex items-center">
-                                                                            <span class="material-icons text-red-600 text-sm mr-2">error</span>
-                                                                            <span class="font-mono font-semibold text-red-600">401</span>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td class="px-4 py-2 text-slate-600">Unauthorized - Missing or invalid API key</td>
-                                                                </tr>
-                                                                <tr class="hover:bg-gray-50">
-                                                                    <td class="px-4 py-2">
-                                                                        <div class="flex items-center">
-                                                                            <span class="material-icons text-red-600 text-sm mr-2">error</span>
-                                                                            <span class="font-mono font-semibold text-red-600">403</span>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td class="px-4 py-2 text-slate-600">Forbidden - You do not have permission to access this resource</td>
-                                                                </tr>
-                                                                <tr class="hover:bg-gray-50">
-                                                                    <td class="px-4 py-2">
-                                                                        <div class="flex items-center">
-                                                                            <span class="material-icons text-red-600 text-sm mr-2">error</span>
-                                                                            <span class="font-mono font-semibold text-red-600">404</span>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td class="px-4 py-2 text-slate-600">Not Found - The requested resource could not be found</td>
-                                                                </tr>
-                                                                <tr class="hover:bg-gray-50">
-                                                                    <td class="px-4 py-2">
-                                                                        <div class="flex items-center">
-                                                                            <span class="material-icons text-red-600 text-sm mr-2">error</span>
-                                                                            <span class="font-mono font-semibold text-red-600">405</span>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td class="px-4 py-2 text-slate-600">Method Not Allowed - HTTP method not supported for this resource</td>
-                                                                </tr>
-                                                                <tr class="hover:bg-gray-50">
-                                                                    <td class="px-4 py-2">
-                                                                        <div class="flex items-center">
-                                                                            <span class="material-icons text-orange-500 text-sm mr-2">warning</span>
-                                                                            <span class="font-mono font-semibold text-orange-500">429</span>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td class="px-4 py-2 text-slate-600">Too Many Requests - You have hit the rate limit</td>
-                                                                </tr>
-                                                                <tr class="hover:bg-gray-50">
-                                                                    <td class="px-4 py-2">
-                                                                        <div class="flex items-center">
-                                                                            <span class="material-icons text-red-600 text-sm mr-2">error</span>
-                                                                            <span class="font-mono font-semibold text-red-600">500</span>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td class="px-4 py-2 text-slate-600">Internal Server Error - Something went wrong on our end</td>
-                                                                </tr>
-                                                                <tr class="hover:bg-gray-50">
-                                                                    <td class="px-4 py-2">
-                                                                        <div class="flex items-center">
-                                                                            <span class="material-icons text-red-600 text-sm mr-2">error</span>
-                                                                            <span class="font-mono font-semibold text-red-600">503</span>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td class="px-4 py-2 text-slate-600">Service Unavailable - The server is temporarily unavailable</td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                        </div>
-                                    </div>`;
-                    });
-                    html += `</div></div></div>`;
-                });
-                apiList.innerHTML = html;
-                const categoriess = apiList.querySelectorAll('.category-group');
-                categoriess.forEach((category, index) => {
-                    category.classList.add('will-fade-in', 'fade-in');
-                    category.style.animationDelay = `${index * 70}ms`;
-                });
-            } catch (error) {
-                apiList.innerHTML = '<p class="text-red-500">Failed to load API data.</p>';
-                console.error('Error loading API data:', error);
-            }
-        }
-
-        // Function to load and render notifications
-        async function loadNotifications() {
-    const notificationsList = document.getElementById('notifications-list');
-    const unreadCountBadge = document.getElementById('unread-count');
-
-    try {
-        // Tambahkan cache-busting untuk selalu ambil versi terbaru
-        const response = await fetch(`/src/notifications.json?t=${Date.now()}`);
-        let notifications = await response.json();
-
-        // Pastikan notifications selalu array
-        if (!Array.isArray(notifications)) {
-            notifications = notifications ? [notifications] : [];
-        }
-
-        notificationsList.innerHTML = ''; // Clear loader
-        let unreadCount = 0;
-
-        // Sort notifications by date, newest first
-        notifications.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-
-        notifications.forEach((notif, index) => {
-            if (!notif.read) unreadCount++;
-
-            const notifElement = document.createElement('div');
-            notifElement.className = `bg-white border border-gray-200 p-4 text-xs will-fade-in fade-in ${notif.read ? 'opacity-60' : ''}`;
-            notifElement.style.animationDelay = `${index * 50}ms`;
-            notifElement.innerHTML = `
-                <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                        <p class="font-bold text-slate-800 mb-1">${notif.title || 'Tanpa Judul'}</p>
-                        <p class="text-slate-600">${notif.message || '-'}</p>
-                    </div>
-                    <div class="flex items-center ml-4 flex-shrink-0">
-                        ${!notif.read ? '<div class="w-2 h-2 bg-green-400 rounded-full mr-2" title="Unread"></div>' : ''}
-                        <span class="text-slate-500">${notif.date ? new Date(notif.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' }) : '-'}</span>
-                    </div>
+                <div class="flex items-center gap-2 sm:ml-4 sm:shrink-0">
+                  ${!item.read ? '<span class="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>' : ''}
+                  <span class="text-xs text-slate-500 break-anywhere">${escapeHtml(dateText)}</span>
                 </div>
-            `;
-            notificationsList.appendChild(notifElement);
-        });
+              </div>
+            </div>
+          `;
+        }).join('');
 
-        // Update unread badge
-        if (unreadCount > 0) {
-            unreadCountBadge.textContent = unreadCount;
-            unreadCountBadge.classList.remove('hidden');
+        if (unread > 0) {
+          unreadCount.textContent = unread;
+          unreadCount.classList.remove('hidden');
         } else {
-            unreadCountBadge.classList.add('hidden');
+          unreadCount.classList.add('hidden');
         }
-
-        // Jika tidak ada notifikasi
-        if (notifications.length === 0) {
-            notificationsList.innerHTML = '<p class="text-center text-slate-500 text-xs py-4">Tidak ada notifikasi</p>';
-        }
-
-    } catch (error) {
-        console.error('Gagal memuat notifikasi:', error);
-        notificationsList.innerHTML = '<p class="text-center text-red-500 text-xs py-4">Gagal memuat notifikasi</p>';
-        unreadCountBadge.classList.add('hidden');
+      } catch (_) {
+        container.innerHTML = '<div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">No notifications available.</div>';
+        unreadCount.classList.add('hidden');
+      }
     }
-}
 
+    async function loadApis() {
+      const apiList = document.getElementById('apiList');
 
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const apiItems = document.querySelectorAll('.api-item');
-            const categories = document.querySelectorAll('.category-group');
-            const noResults = document.getElementById('noResults');
-            let visibleCount = 0;
+      try {
+        const spec = await fetchFirstJson(['/openapi.json', '/src/openapi.json']);
+        state.categories = normalizeCategories(spec);
+        renderApiList();
+      } catch (error) {
+        apiList.innerHTML = `<div class="border border-red-200 bg-red-50 p-4 text-sm text-red-700">Failed to load API docs: ${escapeHtml(error.message || String(error))}</div>`;
+      }
+    }
 
-            apiItems.forEach(item => {
-                const path = item.dataset.path.toLowerCase();
-                const alias = item.dataset.alias.toLowerCase();
-                const description = item.dataset.description.toLowerCase();
+    sidebarToggle.addEventListener('click', openSidebar);
+    sidebarClose.addEventListener('click', closeSidebar);
+    backdrop.addEventListener('click', closeSidebar);
+    modalClose.addEventListener('click', closeModal);
+    clearResponseBtn.addEventListener('click', clearResponse);
+    endpointForm.addEventListener('submit', executeEndpoint);
 
-                if (path.includes(searchTerm) || alias.includes(searchTerm) || description.includes(searchTerm)) {
-                    item.style.display = '';
-                    visibleCount++;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
+    document.getElementById('searchInput').addEventListener('input', renderApiList);
 
-            categories.forEach(category => {
-                const visibleItems = category.querySelectorAll('.api-item[style=""]');
-                if (visibleItems.length > 0) {
-                    category.style.display = '';
-                } else {
-                    category.style.display = 'none';
-                }
-            });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeSidebar();
+        closeModal();
+      }
+    });
 
-            if (visibleCount === 0) {
-                noResults.style.display = 'block';
-            } else {
-                noResults.style.display = 'none';
-            }
-        });
+    endpointModal.addEventListener('click', (event) => {
+      if (event.target === endpointModal || event.target === endpointModal.firstElementChild) {
+        closeModal();
+      }
+    });
 
+    window.toggleCategory = toggleCategory;
+    window.openEndpointByFilter = openEndpointByFilter;
 
-        // Initial load
-        document.addEventListener('DOMContentLoaded', () => {
-            loadApis();
-            loadNotifications();
-        });
-    </script>
+    document.addEventListener('DOMContentLoaded', () => {
+      loadNotifications();
+      loadApis();
+    });
+  </script>
 </body>
-
 </html>
