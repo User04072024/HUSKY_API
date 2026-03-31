@@ -1,0 +1,10 @@
+* { box-sizing: border-box; }
+html, body { max-width: 100%; overflow-x: hidden; }
+body { font-family: 'Ubuntu Mono', monospace; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { scrollbar-width: none; }
+.break-anywhere { overflow-wrap: anywhere; word-break: break-word; }
+.glass {
+  backdrop-filter: blur(14px) saturate(180%);
+  background: rgba(255,255,255,0.88);
+}
