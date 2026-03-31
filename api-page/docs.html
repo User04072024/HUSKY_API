@@ -114,9 +114,273 @@
         .fade-out {
             animation: fadeOut 0.2s ease-out forwards;
         }
+        .endpoint-dialog {
+    max-width: 42rem;
+    width: 94%;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 0;
+    margin: auto;
+    background: #111111;
+    color: #e0e0e0;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.03),
+        0 32px 64px rgba(0, 0, 0, 0.6);
+    opacity: 1;
+    scale: 1;
+    transition:
+        display 0.3s allow-discrete,
+        overlay 0.3s allow-discrete,
+        opacity 0.3s ease,
+        scale 0.3s ease;
+}
+
+@starting-style {
+    .endpoint-dialog[open] {
+        opacity: 0;
+        scale: 0.96;
+    }
+}
+
+.endpoint-dialog:not([open]) {
+    opacity: 0;
+    scale: 0.96;
+}
+
+.endpoint-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    opacity: 1;
+    transition:
+        display 0.3s allow-discrete,
+        overlay 0.3s allow-discrete,
+        opacity 0.3s ease;
+}
+
+@starting-style {
+    .endpoint-dialog[open]::backdrop {
+        opacity: 0;
+    }
+}
+
+.endpoint-dialog:not([open])::backdrop {
+    opacity: 0;
+}
+
+html:has(.endpoint-dialog[open]) {
+    overflow: hidden;
+}
+
+.endpoint-dialog .dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.endpoint-dialog .dialog-header h2 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.88);
+    letter-spacing: 0.02em;
+}
+
+.endpoint-dialog .close-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.25rem 0.4rem;
+    line-height: 1;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.endpoint-dialog .close-btn:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.06);
+}
+
+.endpoint-dialog .dialog-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.endpoint-dialog .endpoint-description {
+    font-size: 0.84rem;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.68);
+}
+
+.endpoint-dialog .dialog-field {
+    margin-bottom: 0.95rem;
+}
+
+.endpoint-dialog .dialog-field label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.78);
+    margin-bottom: 0.35rem;
+    display: block;
+}
+
+.endpoint-dialog .dialog-field .helper {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.4);
+    margin-top: 0.35rem;
+}
+
+.endpoint-dialog .required {
+    color: #ef4444;
+}
+
+.endpoint-dialog input,
+.endpoint-dialog select,
+.endpoint-dialog textarea {
+    width: 100%;
+    padding: 0.85rem 0.95rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.endpoint-dialog input::placeholder,
+.endpoint-dialog textarea::placeholder {
+    color: rgba(255,255,255,0.28);
+}
+
+.endpoint-dialog input:focus,
+.endpoint-dialog select:focus,
+.endpoint-dialog textarea:focus {
+    border-color: rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.06);
+}
+
+.endpoint-dialog .dialog-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.endpoint-dialog .execute-btn,
+.endpoint-dialog .clear-btn {
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    font-weight: 600;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.endpoint-dialog .execute-btn {
+    background: #ffffff;
+    color: #111111;
+}
+
+.endpoint-dialog .execute-btn:hover {
+    background: #eaeaea;
+}
+
+.endpoint-dialog .clear-btn {
+    background: rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.75);
+}
+
+.endpoint-dialog .clear-btn:hover {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+}
+
+.endpoint-dialog .response-box,
+.endpoint-dialog .code-block {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.endpoint-dialog .code-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.625rem 0.875rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.endpoint-dialog .code-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.endpoint-dialog .code-bar span {
+    margin-left: auto;
+    font-size: 0.6875rem;
+    color: rgba(255, 255, 255, 0.28);
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+.endpoint-dialog pre {
+    margin: 0;
+    padding: 1rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.08) transparent;
+}
+
+.endpoint-dialog pre code,
+.endpoint-dialog pre {
+    font-family: 'Ubuntu Mono', monospace;
+    font-size: 0.75rem;
+    line-height: 1.7;
+    tab-size: 2;
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.endpoint-dialog .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.endpoint-dialog img {
+    max-width: 100%;
+    border-radius: 12px;
+    display: block;
+    }
     </style>
 </head>
 
+    <dialog id="endpointDialog" class="endpoint-dialog">
+    <div class="dialog-header">
+        <h2 id="dialogTitle">Endpoint</h2>
+        <button class="close-btn" id="closeBtn" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="dialog-body">
+        <div id="dialogContent"></div>
+    </div>
+
+    <div class="dialog-footer">
+        <button id="dismissBtn" type="button" class="clear-btn">Cerrar</button>
+    </div>
+    </dialog>
 <body class="bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-800 antialiased font-mono min-h-screen">
 
     <aside id="sidebar" class="fixed top-0 right-0 h-full w-64 bg-white text-slate-800 border-l border-gray-200 transform translate-x-full duration-300 ease-in-out z-[100]">
@@ -259,6 +523,334 @@ document.addEventListener('DOMContentLoaded', loadNotifications);
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
 
+        const endpointDialog = document.getElementById("endpointDialog");
+const dialogTitle = document.getElementById("dialogTitle");
+const dialogContent = document.getElementById("dialogContent");
+const closeBtn = document.getElementById("closeBtn");
+const dismissBtn = document.getElementById("dismissBtn");
+
+let watcher = null;
+let currentDialogEndpoint = null;
+window.loadedCategories = [];
+
+function escapeAttr(value = "") {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
+function openEndpointDialog(catIndex, endpointIndex) {
+    currentDialogEndpoint = window.loadedCategories?.[catIndex]?.items?.[endpointIndex];
+    if (!currentDialogEndpoint) return;
+
+    dialogTitle.textContent = `${currentDialogEndpoint.method} ${currentDialogEndpoint.path}`;
+    dialogContent.innerHTML = renderDialogEndpoint(currentDialogEndpoint);
+    endpointDialog.showModal();
+
+    if ("CloseWatcher" in window) {
+        watcher?.destroy?.();
+        watcher = new CloseWatcher();
+        watcher.onclose = () => endpointDialog.close();
+    }
+}
+
+function closeEndpointDialog() {
+    if (watcher) watcher.close();
+    else endpointDialog.close();
+}
+
+closeBtn.addEventListener("click", closeEndpointDialog);
+dismissBtn.addEventListener("click", closeEndpointDialog);
+
+endpointDialog.addEventListener("click", (e) => {
+    if (e.target === endpointDialog) closeEndpointDialog();
+});
+
+endpointDialog.addEventListener("close", () => {
+    watcher?.destroy?.();
+    watcher = null;
+    dialogContent.innerHTML = "";
+});
+
+function renderParamFields(item) {
+    let html = "";
+
+    (item.parameters || []).forEach(param => {
+        const schema = param.schema || {};
+        const required = param.required ? "required" : "";
+        const requiredLabel = param.required ? '<span class="required">*</span>' : '';
+        const helper = param.description ? `<div class="helper">${param.description}</div>` : '';
+        const placeholder = escapeAttr(schema.example ?? schema.default ?? "");
+
+        if (Array.isArray(schema.enum) && schema.enum.length) {
+            html += `
+                <div class="dialog-field">
+                    <label>${param.name} ${requiredLabel}</label>
+                    <select name="${param.name}" ${required}>
+                        ${schema.enum.map(v => `<option value="${escapeAttr(v)}">${v}</option>`).join('')}
+                    </select>
+                    ${helper}
+                </div>
+            `;
+        } else if (schema.type === "boolean") {
+            html += `
+                <div class="dialog-field">
+                    <label>${param.name} ${requiredLabel}</label>
+                    <select name="${param.name}" ${required}>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                    ${helper}
+                </div>
+            `;
+        } else {
+            let type = "text";
+            if (schema.type === "number" || schema.type === "integer") type = "number";
+
+            html += `
+                <div class="dialog-field">
+                    <label>${param.name} ${requiredLabel}</label>
+                    <input type="${type}" name="${param.name}" placeholder="${placeholder}" ${required}>
+                    ${helper}
+                </div>
+            `;
+        }
+    });
+
+    return html;
+}
+
+function renderBodyFields(item) {
+    let html = "";
+    const content = item.requestBody?.content || {};
+
+    if (content["multipart/form-data"]) {
+        const schema = content["multipart/form-data"].schema || { properties: {} };
+        const requiredFields = schema.required || [];
+
+        Object.keys(schema.properties || {}).forEach(propName => {
+            const prop = schema.properties[propName] || {};
+            const isRequired = requiredFields.includes(propName) ? "required" : "";
+            const requiredLabel = requiredFields.includes(propName) ? '<span class="required">*</span>' : '';
+            const helper = prop.description ? `<div class="helper">${prop.description}</div>` : '';
+            const placeholder = escapeAttr(prop.example ?? prop.default ?? "");
+
+            if (prop.format === "binary") {
+                html += `
+                    <div class="dialog-field">
+                        <label>${propName} ${requiredLabel}</label>
+                        <input type="file" name="${propName}" ${isRequired}>
+                        ${helper}
+                    </div>
+                `;
+            } else if (Array.isArray(prop.enum) && prop.enum.length) {
+                html += `
+                    <div class="dialog-field">
+                        <label>${propName} ${requiredLabel}</label>
+                        <select name="${propName}" ${isRequired}>
+                            ${prop.enum.map(v => `<option value="${escapeAttr(v)}">${v}</option>`).join('')}
+                        </select>
+                        ${helper}
+                    </div>
+                `;
+            } else if (prop.type === "boolean") {
+                html += `
+                    <div class="dialog-field">
+                        <label>${propName} ${requiredLabel}</label>
+                        <select name="${propName}" ${isRequired}>
+                            <option value="true">true</option>
+                            <option value="false">false</option>
+                        </select>
+                        ${helper}
+                    </div>
+                `;
+            } else {
+                let type = "text";
+                if (prop.type === "number" || prop.type === "integer") type = "number";
+
+                html += `
+                    <div class="dialog-field">
+                        <label>${propName} ${requiredLabel}</label>
+                        <input type="${type}" name="${propName}" placeholder="${placeholder}" ${isRequired}>
+                        ${helper}
+                    </div>
+                `;
+            }
+        });
+    }
+
+    if (content["application/json"]) {
+        html += `
+            <div class="dialog-field">
+                <label>Body (application/json)</label>
+                <textarea name="__raw_json__" rows="6" placeholder='{"key":"value"}'></textarea>
+                <div class="helper">Si llenas este campo, se enviará como JSON.</div>
+            </div>
+        `;
+    }
+
+    return html;
+}
+
+function renderDialogEndpoint(item) {
+    const fields = renderParamFields(item) + renderBodyFields(item);
+
+    return `
+        <div class="endpoint-description">${item.desc || "No description"}</div>
+
+        <form id="dialogExecuteForm" onsubmit="executeDialogRequest(event)">
+            ${fields || `<div class="endpoint-description">Este endpoint no requiere parámetros.</div>`}
+
+            <div class="dialog-actions">
+                <button type="submit" class="execute-btn">Execute</button>
+                <button type="button" class="clear-btn" onclick="clearDialogResponse()">Clear</button>
+            </div>
+        </form>
+
+        <div id="dialogResponseBox" class="response-box hidden" style="margin-top: 1rem;">
+            <div class="code-block">
+                <div class="code-bar">
+                    <div class="code-dot"></div>
+                    <div class="code-dot"></div>
+                    <div class="code-dot"></div>
+                    <span>REQUEST URL</span>
+                </div>
+                <pre id="dialogRequestUrl"></pre>
+            </div>
+
+            <div class="code-block" style="margin-top: 0.75rem;">
+                <div class="code-bar">
+                    <div class="code-dot"></div>
+                    <div class="code-dot"></div>
+                    <div class="code-dot"></div>
+                    <span>CURL</span>
+                </div>
+                <pre id="dialogCurl"></pre>
+            </div>
+
+            <div class="code-block" style="margin-top: 0.75rem;">
+                <div class="code-bar">
+                    <div class="code-dot"></div>
+                    <div class="code-dot"></div>
+                    <div class="code-dot"></div>
+                    <span>RESPONSE</span>
+                </div>
+                <div id="dialogResponseBody"></div>
+            </div>
+        </div>
+    `;
+}
+
+function buildCurlCommand(method, fullPath, formData, rawJson) {
+    let curl = `curl -X ${method} "${window.location.origin}${fullPath}"`;
+
+    if (rawJson && rawJson.trim() && ["POST", "PUT", "PATCH"].includes(method)) {
+        curl += ` -H "Content-Type: application/json" -d '${rawJson.replace(/'/g, `'\"'\"'`)}'`;
+        return curl;
+    }
+
+    if (["POST", "PUT", "PATCH"].includes(method)) {
+        for (const [key, value] of formData.entries()) {
+            if (key === "__raw_json__") continue;
+            if (typeof value === "string" && !value) continue;
+
+            if (value instanceof File && value.name) {
+                curl += ` -F "${key}=@${value.name}"`;
+            } else {
+                curl += ` -F "${key}=${value}"`;
+            }
+        }
+    }
+
+    return curl;
+}
+
+async function executeDialogRequest(event) {
+    event.preventDefault();
+
+    if (!currentDialogEndpoint) return;
+
+    const form = event.target;
+    const responseBox = document.getElementById("dialogResponseBox");
+    const requestUrlEl = document.getElementById("dialogRequestUrl");
+    const curlEl = document.getElementById("dialogCurl");
+    const responseBodyEl = document.getElementById("dialogResponseBody");
+
+    const method = currentDialogEndpoint.method.toUpperCase();
+    let fullPath = currentDialogEndpoint.path;
+    const formData = new FormData(form);
+    const fetchOptions = { method };
+
+    const rawJson = (formData.get("__raw_json__") || "").toString().trim();
+
+    if (["POST", "PUT", "PATCH"].includes(method)) {
+        if (rawJson) {
+            fetchOptions.headers = { "Content-Type": "application/json" };
+            fetchOptions.body = rawJson;
+        } else {
+            const cleaned = new FormData();
+            for (const [key, value] of formData.entries()) {
+                if (key === "__raw_json__") continue;
+                if (typeof value === "string" && !value) continue;
+                cleaned.append(key, value);
+            }
+            fetchOptions.body = cleaned;
+        }
+    } else {
+        const params = new URLSearchParams();
+        for (const [key, value] of formData.entries()) {
+            if (key === "__raw_json__") continue;
+            if (typeof value === "string" && value) params.append(key, value);
+        }
+        const qs = params.toString();
+        if (qs) {
+            fullPath += (fullPath.includes("?") ? "&" : "?") + qs;
+        }
+    }
+
+    responseBox.classList.remove("hidden");
+    requestUrlEl.textContent = `${window.location.origin}${fullPath}`;
+    curlEl.textContent = buildCurlCommand(method, fullPath, formData, rawJson);
+    responseBodyEl.innerHTML = `<pre>Loading...</pre>`;
+
+    try {
+        const response = await fetch(fullPath, fetchOptions);
+        const contentType = response.headers.get("content-type") || "";
+
+        if (!response.ok) {
+            const errText = await response.text().catch(() => "");
+            throw new Error(`${response.status} ${response.statusText}\n${errText}`);
+        }
+
+        if (contentType.includes("application/json")) {
+            const data = await response.json();
+            responseBodyEl.innerHTML = `<pre><code>${JSON.stringify(data, null, 2)}</code></pre>`;
+        } else if (contentType.startsWith("image/")) {
+            const blob = await response.blob();
+            const imageUrl = URL.createObjectURL(blob);
+            responseBodyEl.innerHTML = `<div style="padding:1rem;"><img src="${imageUrl}" alt="response image"></div>`;
+        } else {
+            const text = await response.text();
+            responseBodyEl.innerHTML = `<pre>${escapeAttr(text)}</pre>`;
+        }
+    } catch (err) {
+        responseBodyEl.innerHTML = `<pre style="color:#f87171;">${escapeAttr(err.message || String(err))}</pre>`;
+    }
+}
+
+function clearDialogResponse() {
+    const responseBox = document.getElementById("dialogResponseBox");
+    const requestUrlEl = document.getElementById("dialogRequestUrl");
+    const curlEl = document.getElementById("dialogCurl");
+    const responseBodyEl = document.getElementById("dialogResponseBody");
+
+    if (responseBox) responseBox.classList.add("hidden");
+    if (requestUrlEl) requestUrlEl.textContent = "";
+    if (curlEl) curlEl.textContent = "";
+    if (responseBodyEl) responseBodyEl.innerHTML = "";
+        }
         function openSidebar() {
             sidebar.classList.remove('translate-x-full');
             overlay.classList.remove('opacity-0', 'invisible');
@@ -485,7 +1077,8 @@ document.addEventListener('DOMContentLoaded', loadNotifications);
                 });
 
                 let html = '';
-                Object.values(categories).forEach((category, catIndex) => {
+                const categoriesArray = Object.values(categories); window.loadedCategories = categoriesArray;
+                categoriesArray.forEach((category, catIndex) => {
                     if (category.items.length === 0) return;
 
                     html += `
@@ -528,7 +1121,7 @@ document.addEventListener('DOMContentLoaded', loadNotifications);
                                          data-alias="${item.name}"
                                          data-description="${item.desc}"
                                          data-category="${category.name}">
-                                        <button onclick="toggleEndpoint(${catIndex}, ${endpointIndex})" class="w-full px-4 py-3 text-left flex items-center justify-between transition-colors duration-150">
+                                        <button onclick="openEndpointDialog(${catIndex}, ${endpointIndex})" class="w-full px-4 py-3 text-left flex items-center justify-between transition-colors duration-150">
                                             <div class="flex items-center min-w-0 flex-1">
                                                 <span class="inline-block px-3 py-1 text-xs font-semibold text-white mr-3 flex-shrink-0 ${methodClass}">
                                                     ${method}
@@ -541,7 +1134,7 @@ document.addEventListener('DOMContentLoaded', loadNotifications);
                                                     </div>
                                                 </div>
                                             </div>
-                                            <span class="material-icons transition-transform duration-150 flex-shrink-0" id="endpoint-icon-${catIndex}-${endpointIndex}">expand_more</span>
+                                            <span class="material-icons transition-transform duration-150 flex-shrink-0">open_in_new</span>
                                         </button>
                                         
                                         <div id="endpoint-${catIndex}-${endpointIndex}" class="hidden bg-gray-50 p-4 border-t border-gray-200 space-y-4">
