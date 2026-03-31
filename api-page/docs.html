@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Husky API documentation" />
+  <meta name="description" content="Husky API Documentación" />
   <meta name="theme-color" content="#ffffff" />
-  <title>Husky API Docs</title>
+  <title>Documentación de Husky API</title>
 
   <link rel="icon" href="/src/icon.png" type="image/png" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -39,32 +39,32 @@
         <p class="text-xs text-slate-500">Husky API</p>
       </div>
       <button id="sidebarClose" class="border border-slate-200 px-3 py-2 text-slate-700 hover:border-slate-400">
-        <span class="material-icons text-base">close</span>
+        <span class="material-icons text-base">Cerrar</span>
       </button>
     </div>
 
     <div class="p-4 sm:p-6 space-y-6">
       <div class="space-y-2">
         <a href="/" class="flex items-center gap-3 border border-slate-200 px-4 py-3 text-sm text-slate-700 hover:border-slate-500">
-          <span class="material-icons text-lg">dashboard</span>
+          <span class="material-icons text-lg">Inicio</span>
           Dashboard
         </a>
         <a href="/docs-v2.html" class="flex items-center gap-3 border border-slate-200 px-4 py-3 text-sm text-slate-700 hover:border-slate-500">
-          <span class="material-icons text-lg">description</span>
-          Docs V2
+          <span class="material-icons text-lg">descripción</span>
+          Docs V1
         </a>
       </div>
 
       <div>
         <p class="text-xs text-slate-500 mb-2">LINKS</p>
         <div class="space-y-2">
-          <a href="https://wa.me/6282313745397" target="_blank" class="flex items-center gap-3 border border-slate-200 px-4 py-3 text-sm text-slate-700 hover:border-slate-500">
+          <a href="https://wa.me/573006252061" target="_blank" class="flex items-center gap-3 border border-slate-200 px-4 py-3 text-sm text-slate-700 hover:border-slate-500">
             <span class="material-icons text-lg">arrow_outward</span>
-            Contact
+            Contacto
           </a>
           <a href="https://whatsapp.com/channel/0029Vb6pfuzJf05iZHfkli44" target="_blank" class="flex items-center gap-3 border border-slate-200 px-4 py-3 text-sm text-slate-700 hover:border-slate-500">
             <span class="material-icons text-lg">arrow_outward</span>
-            Channel
+            Canal de WhatsApp
           </a>
         </div>
       </div>
@@ -75,12 +75,12 @@
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
       <div class="min-w-0 flex items-center gap-3 sm:gap-4">
         <a href="/" class="border border-slate-200 p-2 text-slate-700 hover:border-slate-500 shrink-0">
-          <span class="material-icons text-lg">home</span>
+          <span class="material-icons text-lg">Inicio</span>
         </a>
 
         <div class="min-w-0">
           <h1 class="text-base sm:text-lg font-semibold text-slate-900 leading-none truncate">Husky API</h1>
-          <p class="text-xs text-slate-500 mt-1 truncate">API Documentation V2</p>
+          <p class="text-xs text-slate-500 mt-1 truncate">Documentación de API</p>
         </div>
 
         <div class="hidden sm:inline-flex px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold shrink-0">
@@ -104,20 +104,20 @@
       <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
         <h2 class="text-lg font-semibold text-slate-900 flex items-center gap-2">
           <span class="material-icons text-slate-500">notifications</span>
-          Informasi
+          Información
         </h2>
         <span id="unreadCount" class="hidden bg-slate-900 text-white text-xs px-2 py-1"></span>
       </div>
 
       <div id="notificationsList" class="space-y-3">
-        <div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">Loading notifications...</div>
+        <div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">Cargando información...</div>
       </div>
     </section>
 
     <section class="mb-6 sm:mb-8">
       <div class="relative">
         <div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-          <span class="material-icons text-slate-400 text-lg">search</span>
+          <span class="material-icons text-slate-400 text-lg">buscar</span>
         </div>
         <input
           id="searchInput"
@@ -129,15 +129,15 @@
     </section>
 
     <section id="emptyState" class="hidden border border-slate-200 bg-white p-8 text-center text-slate-500">
-      No matching endpoint found.
+      No se encontraron endpoints.
     </section>
 
     <section id="apiList" class="space-y-4">
-      <div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">Loading API docs...</div>
+      <div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">Cargando API docs...</div>
     </section>
 
     <footer class="pt-8 sm:pt-10 text-center">
-      <p class="text-xs text-slate-500">© 2025 Husky API. | All Rights Reserved.</p>
+      <p class="text-xs text-slate-500">© 2026 Husky API. | Todos los derechos reservados.</p>
     </footer>
   </main>
 
@@ -170,8 +170,8 @@
             <div id="formFields" class="space-y-4"></div>
 
             <div class="flex flex-wrap gap-2 pt-2">
-              <button type="submit" class="bg-slate-900 text-white px-5 py-2.5 text-sm font-semibold hover:bg-slate-800">Execute</button>
-              <button type="button" id="clearResponseBtn" class="border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-800 hover:border-slate-500">Clear</button>
+              <button type="submit" class="bg-slate-900 text-white px-5 py-2.5 text-sm font-semibold hover:bg-slate-800">Ejecutar</button>
+              <button type="button" id="clearResponseBtn" class="border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-800 hover:border-slate-500">Borrar</button>
             </div>
           </form>
 
@@ -187,7 +187,7 @@
             </div>
 
             <div class="border border-slate-200">
-              <div class="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-700">RESPONSE</div>
+              <div class="border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-700">RESPUESTA</div>
               <div id="responseBox" class="p-4 text-xs overflow-x-auto"></div>
             </div>
           </div>
