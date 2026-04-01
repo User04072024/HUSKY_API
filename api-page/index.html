@@ -3,21 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Documentación moderna de API y una interfaz interactiva de prueba. Explora fácilmente nuestros endpoints." />
-    <meta name="keywords" content="API, Documentación API, REST API, Husky APIs, ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ, Herramientas para desarrolladores">
-    <meta name="author" content="ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://github.com/User04072024/HUSKY_API">
-    <meta property="og:title" content="Husky API V1 - Documentación moderna">
-    <meta property="og:description" content="Explora nuestros endpoints con una interfaz moderna y fácil de usar.">
-    <meta property="og:image" content="/src/banner.jpg">
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://github.com/User04072024/HUSKY_API">
-    <meta property="twitter:title" content="Husky API V1 - Documentación moderna">
-    <meta property="twitter:description" content="Explora nuestros endpoints con una interfaz moderna y fácil de usar.">
-    <meta property="twitter:image" content="/src/banner.jpg">
-    <link rel="icon" href="/src/icon.png" type="image/png">
-    <title id="page">Husky API V1</title>
+    <meta name="description" content="Husky API con portada futurista y fondo líquido" />
+    <meta name="author" content="ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ" />
+    <link rel="icon" href="/src/icon.png" type="image/png" />
+    <title>Husky API Futuristic</title>
 
     <script src="https://cdn.tailwindcss.com/"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com/">
@@ -26,7 +15,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
     <link rel="stylesheet" href="/assets/index.css">
     <link rel="stylesheet" href="/assets/index-glitch-v2.css">
-    
+    <link rel="stylesheet" href="/assets/index-background.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -39,18 +30,11 @@
             }
         }
     </script>
-
-    <link rel="stylesheet" href="/assets/index.css">
-    <script src="/assets/index-glitch.js"></script>
-    <script src="/assets/index-glitch-v2.js"></script>
-    
 </head>
 <body class="text-foreground antialiased font-mono min-h-screen">
-
+    <div class="index-bg-noise"></div>
     <div id="mouse-spotlight"></div>
-    <div id="loader">
-        <div class="spinner"></div>
-    </div>
+    <div id="loader"><div class="spinner"></div></div>
 
     <header class="sticky top-0 z-40 bg-card border-b py-5">
         <div class="max-w-2xl mx-auto px-8 flex justify-between items-center">
@@ -63,17 +47,13 @@
         <div class="text-left mb-6">
             <p class="text-muted-foreground text-xs mb-4 animate-on-load" style="animation-delay: 0.1s;">¡Hola, desarrollador! Bienvenido a</p>
             <div class="flex flex-wrap items-center gap-3 mb-1.5 animate-on-load" style="animation-delay: 0.2s;">
-    <h2 class="glitch-title text-3xl text-foreground font-bold leading-none">
-        <span class="glitch-main">Husky API</span>
-        <span class="glitch-layer glitch-layer-pink" aria-hidden="true">Husky API</span>
-        <span class="glitch-layer glitch-layer-blue" aria-hidden="true">Husky API</span>
-    </h2>
-
-    <span class="text-xs font-bold text-white bg-black px-3 py-1 whitespace-nowrap">
-        v1.0
-    </span>
+                <h2 class="glitch-title text-3xl text-foreground font-bold leading-none">
+                    <span class="glitch-main">Husky API</span>
+                    <span class="glitch-layer glitch-layer-pink" aria-hidden="true">Husky API</span>
+                    <span class="glitch-layer glitch-layer-blue" aria-hidden="true">Husky API</span>
+                </h2>
+                <span class="text-xs font-bold text-white bg-black px-3 py-1 whitespace-nowrap">v1.0</span>
             </div>
-            
             <p class="text-muted-foreground text-xs mx-auto mb-4 animate-on-load" style="animation-delay: 0.3s;">Plataforma de API potente para aplicaciones modernas</p>
 
             <div class="mb-4 animate-on-load" style="animation-delay: 0.4s;">
@@ -83,22 +63,10 @@
             </div>
 
             <div class="text-xs space-y-1 animate-on-load" style="animation-delay: 0.5s;">
-                <div>
-                    <a href="#features" class="text-foreground underline hover:text-primary">Características</a>
-                </div>
-                <div>
-                    <a href="https://github.com/" target="_blank" class="text-foreground underline hover:text-primary">GitHub</a>
-                </div>
-                <div>
-                  <a href="https://whatsapp.com/channel/0029VbCGBnb2UPBF8LXws83u" target="_blank" class="text-foreground underline hover:text-primary">
-                    Canal de WhatsApp
-                  </a>
-                </div>
-                <div>
-                  <a href="https://wa.me/6283191473712 target="_blank" class="text-foreground underline hover:text-primary">
-                    Contacto
-                  </a>
-                </div>
+                <div><a href="#features" class="text-foreground underline hover:text-primary">Características</a></div>
+                <div><a href="https://github.com/" target="_blank" class="text-foreground underline hover:text-primary">GitHub</a></div>
+                <div><a href="https://whatsapp.com/channel/0029VbCGBnb2UPBF8LXws83u" target="_blank" class="text-foreground underline hover:text-primary">Canal de WhatsApp</a></div>
+                <div><a href="https://wa.me/6283191473712" target="_blank" class="text-foreground underline hover:text-primary">Contacto</a></div>
             </div>
         </div>
 
@@ -119,33 +87,11 @@
             </div>
         </div>
 
-        <script>
-        async function updateStats() {
-            try {
-                const response = await fetch('/src/openapi.json');
-                const data = await response.json();
-
-                const totalEndpoints = Object.keys(data.paths || {}).length;
-                const categories = new Set((data.tags || []).map(tag => tag.name));
-                const totalCategories = categories.size;
-
-                document.getElementById('total-endpoints').textContent = totalEndpoints;
-                document.getElementById('total-categories').textContent = totalCategories;
-            } catch (err) {
-                console.error('No se pudo cargar openapi.json', err);
-            }
-        }
-
-        updateStats();
-        </script>
-
         <div class="space-y-3" id="features">
             <div class="bg-card border-default bg-card-hover transition-all duration-300 rounded-none animate-on-scroll">
                 <div class="px-4 py-4 flex items-center justify-between">
                     <div class="flex items-center min-w-0 flex-1">
-                        <div class="feature-icon border-2 border-black w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4">
-                            <i class="fas fa-bolt text-black text-sm"></i>
-                        </div>
+                        <div class="feature-icon border-2 border-black w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4"><i class="fas fa-bolt text-black text-sm"></i></div>
                         <div class="flex flex-col min-w-0 flex-1">
                             <h3 class="font-bold text-sm text-foreground truncate">Rápida y confiable</h3>
                             <p class="text-xs text-muted-foreground">Endpoints de alto rendimiento con baja latencia</p>
@@ -153,13 +99,10 @@
                     </div>
                 </div>
             </div>
-
             <div class="bg-card border-default bg-card-hover transition-all duration-300 rounded-none animate-on-scroll" style="--delay: 0.1s;">
                 <div class="px-4 py-4 flex items-center justify-between">
                     <div class="flex items-center min-w-0 flex-1">
-                        <div class="feature-icon border-2 border-black w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4">
-                            <i class="fas fa-shield-alt text-black text-sm"></i>
-                        </div>
+                        <div class="feature-icon border-2 border-black w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4"><i class="fas fa-shield-alt text-black text-sm"></i></div>
                         <div class="flex flex-col min-w-0 flex-1">
                             <h3 class="font-bold text-sm text-foreground truncate">Segura</h3>
                             <p class="text-xs text-muted-foreground">Seguridad y protección de nivel empresarial</p>
@@ -167,13 +110,10 @@
                     </div>
                 </div>
             </div>
-
             <div class="bg-card border-default bg-card-hover transition-all duration-300 rounded-none animate-on-scroll" style="--delay: 0.2s;">
                 <div class="px-4 py-4 flex items-center justify-between">
                     <div class="flex items-center min-w-0 flex-1">
-                        <div class="feature-icon border-2 border-black w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4">
-                            <i class="fas fa-code text-black text-sm"></i>
-                        </div>
+                        <div class="feature-icon border-2 border-black w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4"><i class="fas fa-code text-black text-sm"></i></div>
                         <div class="flex flex-col min-w-0 flex-1">
                             <h3 class="font-bold text-sm text-foreground truncate">Integración sencilla</h3>
                             <p class="text-xs text-muted-foreground">API REST simple con documentación clara</p>
@@ -181,13 +121,10 @@
                     </div>
                 </div>
             </div>
-
             <div class="bg-card border-default bg-card-hover transition-all duration-300 rounded-none animate-on-scroll" style="--delay: 0.3s;">
                 <div class="px-4 py-4 flex items-center justify-between">
                     <div class="flex items-center min-w-0 flex-1">
-                        <div class="feature-icon border-2 border-black w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4">
-                            <i class="fas fa-chart-line text-black text-sm"></i>
-                        </div>
+                        <div class="feature-icon border-2 border-black w-8 h-8 flex items-center justify-center flex-shrink-0 mr-4"><i class="fas fa-chart-line text-black text-sm"></i></div>
                         <div class="flex flex-col min-w-0 flex-1">
                             <h3 class="font-bold text-sm text-foreground truncate">Analítica</h3>
                             <p class="text-xs text-muted-foreground">Monitoreo y métricas detalladas de uso</p>
@@ -201,100 +138,69 @@
 
         <div class="bg-card border-default p-6 mb-6 rounded-none animate-on-scroll">
             <h3 class="flex items-center gap-2 font-bold text-lg text-foreground mb-5">
-                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
+                <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 Primeros pasos
             </h3>
-
             <div class="space-y-4">
                 <div class="flex items-start gap-4 step-item">
                     <div class="step-number border-2 border-dashed border-black text-black w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold text-sm rounded-none">1</div>
-                    <div class="flex-1">
-                        <h4 class="font-bold text-sm text-foreground mb-1">Elige tu categoría</h4>
-                        <p class="text-xs text-muted-foreground">Explora las categorías disponibles y selecciona la que necesites.</p>
-                    </div>
+                    <div class="flex-1"><h4 class="font-bold text-sm text-foreground mb-1">Elige tu categoría</h4><p class="text-xs text-muted-foreground">Explora las categorías disponibles y selecciona la que necesites.</p></div>
                 </div>
-
                 <div class="flex items-start gap-4 step-item">
                     <div class="step-number border-2 border-dashed border-black text-black w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold text-sm rounded-none">2</div>
-                    <div class="flex-1">
-                        <h4 class="font-bold text-sm text-foreground mb-1">Lee la documentación</h4>
-                        <p class="text-xs text-muted-foreground">Revisa parámetros, formato de respuesta y ejemplos de uso.</p>
-                    </div>
+                    <div class="flex-1"><h4 class="font-bold text-sm text-foreground mb-1">Lee la documentación</h4><p class="text-xs text-muted-foreground">Revisa parámetros, formato de respuesta y ejemplos de uso.</p></div>
                 </div>
-
                 <div class="flex items-start gap-4 step-item">
                     <div class="step-number border-2 border-dashed border-black text-black w-8 h-8 flex items-center justify-center flex-shrink-0 font-bold text-sm rounded-none">3</div>
-                    <div class="flex-1">
-                        <h4 class="font-bold text-sm text-foreground mb-1">Haz tu solicitud</h4>
-                        <p class="text-xs text-muted-foreground">Envía solicitudes HTTP e integra la respuesta JSON en tu aplicación.</p>
-                    </div>
+                    <div class="flex-1"><h4 class="font-bold text-sm text-foreground mb-1">Haz tu solicitud</h4><p class="text-xs text-muted-foreground">Envía solicitudes HTTP e integra la respuesta JSON en tu aplicación.</p></div>
                 </div>
             </div>
         </div>
 
         <div class="flex flex-col mt-10 text-center space-y-2 animate-on-scroll">
-            <p class="text-muted-foreground" style="font-size: 0.7rem; line-height: 1rem;">
-                © <span id="year"></span> Husky API — Todos los derechos reservados.
-            </p>
-            <p class="text-muted-foreground space-x-3" style="font-size: 0.7rem; line-height: 1rem;">
-                <a href="/privacy-policy" class="hover:underline hover:text-black">Política de privacidad</a>
-                <span aria-hidden="true">|</span>
-                <a href="/terms-of-service" class="hover:underline hover:text-black">Términos del servicio</a>
-            </p>
+            <p class="text-muted-foreground" style="font-size: 0.7rem; line-height: 1rem;">© <span id="year"></span> Husky API — Todos los derechos reservados.</p>
+            <p class="text-muted-foreground space-x-3" style="font-size: 0.7rem; line-height: 1rem;"><a href="/privacy-policy" class="hover:underline hover:text-black">Política de privacidad</a><span aria-hidden="true">|</span><a href="/terms-of-service" class="hover:underline hover:text-black">Términos del servicio</a></p>
         </div>
     </main>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+        async function updateStats() {
+            try {
+                const response = await fetch('/src/openapi.json');
+                const data = await response.json();
+                document.getElementById('total-endpoints').textContent = Object.keys(data.paths || {}).length;
+                document.getElementById('total-categories').textContent = new Set((data.tags || []).map(tag => tag.name)).size;
+            } catch (err) {
+                console.error('No se pudo cargar openapi.json', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
             const loader = document.getElementById('loader');
             loader.classList.add('hidden');
+            document.getElementById('year').textContent = new Date().getFullYear();
+            updateStats();
 
-            document.getElementById("year").textContent = new Date().getFullYear();
-
-            const spotlight = document.getElementById('mouse-spotlight');
-            if (spotlight) {
-                document.addEventListener('mousemove', (e) => {
-                    spotlight.style.background = `radial-gradient(600px circle at ${e.clientX}px ${e.clientY}px, rgba(52, 152, 219, 0.08), transparent 80%)`;
-                });
-            }
-
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.1
-            };
-
-            const observerCallback = (entries, observer) => {
+            const observer = new IntersectionObserver((entries, obs) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
-                        observer.unobserve(entry.target);
+                        obs.unobserve(entry.target);
                     }
                 });
-            };
+            }, { threshold: 0.1 });
 
-            const observer = new IntersectionObserver(observerCallback, observerOptions);
-
-            document.querySelectorAll('.animate-on-scroll').forEach(target => {
-                observer.observe(target);
-            });
-
+            document.querySelectorAll('.animate-on-scroll').forEach(target => observer.observe(target));
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     e.preventDefault();
-                    const targetId = this.getAttribute('href');
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        targetElement.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 });
             });
         });
     </script>
+    <script src="/assets/index-glitch-v2.js"></script>
+    <script src="/assets/index-background.js"></script>
 </body>
-                    </html>
+                                </html>
