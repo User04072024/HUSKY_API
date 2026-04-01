@@ -9,6 +9,7 @@ const sidebarToggle = document.getElementById('sidebarToggle');
 const sidebarClose = document.getElementById('sidebarClose');
 
 const endpointModal = document.getElementById('endpointModal');
+const modalOverlay = document.getElementById('modalOverlay');
 const modalClose = document.getElementById('modalClose');
 const endpointForm = document.getElementById('endpointForm');
 const formFields = document.getElementById('formFields');
@@ -17,6 +18,69 @@ const requestUrlBox = document.getElementById('requestUrlBox');
 const curlBox = document.getElementById('curlBox');
 const responseBox = document.getElementById('responseBox');
 const clearResponseBtn = document.getElementById('clearResponseBtn');
+
+const endpointTranslations = {
+  '/ai/copilot': {
+    summary: 'Chat de Copilot',
+    description: 'Envía preguntas a Microsoft Copilot y obtén respuestas junto con referencias/citas.',
+    parameters: {
+      message: {
+        description: 'Mensaje o pregunta que quieres enviar a Copilot'
+      },
+      model: {
+        description: 'Modelo de Copilot que se utilizará (predeterminado: default; opcional: think-deeper, gpt-5)'
+      }
+    }
+  },
+  '/ai/venice': {
+    summary: 'Chat de Venice AI',
+    description: 'Envía preguntas a Venice AI y obtén una respuesta final.'
+  },
+  '/anime/waifu': {
+    summary: 'Waifu',
+    description: 'Obtiene una imagen aleatoria de waifu desde la API.'
+  },
+  '/download/capcut': {
+    summary: 'Descargador de CapCut',
+    description: 'Obtiene datos y video de una plantilla de CapCut a partir de su URL.'
+  },
+  '/download/pinterest': {
+    summary: 'Pinterest',
+    description: 'Obtiene datos y enlaces multimedia desde una URL de Pinterest o pin.it.'
+  },
+  '/download/tiktok': {
+    summary: 'TikTok',
+    description: 'Descarga video de TikTok.'
+  },
+  '/image/bluearchive': {
+    summary: 'Blue Archive',
+    description: 'Imágenes aleatorias de Blue Archive.'
+  },
+  '/image/loli': {
+    summary: 'Loli',
+    description: 'Imágenes aleatorias de loli.'
+  },
+  '/image/mpls': {
+    summary: 'Generador MPLS',
+    description: 'Crea un marco/twibbon usando la foto del usuario.'
+  },
+  '/image/papayang': {
+    summary: 'Papayang',
+    description: 'Imágenes aleatorias de Papayang.'
+  },
+  '/image/wallpaper': {
+    summary: 'Wallpaper',
+    description: 'Imágenes aleatorias desde WallpaperFlare según una búsqueda.'
+  },
+  '/news/detik': {
+    summary: 'Noticias Detik',
+    description: 'Extrae noticias populares de Detik.com.'
+  },
+  '/news/kontan': {
+    summary: 'Noticias Kontan',
+    description: 'Extrae noticias recientes de Kontan.co.id.'
+  }
+};
 
 function escapeHtml(value = '') {
   return String(value)
@@ -29,6 +93,32 @@ function escapeHtml(value = '') {
 
 function escapeAttr(value = '') {
   return escapeHtml(value);
+}
+
+function localizeSpec(spec) {
+  if (!spec || !spec.paths) return spec;
+
+  Object.entries(spec.paths).forEach(([path, methods]) => {
+    const tr = endpointTranslations[path];
+    if (!tr) return;
+
+    Object.values(methods || {}).forEach((endpoint) => {
+      if (tr.summary) endpoint.summary = tr.summary;
+      if (tr.description) endpoint.description = tr.description;
+
+      if (endpoint.parameters && tr.parameters) {
+        endpoint.parameters = endpoint.parameters.map((param) => {
+          const pTr = tr.parameters[param.name];
+          if (pTr?.description) {
+            return { ...param, description: pTr.description };
+          }
+          return param;
+        });
+      }
+    });
+  });
+
+  return spec;
 }
 
 function openSidebar() {
@@ -50,8 +140,8 @@ function openModal(endpoint) {
 
   document.getElementById('modalMethod').textContent = endpoint.method;
   document.getElementById('modalPath').textContent = endpoint.path;
-  document.getElementById('modalSummary').textContent = endpoint.summary || 'No summary';
-  document.getElementById('modalDescription').textContent = endpoint.description || 'No description';
+  document.getElementById('modalSummary').textContent = endpoint.summary || 'Sin resumen';
+  document.getElementById('modalDescription').textContent = endpoint.description || 'Sin descripción';
 
   formFields.innerHTML = buildFields(endpoint);
   clearResponse();
@@ -92,8 +182,8 @@ function normalizeCategories(spec) {
       map[tagName].items.push({
         path,
         method: String(method).toUpperCase(),
-        summary: endpoint.summary || 'No summary',
-        description: endpoint.description || 'No description',
+        summary: endpoint.summary || 'Sin resumen',
+        description: endpoint.description || 'Sin descripción',
         parameters: endpoint.parameters || [],
         requestBody: endpoint.requestBody || null,
         deprecated: !!endpoint.deprecated
@@ -169,10 +259,10 @@ function renderApiList() {
               <div class="flex items-start justify-between gap-4">
                 <div class="min-w-0 flex-1">
                   <div class="flex flex-wrap items-center gap-2 mb-2">
-                    <span class="px-2.5 py-1 text-[11px] font-semibold text-white ${item.method === 'DELETE' ? 'bg-red-700' : item.method === 'PUT' ? 'bg-amber-700' : 'bg-slate-900'}">${escapeHtml(item.method)}</span>
-                    ${item.deprecated ? '<span class="px-2 py-1 text-[11px] bg-amber-100 text-amber-800 font-semibold">deprecated</span>' : '<span class="px-2 py-1 text-[11px] bg-green-100 text-green-800 font-semibold">ready</span>'}
+                    <span translate="no" class="notranslate px-2.5 py-1 text-[11px] font-semibold text-white ${item.method === 'DELETE' ? 'bg-red-700' : item.method === 'PUT' ? 'bg-amber-700' : 'bg-slate-900'}">${escapeHtml(item.method)}</span>
+                    ${item.deprecated ? '<span translate="no" class="notranslate px-2 py-1 text-[11px] bg-amber-100 text-amber-800 font-semibold">deprecated</span>' : '<span translate="no" class="notranslate px-2 py-1 text-[11px] bg-green-100 text-green-800 font-semibold">ready</span>'}
                   </div>
-                  <p class="text-sm font-semibold text-slate-900 break-anywhere">${escapeHtml(item.path)}</p>
+                  <p translate="no" class="notranslate text-sm font-semibold text-slate-900 break-anywhere">${escapeHtml(item.path)}</p>
                   <p class="text-xs text-slate-500 mt-1 break-anywhere">${escapeHtml(item.summary)}</p>
                 </div>
 
@@ -264,70 +354,6 @@ function buildFields(endpoint) {
 
   const content = endpoint.requestBody?.content || {};
 
-  if (content['multipart/form-data']) {
-    const schema = content['multipart/form-data'].schema || {};
-    const requiredFields = schema.required || [];
-    const properties = schema.properties || {};
-
-    Object.entries(properties).forEach(([name, prop]) => {
-      const required = requiredFields.includes(name);
-      const label = `${escapeHtml(name)}${required ? ' <span class="text-red-600">*</span>' : ''}`;
-      const helper = prop.description ? `<p class="text-[11px] text-slate-500 mt-1 break-anywhere">${escapeHtml(prop.description)}</p>` : '';
-      const placeholder = escapeAttr(prop.example ?? prop.default ?? '');
-
-      if (prop.format === 'binary') {
-        parts.push(`
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-2">${label}</label>
-            <input
-              type="file"
-              name="${escapeAttr(name)}"
-              class="w-full border border-slate-200 bg-white px-3 py-3 text-sm focus:outline-none focus:border-slate-500"
-              ${required ? 'required' : ''}
-            />
-            ${helper}
-          </div>
-        `);
-      } else if (Array.isArray(prop.enum) && prop.enum.length) {
-        parts.push(`
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-2">${label}</label>
-            <select name="${escapeAttr(name)}" class="w-full border border-slate-200 bg-white px-3 py-3 text-sm focus:outline-none focus:border-slate-500" ${required ? 'required' : ''}>
-              ${prop.enum.map(value => `<option value="${escapeAttr(value)}">${escapeHtml(value)}</option>`).join('')}
-            </select>
-            ${helper}
-          </div>
-        `);
-      } else if (prop.type === 'boolean') {
-        parts.push(`
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-2">${label}</label>
-            <select name="${escapeAttr(name)}" class="w-full border border-slate-200 bg-white px-3 py-3 text-sm focus:outline-none focus:border-slate-500" ${required ? 'required' : ''}>
-              <option value="true">true</option>
-              <option value="false">false</option>
-            </select>
-            ${helper}
-          </div>
-        `);
-      } else {
-        const inputType = (prop.type === 'number' || prop.type === 'integer') ? 'number' : 'text';
-        parts.push(`
-          <div>
-            <label class="block text-xs font-semibold text-slate-700 mb-2">${label}</label>
-            <input
-              type="${inputType}"
-              name="${escapeAttr(name)}"
-              placeholder="${placeholder}"
-              class="w-full border border-slate-200 bg-white px-3 py-3 text-sm focus:outline-none focus:border-slate-500 placeholder:text-slate-400"
-              ${required ? 'required' : ''}
-            />
-            ${helper}
-          </div>
-        `);
-      }
-    });
-  }
-
   if (content['application/json']) {
     parts.push(`
       <div>
@@ -338,7 +364,7 @@ function buildFields(endpoint) {
           placeholder='{"key":"value"}'
           class="w-full border border-slate-200 bg-white px-3 py-3 text-sm font-mono focus:outline-none focus:border-slate-500 placeholder:text-slate-400"
         ></textarea>
-        <p class="text-[11px] text-slate-500 mt-1">If this field is filled, the request will be sent as JSON.</p>
+        <p class="text-[11px] text-slate-500 mt-1">Si llenas este campo, la solicitud se enviará como JSON.</p>
       </div>
     `);
   }
@@ -346,7 +372,7 @@ function buildFields(endpoint) {
   if (!parts.length) {
     return `
       <div class="border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-        This endpoint does not require any parameter.
+        Este endpoint no requiere parámetros.
       </div>
     `;
   }
@@ -361,18 +387,6 @@ function buildCurl(method, url, formData, rawJson) {
     const safeJson = rawJson.replace(/'/g, `'\\''`);
     curl += ` -H "Content-Type: application/json" -d '${safeJson}'`;
     return curl;
-  }
-
-  if (['POST', 'PUT', 'PATCH'].includes(method)) {
-    for (const [key, value] of formData.entries()) {
-      if (key === '__raw_json__') continue;
-      if (typeof value === 'string') {
-        if (!value) continue;
-        curl += ` -F "${key}=${value.replace(/\"/g, '\\\"')}"`;
-      } else if (value instanceof File && value.name) {
-        curl += ` -F "${key}=@${value.name}"`;
-      }
-    }
   }
 
   return curl;
@@ -395,14 +409,6 @@ async function executeEndpoint(event) {
     if (rawJson) {
       options.headers = { 'Content-Type': 'application/json' };
       options.body = rawJson;
-    } else {
-      const cleaned = new FormData();
-      for (const [key, value] of formData.entries()) {
-        if (key === '__raw_json__') continue;
-        if (typeof value === 'string' && !value) continue;
-        cleaned.append(key, value);
-      }
-      options.body = cleaned;
     }
   } else {
     const params = new URLSearchParams();
@@ -417,7 +423,7 @@ async function executeEndpoint(event) {
   const fullUrl = `${window.location.origin}${path}`;
   requestUrlBox.textContent = fullUrl;
   curlBox.textContent = buildCurl(method, fullUrl, formData, rawJson);
-  responseBox.innerHTML = '<pre class="whitespace-pre-wrap break-anywhere">Loading...</pre>';
+  responseBox.innerHTML = '<pre class="whitespace-pre-wrap break-anywhere">Cargando...</pre>';
   responseSection.classList.remove('hidden');
 
   try {
@@ -432,10 +438,6 @@ async function executeEndpoint(event) {
     if (contentType.includes('application/json')) {
       const data = await response.json();
       responseBox.innerHTML = `<pre class="whitespace-pre-wrap break-anywhere">${escapeHtml(JSON.stringify(data, null, 2))}</pre>`;
-    } else if (contentType.startsWith('image/')) {
-      const blob = await response.blob();
-      const imageUrl = URL.createObjectURL(blob);
-      responseBox.innerHTML = `<img src="${imageUrl}" alt="Response image" class="max-w-full h-auto border border-slate-200" />`;
     } else {
       const text = await response.text();
       responseBox.innerHTML = `<pre class="whitespace-pre-wrap break-anywhere">${escapeHtml(text)}</pre>`;
@@ -464,27 +466,35 @@ async function loadNotifications() {
     const data = await fetchFirstJson(['/src/data/notifications.json', '/src/notifications.json', '/notifications.json']);
     const notifications = Array.isArray(data) ? data : (data ? [data] : []);
 
-    if (!notifications.length) {
-      container.innerHTML = '<div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">No notifications.</div>';
+    const translated = notifications.map(item => ({
+      ...item,
+      title: item.title === 'Update UI API' ? 'Actualización de la interfaz API' : (item.title || 'Sin título'),
+      message: item.message === 'Sekarang ada update baru dari UI API, silahkan cek informasinya di saluran WhatsApp kami.'
+        ? 'Ahora hay una nueva actualización de la interfaz de la API. Revisa la información en nuestro canal de WhatsApp.'
+        : (item.message || '-')
+    }));
+
+    if (!translated.length) {
+      container.innerHTML = '<div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">No hay notificaciones.</div>';
       unreadCount.classList.add('hidden');
       return;
     }
 
-    const sorted = notifications.slice().sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    const sorted = translated.slice().sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
     let unread = 0;
 
     container.innerHTML = sorted.map(item => {
       if (!item.read) unread++;
 
       const dateText = item.date
-        ? new Date(item.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })
+        ? new Date(item.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
         : '-';
 
       return `
         <div class="border border-slate-200 bg-white p-4">
           <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div class="min-w-0 flex-1">
-              <p class="text-sm font-semibold text-slate-900 break-anywhere">${escapeHtml(item.title || 'Tanpa Judul')}</p>
+              <p class="text-sm font-semibold text-slate-900 break-anywhere">${escapeHtml(item.title || 'Sin título')}</p>
               <p class="text-sm text-slate-600 mt-1 break-anywhere">${escapeHtml(item.message || '-')}</p>
             </div>
             <div class="flex items-center gap-2 sm:ml-4 sm:shrink-0">
@@ -503,7 +513,7 @@ async function loadNotifications() {
       unreadCount.classList.add('hidden');
     }
   } catch (_) {
-    container.innerHTML = '<div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">No notifications available.</div>';
+    container.innerHTML = '<div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">No hay notificaciones disponibles.</div>';
     unreadCount.classList.add('hidden');
   }
 }
@@ -513,10 +523,10 @@ async function loadApis() {
 
   try {
     const spec = await fetchFirstJson(['/openapi.json', '/src/openapi.json', '/src/config/openapi.json']);
-    state.categories = normalizeCategories(spec);
+    state.categories = normalizeCategories(localizeSpec(spec));
     renderApiList();
   } catch (error) {
-    apiList.innerHTML = `<div class="border border-red-200 bg-red-50 p-4 text-sm text-red-700">Failed to load API docs: ${escapeHtml(error.message || String(error))}</div>`;
+    apiList.innerHTML = `<div class="border border-red-200 bg-red-50 p-4 text-sm text-red-700">Error al cargar la documentación: ${escapeHtml(error.message || String(error))}</div>`;
   }
 }
 
@@ -536,10 +546,11 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
+if (modalOverlay) {
+  modalOverlay.addEventListener('click', closeModal);
+}
 endpointModal.addEventListener('click', (event) => {
-  if (event.target === endpointModal || event.target === endpointModal.firstElementChild) {
-    closeModal();
-  }
+  if (event.target === endpointModal) closeModal();
 });
 
 window.toggleCategory = toggleCategory;
