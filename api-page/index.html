@@ -38,172 +38,8 @@
         }
     </script>
 
-    <style>
-        :root {
-            --background: #f9fbff;
-            --foreground: #2c3e50;
-            --card: #ffffff;
-            --card-foreground: #2c3e50;
-            --primary: #3498db;
-            --primary-foreground: #ffffff;
-            --secondary: #85c1e9;
-            --accent: #48d1cc;
-            --muted: #f1f5f9;
-            --muted-foreground: #7f8c8d;
-            --border: rgba(0, 0, 0, 0.08);
-            --radius: 0.5rem;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 6px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        body {
-            background-color: var(--background);
-            color: var(--foreground);
-            font-family: 'Inter', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        #mouse-spotlight {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-            background: radial-gradient(600px circle at 0px 0px, rgba(52, 152, 219, 0.08), transparent 80%);
-            transition: background 0.1s ease-out;
-        }
-
-        header, .bg-card {
-            background-color: var(--card) !important;
-            border-color: var(--border) !important;
-            box-shadow: var(--shadow);
-        }
-
-        .bg-card-hover:hover {
-            border-color: var(--primary) !important;
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-3px) scale(1.02);
-        }
-
-        .bg-primary {
-             background-color: var(--primary);
-             color: var(--primary-foreground);
-        }
-
-        .bg-primary:hover {
-            filter: brightness(1.1);
-            box-shadow: var(--shadow);
-        }
-
-        .text-primary { color: var(--primary); }
-        .text-foreground { color: var(--foreground); }
-        .text-muted-foreground { color: var(--muted-foreground); }
-
-        .border-primary { border-color: var(--primary); }
-        .border-default { border-color: var(--border); }
-
-        ::-webkit-scrollbar {
-            display: none !important;
-        }
-
-        #loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--background);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
-        }
-
-        #loader.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid var(--border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .animate-on-load {
-            opacity: 0;
-            animation: fadeInUp 0.6s ease-out forwards;
-        }
-
-        .animate-on-scroll {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-            transition-delay: var(--delay, 0s);
-        }
-
-        .animate-on-scroll.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .feature-icon {
-            transition: transform 0.3s ease;
-        }
-        .bg-card-hover:hover .feature-icon {
-            transform: scale(1.1) rotate(-5deg);
-        }
-
-        .stat-item {
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-            border-radius: var(--radius);
-            padding: 0.5rem 0;
-        }
-        .stat-item:hover {
-            transform: translateY(-3px);
-            background-color: var(--card);
-            box-shadow: var(--shadow);
-        }
-
-        .step-item {
-            transition: transform 0.3s ease;
-        }
-        .step-item:hover {
-            transform: translateX(5px);
-        }
-        .step-number {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .step-item:hover .step-number {
-             transform: scale(1.1);
-             box-shadow: var(--shadow);
-        }
-    </style>
+    <link rel="stylesheet" href="/assets/index.css">
+    
 </head>
 <body class="text-foreground antialiased font-mono min-h-screen">
 
@@ -222,12 +58,17 @@
     <main class="max-w-2xl mx-auto px-8 py-10">
         <div class="text-left mb-6">
             <p class="text-muted-foreground text-xs mb-4 animate-on-load" style="animation-delay: 0.1s;">¡Hola, desarrollador! Bienvenido a</p>
-            <h2 class="flex flex-wrap items-center gap-1 text-3xl text-foreground font-bold mb-1.5 animate-on-load" style="animation-delay: 0.2s;">
-                <span class="flex-grow text-black">Husky API</span>
-                <span class="text-xs font-bold text-white bg-black px-3 py-1 whitespace-nowrap">
-                    v1.0
-                </span>
-            </h2>
+            <div class="flex flex-wrap items-center gap-3 mb-1.5 animate-on-load" style="animation-delay: 0.2s;">
+    <h2 class="glitch-title text-3xl text-foreground font-bold leading-none" data-text="Husky API">
+        <span class="glitch-main">Husky API</span>
+        <span class="glitch-layer glitch-layer-pink" aria-hidden="true">Husky API</span>
+        <span class="glitch-layer glitch-layer-blue" aria-hidden="true">Husky API</span>
+    </h2>
+
+    <span class="text-xs font-bold text-white bg-black px-3 py-1 whitespace-nowrap">
+        v1.0
+    </span>
+            </div>
             <p class="text-muted-foreground text-xs mx-auto mb-4 animate-on-load" style="animation-delay: 0.3s;">Plataforma de API potente para aplicaciones modernas</p>
 
             <div class="mb-4 animate-on-load" style="animation-delay: 0.4s;">
