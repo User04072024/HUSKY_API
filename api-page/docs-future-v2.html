@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Documentación futurista de Husky API" />
+    <meta name="theme-color" content="#020617" />
+    <title>Husky API — Future Docs</title>
+
+    <link rel="icon" href="/src/icon.png" type="image/png" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              mono: ["Ubuntu Mono", "monospace"],
+              sans: ["Inter", "system-ui", "sans-serif"]
+            }
+          }
+        }
+      };
+    </script>
+
+    <link rel="stylesheet" href="/assets/docs.css" />
+    <link rel="stylesheet" href="/assets/docs-cat-line-v4.css" />
+    <link rel="stylesheet" href="/assets/docs-future.css" />
+    <link rel="stylesheet" href="/assets/docs-future-v2.css" />
+  </head>
+
+  <body class="future-docs-body overflow-x-hidden">
+    <div id="backdrop" class="fixed inset-0 bg-black/50 hidden z-40"></div>
+
+    <aside
+      id="sidebar"
+      class="fixed top-0 right-0 h-full w-[88vw] max-w-xs translate-x-full transition-transform duration-300 z-50 future-glass"
+    >
+      <div class="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+        <div>
+          <p class="text-sm font-semibold text-white">Navegación</p>
+          <p class="text-xs text-slate-400">Husky API</p>
+        </div>
+
+        <button
+          id="sidebarClose"
+          class="future-icon-btn rounded-full px-3 py-2"
+        >
+          <span class="material-icons text-base">close</span>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-3">
+        <a
+          href="/"
+          class="future-outline-btn flex items-center gap-3 px-4 py-3 text-sm"
+        >
+          <span class="material-icons text-base">home</span>
+          Inicio
+        </a>
+
+        <a
+          href="/docs.html"
+          class="future-outline-btn flex items-center gap-3 px-4 py-3 text-sm"
+        >
+          <span class="material-icons text-base">description</span>
+          Docs actual
+        </a>
+      </div>
+    </aside>
+
+    <div class="future-page-shell">
+      <header class="future-topbar sticky top-0 z-30">
+        <div
+          class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4"
+        >
+          <div class="min-w-0 flex items-center gap-3 sm:gap-4">
+            <a href="/" class="future-icon-btn rounded-full p-2.5 shrink-0">
+              <span class="material-icons text-lg">arrow_back</span>
+            </a>
+
+            <div class="min-w-0">
+              <p class="future-brand-kicker">Future documentation</p>
+              <h1
+                class="future-mini-glitch text-base sm:text-lg font-semibold truncate"
+                data-text="Husky API"
+              >
+                Husky API
+              </h1>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="future-version-pill hidden sm:inline-flex">v2</span>
+            <button
+              id="sidebarToggle"
+              class="future-icon-btn rounded-full px-3 py-2"
+            >
+              <span class="material-icons text-lg">menu</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+        <section class="mb-6 sm:mb-8">
+          <div class="docs-notify-photo future-glass future-notify-shell">
+            <div class="notify-title-row">
+              <h2 class="text-lg font-semibold flex items-center gap-2 future-section-title">
+                <span class="material-icons text-sky-300">notifications_active</span>
+                Información
+              </h2>
+            </div>
+
+            <div class="notify-scene">
+              <div class="notify-right">
+                <div
+                  class="docs-cat-photo-wrap docs-cat-wrap is-awake"
+                  aria-label="Gatito de notificaciones"
+                >
+                  <div class="docs-cat-sleep">
+                    <span>Z</span>
+                    <span>z</span>
+                    <span>z</span>
+                  </div>
+
+                  <div class="cat-bed-shadow"></div>
+
+                  <svg
+                    viewBox="0 0 45.952225 35.678726"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <g transform="translate(-121.80376,-101.90461)">
+                      <path fill="#000" d="m 144.95859,104.74193 c 6.01466,-2.1201 14.02915,-0.85215 17.62787,2.77812 3.59872,3.63027 2.91927,7.6226 -0.0661,11.80703 -2.98542,4.18443 -9.54667,3.58363 -15.1474,3.43959 -5.60073,-0.14404 -10.30411,-0.0586 -11.67474,-3.9026 7.85671,-2.22341 3.24576,-12.00205 9.26042,-14.12214 z" />
+                      <path fill="#000" d="m 156.30732,121.30486 c 0,0 -3.82398,2.52741 -4.14054,3.7997 -0.31656,1.2723 0.31438,2.18109 0.95701,2.55128 0.64264,0.3702 1.59106,-0.085 2.13559,-0.75306 0.54452,-0.6681 1.5629,-2.25488 2.47945,-3.20579 0.91654,-0.95091 2.96407,-2.74361 2.96407,-2.74361 l 0.73711,-3.60348 z" />
+                      <path fill="#000" d="m 136.93356,123.08347 c 0,0 -3.20149,3.2804 -3.24123,4.59088 -0.0397,1.31049 0.60411,1.83341 1.3106,2.05901 0.7065,0.22559 1.60304,-0.55255 1.99363,-1.32084 0.39056,-0.76832 1.14875,-2.30337 2.04139,-3.29463 0.89264,-0.99126 3.37363,-3.37561 3.37363,-3.37561 l -1.30007,-3.61169 z" />
+                      <path fill="#000" d="m 130.12859,121.60522 c -2.15849,1.92962 -3.38576,3.23532 -3.61836,4.5256 -0.23257,1.2903 0.0956,1.80324 0.76105,2.13059 0.66549,0.32733 1.66701,-0.31006 2.16665,-1.01233 0.49961,-0.70231 1.04598,-1.14963 2.83575,-3.05671 1.78977,-1.90708 5.91823,-3.27102 5.91823,-3.27102 l -0.75313,-3.99546 c 0,0 -5.15171,2.7497 -7.31019,4.67933 z" />
+                      <path fill="#000" d="m 147.59927,113.85404 c 0.68896,4.40837 -4.04042,7.93759 -10.51533,8.9455 -6.47491,1.00791 -12.24344,-0.88717 -12.9324,-5.29555 -0.68895,-4.40838 3.44199,-9.94186 9.9169,-10.94977 6.47491,-1.0079 12.84186,2.89144 13.53083,7.29982 z" />
+                      <path fill="#000" d="m 126.36446,111.82609 c 0,0 -2.37067,-6.28072 -0.86724,-7.10855 1.50342,-0.82783 5.87139,3.72617 5.87139,3.72617 z" />
+                      <path fill="#000" d="m 143.50182,108.85407 c 0,0 -0.0544,-6.71302 -1.75519,-6.94283 -1.70081,-0.22982 -4.13211,5.59314 -4.13211,5.59314 z" />
+                      <g fill="none" stroke="#000" stroke-width="0.529167" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m 125.27102,116.06007 -2.97783,-1.05373" />
+                        <path d="m 124.91643,116.80991 -2.84808,0.0754" />
+                        <path d="m 124.97798,118.00308 -2.53111,0.5156" />
+                      </g>
+                      <g fill="none" stroke="#000" stroke-width="0.529167" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-23.188815,49.755584,71.047761)">
+                        <path d="m 121.77448,146.87682 3.00963,-0.95912" />
+                        <path d="m 122.10521,147.63749 2.84427,0.16537" />
+                        <path d="m 122.00599,148.82812 2.51354,0.59531" />
+                      </g>
+                      <ellipse id="eyeWhiteRight" class="cat-eye-white" fill="#fff" cx="142.61723" cy="108.6707" rx="3.0261719" ry="3.0757811" transform="rotate(1.8105864)" />
+                      <ellipse id="pupilRight" class="cat-pupil" fill="#000" cx="112.57543" cy="138.29808" rx="1.0380507" ry="1.3097118" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)" />
+                      <ellipse id="highlightRight" class="cat-highlight" fill="#f9f9f9" cx="112.70263" cy="137.817" rx="0.32146212" ry="0.40558979" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)" />
+                      <ellipse id="eyeWhiteLeft" class="cat-eye-white" fill="#fff" cx="135.40735" cy="110.12592" rx="3.0261719" ry="3.0757811" transform="rotate(1.8105864)" />
+                      <ellipse id="pupilLeft" class="cat-pupil" fill="#000" cx="105.22613" cy="138.07497" rx="1.0380507" ry="1.3097118" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)" />
+                      <ellipse id="highlightLeft" class="cat-highlight" fill="#f9f9f9" cx="105.35332" cy="137.59389" rx="0.32146212" ry="0.40558979" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)" />
+                      <path id="tail" fill="#000" d="m 163.77708,109.27292 c 4.36563,2.71198 4.26447,17.63497 3.70417,21.03437 -0.5603,3.3994 -1.86906,4.06275 -4.53099,4.49791 -5.87463,0.96037 -8.39724,-5.87134 -5.7547,-5.72161 2.64254,0.14973 3.15958,3.46446 5.95314,2.05052 2.79356,-1.41394 -1.42214,-13.46068 -1.42214,-13.46068 z" />
+                      <path fill="#000" d="m 159.74981,121.34445 c 0,0 -2.98896,3.47517 -2.94624,4.78555 0.0427,1.31039 0.89775,2.01247 1.61702,2.1932 0.71928,0.18075 1.50745,-0.51603 1.84897,-1.30735 0.34149,-0.79135 0.88811,-2.59584 1.51032,-3.76081 0.62219,-1.16497 2.10268,-3.44845 2.10268,-3.44845 l -0.27441,-3.66785 z" />
+                      <g id="lefteyelid">
+                        <ellipse fill="#000" cx="131.94429" cy="114.29948" rx="3.1571214" ry="3.2155864" />
+                        <path fill="#000" stroke="#fff" stroke-width="0.529167" stroke-linecap="round" stroke-linejoin="round" d="m 129.32504,114.80228 c 2.54908,-1.14592 4.60706,-0.65481 4.60706,-0.65481" />
+                      </g>
+                      <g id="righteyelid">
+                        <ellipse fill="#000" cx="139.07704" cy="113.0834" rx="3.1571214" ry="3.2155864" />
+                        <path fill="#000" stroke="#fff" stroke-width="0.529167" stroke-linecap="round" stroke-linejoin="round" d="m 136.48089,113.70683 c 2.48528,-1.2784 4.56624,-0.89621 4.56624,-0.89621" />
+                      </g>
+                      <g id="eyesdown">
+                        <ellipse fill="#fff" cx="139.12122" cy="113.61373" rx="1.8686198" ry="2.0422525" />
+                        <ellipse fill="#000" cx="112.24622" cy="139.77037" rx="1.0380507" ry="1.3097118" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)" />
+                        <ellipse fill="#f9f9f9" cx="112.37342" cy="139.28929" rx="0.32146212" ry="0.40558979" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)" />
+                        <ellipse fill="#fff" cx="131.994" cy="114.92011" rx="1.8686198" ry="2.0422525" />
+                        <ellipse fill="#000" cx="105.00267" cy="139.64998" rx="1.0380507" ry="1.3097118" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)" />
+                        <ellipse fill="#f9f9f9" cx="105.12987" cy="139.1689" rx="0.32146212" ry="0.40558979" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)" />
+                      </g>
+                      <path id="longtail" fill="#000" d="m 164.24062,110.09354 -2.10788,6.5381 c 0,0 0.84017,12.88397 0.35269,20.95169 h 4.78291 c 0.83489,-8.63528 0.13334,-24.78453 -3.02772,-27.48979 z" />
+                    </g>
+                  </svg>
+                </div>
+
+                <div class="notify-count future-notify-placeholder" aria-hidden="true">
+                  <span id="unreadCount"></span>
+                </div>
+              </div>
+
+              <div id="notificationsList" class="space-y-3">
+                <div class="future-notification-card">Cargando notificaciones...</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="mb-8 sm:mb-10">
+          <div class="future-glass future-hero-card future-hero-card-v2">
+            <div class="future-hero-grid future-hero-grid-v2">
+              <div>
+                <p class="future-kicker">Interactive docs</p>
+                <h2 class="future-glitch" data-text="HUSKY API">HUSKY API</h2>
+                <p class="future-copy mt-5">
+                  Explora endpoints, prueba respuestas y trabaja con una interfaz
+                  más viva, más clara y más cómoda para añadir nuevas carpetas o
+                  servicios sin rehacer toda la página.
+                </p>
+
+                <div class="future-chip-row mt-6">
+                  <span class="future-chip">
+                    <span class="material-icons text-sm text-sky-300">widgets</span>
+                    <span id="categoryCount">0 categorías</span>
+                  </span>
+                  <span class="future-chip">
+                    <span class="material-icons text-sm text-violet-300">lan</span>
+                    <span id="endpointCount">0 endpoints</span>
+                  </span>
+                  <span class="future-chip">
+                    <span class="material-icons text-sm text-emerald-300">notifications</span>
+                    <span id="notificationCount">0 avisos</span>
+                  </span>
+                </div>
+
+                <div class="future-hero-search-inline">
+                  <label for="searchInput" class="future-kicker block mb-3">Buscar endpoint</label>
+                  <div class="future-search-wrap future-search-wrap-inline">
+                    <span class="future-search-icon material-icons">search</span>
+                    <input
+                      id="searchInput"
+                      type="text"
+                      placeholder="Busca por ruta, resumen, categoría o método..."
+                      class="future-search-input"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="emptyState" class="future-empty hidden mb-6">
+          No se encontraron endpoints con esa búsqueda.
+        </section>
+
+        <section id="apiList" class="future-folder-grid">
+          <div class="future-empty">Cargando documentación...</div>
+        </section>
+      </main>
+    </div>
+
+    <div id="endpointModal" class="fixed inset-0 z-[60] hidden">
+      <div id="modalOverlay" class="absolute inset-0 future-modal-overlay"></div>
+
+      <div class="relative z-10 min-h-full flex items-start sm:items-center justify-center p-3 sm:p-6">
+        <div class="future-modal-shell w-full max-w-4xl max-h-[92vh] overflow-y-auto hide-scrollbar">
+          <div class="future-modal-header sticky top-0 px-4 sm:px-6 py-4 flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2 mb-2">
+                <span id="modalMethod" translate="no" class="notranslate future-method-pill get">GET</span>
+                <span id="modalPath" translate="no" class="notranslate text-sm sm:text-base font-semibold text-white break-anywhere"></span>
+              </div>
+              <p id="modalSummary" class="future-modal-summary text-xs sm:text-sm break-anywhere"></p>
+            </div>
+
+            <button id="modalClose" class="future-icon-btn rounded-full px-3 py-2 shrink-0">
+              <span class="material-icons text-base">close</span>
+            </button>
+          </div>
+
+          <div class="px-4 sm:px-6 py-5 space-y-5">
+            <section>
+              <h3 class="future-kicker mb-3">Descripción</h3>
+              <div id="modalDescription" class="future-modal-description p-4 text-sm break-anywhere"></div>
+            </section>
+
+            <form id="endpointForm" class="space-y-4">
+              <div id="formFields" class="space-y-4"></div>
+              <div class="flex flex-wrap gap-3 pt-1">
+                <button type="submit" class="future-solid-btn px-5 py-3 text-sm font-semibold">
+                  Ejecutar
+                </button>
+                <button type="button" id="clearResponseBtn" class="future-outline-btn px-5 py-3 text-sm font-semibold">
+                  Borrar
+                </button>
+              </div>
+            </form>
+
+            <div id="responseSection" class="hidden space-y-4">
+              <article class="future-code-card">
+                <div class="future-code-header">
+                  <div class="future-code-title-wrap">
+                    <span class="future-code-title">Request URL</span>
+                    <span class="future-lang-pill">URL</span>
+                  </div>
+                  <button type="button" class="future-copy-btn" data-copy-target="requestUrlBox">
+                    <span class="material-icons text-base">content_copy</span>
+                  </button>
+                </div>
+                <pre class="future-code-body"><code id="requestUrlBox"></code></pre>
+              </article>
+
+              <article class="future-code-card">
+                <div class="future-code-header">
+                  <div class="future-code-title-wrap">
+                    <span class="future-code-title">Curl</span>
+                    <span class="future-lang-pill">CLI</span>
+                  </div>
+                  <button type="button" class="future-copy-btn" data-copy-target="curlBox">
+                    <span class="material-icons text-base">content_copy</span>
+                  </button>
+                </div>
+                <pre class="future-code-body"><code id="curlBox"></code></pre>
+              </article>
+
+              <article class="future-code-card">
+                <div class="future-code-header">
+                  <div class="future-code-title-wrap">
+                    <span class="future-code-title">Response</span>
+                    <span class="future-lang-pill">JSON</span>
+                  </div>
+                  <button type="button" class="future-copy-btn" data-copy-target="responseBox">
+                    <span class="material-icons text-base">content_copy</span>
+                  </button>
+                </div>
+                <pre class="future-code-body"><code id="responseBox"></code></pre>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/assets/docs-future.js"></script>
+    <script src="/assets/docs-cat-line-v3.js"></script>
+  </body>
+</html>
