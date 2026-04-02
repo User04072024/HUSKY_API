@@ -1,0 +1,267 @@
+body.future-docs-body {
+  background-size: 148% 148%, 148% 148%, 128% 128%, auto;
+  animation: futureBodyDriftV2 20s ease-in-out infinite alternate;
+}
+
+body.future-docs-body::before {
+  opacity: 0.97;
+  filter: blur(60px);
+  animation: futureLavaShiftV2 12s ease-in-out infinite alternate;
+}
+
+body.future-docs-body::after {
+  opacity: 0.26;
+}
+
+@keyframes futureBodyDriftV2 {
+  0% {
+    background-position: 0% 0%, 100% 100%, 50% 50%, 0 0;
+  }
+  35% {
+    background-position: 6% 3%, 96% 95%, 46% 55%, 0 0;
+  }
+  70% {
+    background-position: 3% 8%, 90% 88%, 55% 44%, 0 0;
+  }
+  100% {
+    background-position: 8% 10%, 86% 92%, 52% 40%, 0 0;
+  }
+}
+
+@keyframes futureLavaShiftV2 {
+  0% {
+    transform: translate3d(-4%, -3%, 0) scale(1.03);
+  }
+  32% {
+    transform: translate3d(3%, 1%, 0) scale(1.09);
+  }
+  68% {
+    transform: translate3d(-2%, 4%, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(3%, -2%, 0) scale(1.1);
+  }
+}
+
+.future-hero-card-v2 {
+  padding: 1.4rem;
+}
+
+.future-hero-grid-v2 {
+  display: block;
+}
+
+.future-hero-search-inline {
+  margin-top: 1.7rem;
+  max-width: 38rem;
+}
+
+.future-search-wrap-inline .future-search-input {
+  background: rgba(2, 6, 23, 0.62);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.future-search-wrap-inline .future-search-input:focus {
+  transform: translateY(-1px);
+}
+
+.future-glitch {
+  isolation: isolate;
+  z-index: 0;
+  text-shadow:
+    0 0 10px rgba(56, 189, 248, 0.1),
+    0 0 18px rgba(168, 85, 247, 0.08);
+}
+
+.future-glitch::before,
+.future-glitch::after {
+  z-index: -1;
+  opacity: 0.82;
+}
+
+.future-glitch::before {
+  color: var(--future-cyan);
+  transform: translate(4px, -2px);
+  clip-path: inset(0 0 0 0);
+  mix-blend-mode: screen;
+  filter: blur(0.35px);
+  animation: futureGlitchBackA 2.5s steps(2, end) infinite;
+}
+
+.future-glitch::after {
+  color: var(--future-violet);
+  transform: translate(-4px, 2px);
+  clip-path: inset(0 0 0 0);
+  mix-blend-mode: screen;
+  filter: blur(0.35px);
+  animation: futureGlitchBackB 2.1s steps(2, end) infinite;
+}
+
+@keyframes futureGlitchBackA {
+  0%,
+  100% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(4px, -2px);
+  }
+  12% {
+    clip-path: inset(0 0 62% 0);
+    transform: translate(6px, -3px);
+  }
+  20% {
+    clip-path: inset(34% 0 28% 0);
+    transform: translate(-4px, 1px);
+  }
+  28% {
+    clip-path: inset(68% 0 0 0);
+    transform: translate(5px, 2px);
+  }
+  42% {
+    clip-path: inset(10% 0 50% 0);
+    transform: translate(3px, -2px);
+  }
+  60% {
+    clip-path: inset(48% 0 16% 0);
+    transform: translate(-5px, 1px);
+  }
+  78% {
+    clip-path: inset(22% 0 30% 0);
+    transform: translate(4px, -1px);
+  }
+}
+
+@keyframes futureGlitchBackB {
+  0%,
+  100% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(-4px, 2px);
+  }
+  10% {
+    clip-path: inset(58% 0 0 0);
+    transform: translate(-6px, 3px);
+  }
+  18% {
+    clip-path: inset(24% 0 38% 0);
+    transform: translate(4px, -2px);
+  }
+  26% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(-4px, 2px);
+  }
+  44% {
+    clip-path: inset(12% 0 54% 0);
+    transform: translate(-5px, 1px);
+  }
+  62% {
+    clip-path: inset(46% 0 18% 0);
+    transform: translate(5px, -1px);
+  }
+  82% {
+    clip-path: inset(64% 0 0 0);
+    transform: translate(-4px, 3px);
+  }
+}
+
+.future-mini-glitch-behind {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+  z-index: 0;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 0 10px rgba(56, 189, 248, 0.1),
+    0 0 16px rgba(168, 85, 247, 0.08);
+}
+
+.future-mini-glitch-behind::before,
+.future-mini-glitch-behind::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.future-mini-glitch-behind::before {
+  color: var(--future-cyan);
+  opacity: 0.86;
+  transform: translate(2px, -1px);
+  mix-blend-mode: screen;
+  animation: futureMiniBackA 2.2s steps(2, end) infinite;
+}
+
+.future-mini-glitch-behind::after {
+  color: var(--future-violet);
+  opacity: 0.82;
+  transform: translate(-2px, 1px);
+  mix-blend-mode: screen;
+  animation: futureMiniBackB 1.9s steps(2, end) infinite;
+}
+
+@keyframes futureMiniBackA {
+  0%,
+  100% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(2px, -1px);
+  }
+  14% {
+    clip-path: inset(0 0 58% 0);
+    transform: translate(4px, -2px);
+  }
+  24% {
+    clip-path: inset(38% 0 24% 0);
+    transform: translate(-3px, 1px);
+  }
+  32% {
+    clip-path: inset(66% 0 0 0);
+    transform: translate(3px, 1px);
+  }
+  56% {
+    clip-path: inset(14% 0 46% 0);
+    transform: translate(5px, -1px);
+  }
+  74% {
+    clip-path: inset(52% 0 10% 0);
+    transform: translate(-4px, 1px);
+  }
+}
+
+@keyframes futureMiniBackB {
+  0%,
+  100% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(-2px, 1px);
+  }
+  10% {
+    clip-path: inset(58% 0 0 0);
+    transform: translate(-4px, 2px);
+  }
+  22% {
+    clip-path: inset(24% 0 36% 0);
+    transform: translate(3px, -1px);
+  }
+  42% {
+    clip-path: inset(10% 0 54% 0);
+    transform: translate(-5px, 1px);
+  }
+  60% {
+    clip-path: inset(46% 0 18% 0);
+    transform: translate(3px, 0);
+  }
+  80% {
+    clip-path: inset(62% 0 0 0);
+    transform: translate(-4px, 2px);
+  }
+}
+
+@media (max-width: 640px) {
+  .future-hero-card-v2 {
+    padding: 1.2rem;
+  }
+
+  .future-hero-search-inline {
+    margin-top: 1.3rem;
+  }
+}
