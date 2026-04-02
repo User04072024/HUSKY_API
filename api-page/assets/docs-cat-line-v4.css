@@ -244,7 +244,7 @@
   .notify-right{
     right:.1rem;
     gap:.32rem;
-    top:calc(var(--card-top-gap) - var(--cat-height) + .9rem);
+    top:calc(var(--card-top-gap) - var(--cat-height) + .5rem);
   }
 
   .notify-count #unreadCount{
@@ -265,7 +265,7 @@
   }
 
   .docs-cat-photo-wrap svg{
-    transform:scaleX(1) translateY(1rem);
+    transform:scaleX(1) translateY(.5rem);
   }
 
   .docs-cat-photo-wrap .docs-cat-sleep{
