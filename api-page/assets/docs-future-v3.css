@@ -1,0 +1,215 @@
+body.future-docs-body {
+  background-size: 145% 145%, 145% 145%, 125% 125%, auto;
+  animation: futureBodyDriftV3 20s ease-in-out infinite alternate;
+}
+
+body.future-docs-body::before {
+  opacity: 0.96;
+  filter: blur(58px);
+  animation: futureLavaShiftV4 11s ease-in-out infinite alternate;
+}
+
+body.future-docs-body::after {
+  opacity: 0.28;
+}
+
+@keyframes futureBodyDriftV3 {
+  0% {
+    background-position: 0% 0%, 100% 100%, 50% 50%, 0 0;
+  }
+  40% {
+    background-position: 7% 3%, 95% 94%, 46% 56%, 0 0;
+  }
+  70% {
+    background-position: 3% 8%, 89% 88%, 55% 44%, 0 0;
+  }
+  100% {
+    background-position: 8% 10%, 85% 92%, 52% 40%, 0 0;
+  }
+}
+
+@keyframes futureLavaShiftV4 {
+  0% {
+    transform: translate3d(-4%, -3%, 0) scale(1.03);
+  }
+  30% {
+    transform: translate3d(3%, 1%, 0) scale(1.09);
+  }
+  65% {
+    transform: translate3d(-2%, 4%, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(3%, -2%, 0) scale(1.1);
+  }
+}
+
+.future-hero-card-v3 {
+  padding: 1.4rem;
+}
+
+.future-hero-grid-v3 {
+  display: block;
+}
+
+.future-hero-search-inline {
+  margin-top: 1.7rem;
+  max-width: 38rem;
+}
+
+.future-search-wrap-inline .future-search-input {
+  background: rgba(2, 6, 23, 0.62);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.future-search-wrap-inline .future-search-input:focus {
+  transform: translateY(-1px);
+}
+
+.future-mini-glitch-strong {
+  position: relative;
+  display: inline-block;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 0 12px rgba(56, 189, 248, 0.22),
+    0 0 18px rgba(168, 85, 247, 0.2);
+  animation: futureMiniCoreGlitchStrong 3.8s ease-in-out infinite;
+}
+
+.future-mini-glitch-strong::before,
+.future-mini-glitch-strong::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.future-mini-glitch-strong::before {
+  color: var(--future-cyan);
+  opacity: 0.88;
+  transform: translate(2px, -1px);
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.42);
+  animation: futureMiniLayerStrongOne 2.2s steps(2, end) infinite;
+}
+
+.future-mini-glitch-strong::after {
+  color: var(--future-violet);
+  opacity: 0.84;
+  transform: translate(-2px, 1px);
+  text-shadow: 0 0 8px rgba(168, 85, 247, 0.4);
+  animation: futureMiniLayerStrongTwo 1.9s steps(2, end) infinite;
+}
+
+@keyframes futureMiniCoreGlitchStrong {
+  0%,
+  100% {
+    transform: translate(0, 0) skewX(0deg);
+  }
+  10% {
+    transform: translate(1px, 0) skewX(-1deg);
+  }
+  12% {
+    transform: translate(-1px, 0) skewX(1deg);
+  }
+  14% {
+    transform: translate(0, 0) skewX(0deg);
+  }
+  34% {
+    transform: translate(1px, -1px) skewX(-0.8deg);
+  }
+  36% {
+    transform: translate(-1px, 1px) skewX(0.8deg);
+  }
+  38% {
+    transform: translate(0, 0) skewX(0deg);
+  }
+  62% {
+    transform: translate(2px, 0) skewX(-1deg);
+  }
+  64% {
+    transform: translate(-2px, 0) skewX(1deg);
+  }
+  66% {
+    transform: translate(0, 0) skewX(0deg);
+  }
+}
+
+@keyframes futureMiniLayerStrongOne {
+  0%,
+  100% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(2px, -1px);
+  }
+  10% {
+    clip-path: inset(0 0 60% 0);
+    transform: translate(4px, -2px);
+  }
+  18% {
+    clip-path: inset(38% 0 24% 0);
+    transform: translate(-3px, 1px);
+  }
+  28% {
+    clip-path: inset(66% 0 0 0);
+    transform: translate(3px, 1px);
+  }
+  40% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(2px, 0);
+  }
+  58% {
+    clip-path: inset(16% 0 46% 0);
+    transform: translate(5px, -1px);
+  }
+  74% {
+    clip-path: inset(52% 0 10% 0);
+    transform: translate(-4px, 1px);
+  }
+  88% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(2px, -1px);
+  }
+}
+
+@keyframes futureMiniLayerStrongTwo {
+  0%,
+  100% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(-2px, 1px);
+  }
+  8% {
+    clip-path: inset(58% 0 0 0);
+    transform: translate(-4px, 2px);
+  }
+  16% {
+    clip-path: inset(24% 0 36% 0);
+    transform: translate(3px, -1px);
+  }
+  26% {
+    clip-path: inset(0 0 0 0);
+    transform: translate(-2px, 1px);
+  }
+  44% {
+    clip-path: inset(10% 0 54% 0);
+    transform: translate(-5px, 1px);
+  }
+  60% {
+    clip-path: inset(46% 0 18% 0);
+    transform: translate(3px, 0);
+  }
+  76% {
+    clip-path: inset(62% 0 0 0);
+    transform: translate(-4px, 2px);
+  }
+}
+
+@media (max-width: 640px) {
+  .future-hero-card-v3 {
+    padding: 1.2rem;
+  }
+
+  .future-hero-search-inline {
+    margin-top: 1.3rem;
+  }
+}
