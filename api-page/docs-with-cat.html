@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Documentación de Husky API" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>Documentación de Husky API</title>
+  <link rel="icon" href="/src/icon.png" type="image/png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <script>tailwind.config={theme:{extend:{fontFamily:{mono:['Ubuntu Mono','monospace'],sans:['Inter','system-ui','sans-serif']}}}};</script>
+  <link rel="stylesheet" href="/assets/docs.css" />
+  <link rel="stylesheet" href="/assets/docs-cat.css" />
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen overflow-x-hidden">
+  <div id="backdrop" class="fixed inset-0 bg-black/50 hidden z-40"></div>
+  <aside id="sidebar" class="fixed top-0 right-0 h-full w-[88vw] max-w-xs bg-white border-l border-slate-200 translate-x-full transition-transform duration-300 z-50">
+    <div class="px-4 sm:px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+      <div><p class="text-sm font-semibold text-slate-900">Menú</p><p class="text-xs text-slate-500">Husky API</p></div>
+      <button id="sidebarClose" class="border border-slate-200 px-3 py-2 text-slate-700 hover:border-slate-400"><span class="material-icons text-base">close</span></button>
+    </div>
+    <div class="p-4 sm:p-6 space-y-6">
+      <div class="space-y-2">
+        <a href="/" class="flex items-center gap-3 border border-slate-200 px-4 py-3 text-sm text-slate-700 hover:border-slate-500"><span class="material-icons text-lg">dashboard</span>Inicio</a>
+        <a href="/docs-es.html" class="flex items-center gap-3 border border-slate-200 px-4 py-3 text-sm text-slate-700 hover:border-slate-500"><span class="material-icons text-lg">description</span>Documentación</a>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500 mb-2">ENLACES</p>
+        <div class="space-y-2">
+          <a href="https://wa.me/6282313745397" target="_blank" class="flex items-center gap-3 border border-slate-200 px-4 py-3 text-sm text-slate-700 hover:border-slate-500"><span class="material-icons text-lg">arrow_outward</span>Contacto</a>
+          <a href="https://whatsapp.com/channel/0029Vb6pfuzJf05iZHfkli44" target="_blank" class="flex items-center gap-3 border border-slate-200 px-4 py-3 text-sm text-slate-700 hover:border-slate-500"><span class="material-icons text-lg">arrow_outward</span>Canal</a>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <header class="glass sticky top-0 z-30 border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
+      <div class="min-w-0 flex items-center gap-3 sm:gap-4">
+        <a href="/" class="border border-slate-200 p-2 text-slate-700 hover:border-slate-500 shrink-0"><span class="material-icons text-lg">home</span></a>
+        <div class="min-w-0"><h1 class="text-base sm:text-lg font-semibold text-slate-900 leading-none truncate">Husky API</h1><p class="text-xs text-slate-500 mt-1 truncate">Documentación de API</p></div>
+        <div class="hidden sm:inline-flex px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold shrink-0">v2</div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="sm:hidden inline-flex px-3 py-1.5 bg-slate-900 text-white text-xs font-semibold">v2</div>
+        <button id="sidebarToggle" class="border border-slate-200 px-3 py-2 text-slate-700 hover:border-slate-500"><span class="material-icons text-lg">menu</span></button>
+      </div>
+    </div>
+  </header>
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+    <section class="mb-6 sm:mb-8">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <h2 class="text-lg font-semibold text-slate-900 flex items-center gap-2"><span class="material-icons text-slate-500">notifications</span>Información</h2>
+        <div class="docs-info-side">
+          <div class="docs-cat-wrap" aria-hidden="true">
+            <div class="docs-cat-sleep"><span>Z</span><span>z</span><span>z</span></div>
+            <svg class="docs-cat-svg" viewBox="0 0 45.952225 35.678726" xmlns="http://www.w3.org/2000/svg">
+              <g transform="translate(-121.80376,-101.90461)">
+                <path fill="#000" d="m 144.95859,104.74193 c 6.01466,-2.1201 14.02915,-0.85215 17.62787,2.77812 3.59872,3.63027 2.91927,7.6226 -0.0661,11.80703 -2.98542,4.18443 -9.54667,3.58363 -15.1474,3.43959 -5.60073,-0.14404 -10.30411,-0.0586 -11.67474,-3.9026 7.85671,-2.22341 3.24576,-12.00205 9.26042,-14.12214 z"/>
+                <path fill="#000" d="m 156.30732,121.30486 c 0,0 -3.82398,2.52741 -4.14054,3.7997 -0.31656,1.2723 0.31438,2.18109 0.95701,2.55128 0.64264,0.3702 1.59106,-0.085 2.13559,-0.75306 0.54452,-0.6681 1.5629,-2.25488 2.47945,-3.20579 0.91654,-0.95091 2.96407,-2.74361 2.96407,-2.74361 l 0.73711,-3.60348 z"/>
+                <path fill="#000" d="m 136.93356,123.08347 c 0,0 -3.20149,3.2804 -3.24123,4.59088 -0.0397,1.31049 0.60411,1.83341 1.3106,2.05901 0.7065,0.22559 1.60304,-0.55255 1.99363,-1.32084 0.39056,-0.76832 1.14875,-2.30337 2.04139,-3.29463 0.89264,-0.99126 3.37363,-3.37561 3.37363,-3.37561 l -1.30007,-3.61169 z"/>
+                <path fill="#000" d="m 130.12859,121.60522 c -2.15849,1.92962 -3.38576,3.23532 -3.61836,4.5256 -0.23257,1.2903 0.0956,1.80324 0.76105,2.13059 0.66549,0.32733 1.66701,-0.31006 2.16665,-1.01233 0.49961,-0.70231 1.04598,-1.14963 2.83575,-3.05671 1.78977,-1.90708 5.91823,-3.27102 5.91823,-3.27102 l -0.75313,-3.99546 c 0,0 -5.15171,2.7497 -7.31019,4.67933 z"/>
+                <path fill="#000" d="m 147.59927,113.85404 c 0.68896,4.40837 -4.04042,7.93759 -10.51533,8.9455 -6.47491,1.00791 -12.24344,-0.88717 -12.9324,-5.29555 -0.68895,-4.40838 3.44199,-9.94186 9.9169,-10.94977 6.47491,-1.0079 12.84186,2.89144 13.53083,7.29982 z"/>
+                <path fill="#000" d="m 126.36446,111.82609 c 0,0 -2.37067,-6.28072 -0.86724,-7.10855 1.50342,-0.82783 5.87139,3.72617 5.87139,3.72617 z"/>
+                <path fill="#000" d="m 143.50182,108.85407 c 0,0 -0.0544,-6.71302 -1.75519,-6.94283 -1.70081,-0.22982 -4.13211,5.59314 -4.13211,5.59314 z"/>
+                <g fill="none" stroke="#000" stroke-width="0.529167" stroke-linecap="round" stroke-linejoin="round"><path d="m 125.27102,116.06007 -2.97783,-1.05373"/><path d="m 124.91643,116.80991 -2.84808,0.0754"/><path d="m 124.97798,118.00308 -2.53111,0.5156"/></g>
+                <g fill="none" stroke="#000" stroke-width="0.529167" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-23.188815,49.755584,71.047761)"><path d="m 121.77448,146.87682 3.00963,-0.95912"/><path d="m 122.10521,147.63749 2.84427,0.16537"/><path d="m 122.00599,148.82812 2.51354,0.59531"/></g>
+                <ellipse fill="#fff" cx="142.61723" cy="108.6707" rx="3.0261719" ry="3.0757811" transform="rotate(1.8105864)"/>
+                <ellipse fill="#000" cx="112.57543" cy="138.29808" rx="1.0380507" ry="1.3097118" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)"/>
+                <ellipse fill="#f9f9f9" cx="112.70263" cy="137.817" rx="0.32146212" ry="0.40558979" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)"/>
+                <ellipse fill="#fff" cx="135.40735" cy="110.12592" rx="3.0261719" ry="3.0757811" transform="rotate(1.8105864)"/>
+                <ellipse fill="#000" cx="105.22613" cy="138.07497" rx="1.0380507" ry="1.3097118" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)"/>
+                <ellipse fill="#f9f9f9" cx="105.35332" cy="137.59389" rx="0.32146212" ry="0.40558979" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)"/>
+                <path id="tail" fill="#000" d="m 163.77708,109.27292 c 4.36563,2.71198 4.26447,17.63497 3.70417,21.03437 -0.5603,3.3994 -1.86906,4.06275 -4.53099,4.49791 -5.87463,0.96037 -8.39724,-5.87134 -5.7547,-5.72161 2.64254,0.14973 3.15958,3.46446 5.95314,2.05052 2.79356,-1.41394 -1.42214,-13.46068 -1.42214,-13.46068 z"/>
+                <path fill="#000" d="m 159.74981,121.34445 c 0,0 -2.98896,3.47517 -2.94624,4.78555 0.0427,1.31039 0.89775,2.01247 1.61702,2.1932 0.71928,0.18075 1.50745,-0.51603 1.84897,-1.30735 0.34149,-0.79135 0.88811,-2.59584 1.51032,-3.76081 0.62219,-1.16497 2.10268,-3.44845 2.10268,-3.44845 l -0.27441,-3.66785 z"/>
+                <g id="lefteyelid"><ellipse fill="#000" cx="131.94429" cy="114.29948" rx="3.1571214" ry="3.2155864"/><path fill="#000" stroke="#fff" stroke-width="0.529167" stroke-linecap="round" stroke-linejoin="round" d="m 129.32504,114.80228 c 2.54908,-1.14592 4.60706,-0.65481 4.60706,-0.65481"/></g>
+                <g id="righteyelid"><ellipse fill="#000" cx="139.07704" cy="113.0834" rx="3.1571214" ry="3.2155864"/><path fill="#000" stroke="#fff" stroke-width="0.529167" stroke-linecap="round" stroke-linejoin="round" d="m 136.48089,113.70683 c 2.48528,-1.2784 4.56624,-0.89621 4.56624,-0.89621"/></g>
+                <g id="eyesdown"><ellipse fill="#fff" cx="139.12122" cy="113.61373" rx="1.8686198" ry="2.0422525"/><ellipse fill="#000" cx="112.24622" cy="139.77037" rx="1.0380507" ry="1.3097118" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)"/><ellipse fill="#f9f9f9" cx="112.37342" cy="139.28929" rx="0.32146212" ry="0.40558979" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)"/><ellipse fill="#fff" cx="131.994" cy="114.92011" rx="1.8686198" ry="2.0422525"/><ellipse fill="#000" cx="105.00267" cy="139.64998" rx="1.0380507" ry="1.3097118" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)"/><ellipse fill="#f9f9f9" cx="105.12987" cy="139.1689" rx="0.32146212" ry="0.40558979" transform="matrix(0.98048242,-0.19660678,0.20800608,0.97812753,0,0)"/></g>
+                <path id="longtail" fill="#000" d="m 164.24062,110.09354 -2.10788,6.5381 c 0,0 0.84017,12.88397 0.35269,20.95169 h 4.78291 c 0.83489,-8.63528 0.13334,-24.78453 -3.02772,-27.48979 z" style="visibility:hidden"/>
+              </g>
+            </svg>
+          </div>
+          <div class="docs-info-count"><span id="unreadCount" class="hidden bg-slate-900 text-white text-xs px-2 py-1"></span></div>
+        </div>
+      </div>
+      <div id="notificationsList" class="space-y-3"><div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">Cargando notificaciones...</div></div>
+    </section>
+    <section class="mb-6 sm:mb-8"><div class="relative"><div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"><span class="material-icons text-slate-400 text-lg">search</span></div><input id="searchInput" type="text" placeholder="Buscar endpoints..." class="w-full border border-slate-200 bg-white pl-12 pr-4 py-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-500" /></div></section>
+    <section id="emptyState" class="hidden border border-slate-200 bg-white p-8 text-center text-slate-500">No se encontraron endpoints.</section>
+    <section id="apiList" class="space-y-4"><div class="border border-slate-200 bg-white p-4 text-sm text-slate-500">Cargando documentación...</div></section>
+    <footer class="pt-8 sm:pt-10 text-center"><p class="text-xs text-slate-500">© 2025 Husky API. | Todos los derechos reservados.</p></footer>
+  </main>
+  <div id="endpointModal" class="fixed inset-0 z-[60] hidden"><div id="modalOverlay" class="absolute inset-0 bg-black/60"></div><div class="relative z-10 min-h-full flex items-start sm:items-center justify-center p-3 sm:p-6"><div class="w-full max-w-3xl max-h-[92vh] overflow-y-auto hide-scrollbar bg-white border border-slate-200 shadow-2xl"><div class="sticky top-0 bg-white border-b border-slate-200 px-4 sm:px-6 py-4 flex items-start justify-between gap-4"><div class="min-w-0"><div class="flex flex-wrap items-center gap-2 mb-2"><span id="modalMethod" translate="no" class="notranslate px-2.5 py-1 text-xs font-semibold text-white bg-slate-900"></span><span id="modalPath" translate="no" class="notranslate text-sm sm:text-base font-semibold text-slate-900 break-anywhere"></span></div><p id="modalSummary" class="text-xs sm:text-sm text-slate-500 break-anywhere"></p></div><button id="modalClose" class="border border-slate-200 px-3 py-2 text-slate-700 hover:border-slate-500 shrink-0"><span class="material-icons text-base">close</span></button></div><div class="px-4 sm:px-6 py-5"><div class="mb-5"><h3 class="text-xs font-semibold text-slate-700 mb-2">DESCRIPCIÓN</h3><div id="modalDescription" class="border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 break-anywhere"></div></div><form id="endpointForm" class="space-y-4"><div id="formFields" class="space-y-4"></div><div class="flex flex-wrap gap-2 pt-2"><button type="submit" class="bg-slate-900 text-white px-5 py-2.5 text-sm font-semibold hover:bg-slate-800">Ejecutar</button><button type="button" id="clearResponseBtn" class="border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-800 hover:border-slate-500">Borrar</button></div></form><div id="responseSection" class="hidden mt-6 space-y-4"><div class="border border-slate-200"><div translate="no" class="notranslate border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-700">REQUEST URL</div><pre id="requestUrlBox" class="p-4 text-xs overflow-x-auto break-anywhere whitespace-pre-wrap"></pre></div><div class="border border-slate-200"><div translate="no" class="notranslate border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-700">CURL</div><pre id="curlBox" class="p-4 text-xs overflow-x-auto break-anywhere whitespace-pre-wrap"></pre></div><div class="border border-slate-200"><div translate="no" class="notranslate border-b border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold text-slate-700">RESPONSE</div><div id="responseBox" class="p-4 text-xs overflow-x-auto"></div></div></div></div></div></div></div>
+  <script src="/assets/docs-es.js"></script>
+</body>
+</html>
