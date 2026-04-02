@@ -20,7 +20,7 @@
 .notify-right{
   position:absolute;
   right:.34rem;
-  top:calc(var(--card-top-gap) - var(--cat-height) - 1rem);
+  top:calc(var(--card-top-gap) - var(--cat-height) - .1rem);
   display:flex;
   align-items:flex-start;
   gap:.52rem;
@@ -87,7 +87,7 @@
   width:100%;
   height:auto;
   overflow:visible;
-  transform:scaleX(1) translateY(-1rem);
+  transform:scaleX(1) translateY(-.1rem);
   filter:
     drop-shadow(0 9px 12px rgba(15,23,42,.16))
     drop-shadow(0 3px 5px rgba(15,23,42,.08));
