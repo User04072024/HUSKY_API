@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Husky API",
-    "author": "ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ",
+    "x-author": "ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ",
     "version": "v1.0.0",
     "description": "API simple y fácil de usar."
   },
@@ -17,42 +17,42 @@
   ],
   "paths": {
     "/ai/chatgpt": {
-  "get": {
-    "summary": "ChatGPT",
-    "description": "Envía una consulta a ChatGPT y devuelve la respuesta generada.",
-    "tags": ["IA"],
-    "parameters": [
-      {
-        "name": "text",
-        "in": "query",
-        "required": true,
-        "description": "Texto o pregunta para ChatGPT.",
-        "schema": { "type": "string" }
-      },
-      {
-        "name": "model",
-        "in": "query",
-        "required": false,
-        "description": "Modelo a usar. Por defecto: default.",
-        "schema": {
-          "type": "string",
-          "default": "default"
+      "get": {
+        "summary": "ChatGPT",
+        "description": "Envía una consulta a ChatGPT y devuelve la respuesta generada.",
+        "tags": ["IA"],
+        "parameters": [
+          {
+            "name": "text",
+            "in": "query",
+            "required": true,
+            "description": "Texto o pregunta para ChatGPT.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "description": "Modelo a usar. Por defecto: default.",
+            "schema": {
+              "type": "string",
+              "default": "default"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta correcta"
+          },
+          "400": {
+            "description": "Falta el parámetro text"
+          },
+          "500": {
+            "description": "Error interno"
+          }
         }
       }
-    ],
-    "responses": {
-      "200": {
-        "description": "Respuesta correcta"
-      },
-      "400": {
-        "description": "Falta el parámetro text"
-      },
-      "500": {
-        "description": "Error interno"
-      }
-    }
-  }
-    }
+    },
     "/ai/copilot": {
       "get": {
         "summary": "Copilot",
@@ -198,4 +198,4 @@
       }
     }
   }
-}
+    }
