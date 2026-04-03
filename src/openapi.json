@@ -14,7 +14,8 @@
     { "name": "Anime" },
     { "name": "Downloader" },
     { "name": "Image" },
-   { "name": "News" }
+   { "name": "News" },
+    { "name": "Prueba"}
   ],
   "paths": {
       "/ai/copilot": {
