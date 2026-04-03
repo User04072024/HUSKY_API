@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="theme-color" content="#020617" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Husky API con portada lava lamp optimizada" />
+    <meta name="author" content="ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ" />
+    <link rel="icon" href="/src/icon.png" type="image/png" />
+    <title>Husky API Lava</title>
+
+    <script src="https://cdn.tailwindcss.com/"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com/" />
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/assets/index.css" />
+    <link rel="stylesheet" href="/assets/index-glitch-v2.css" />
+    <link rel="stylesheet" href="/assets/index-lava.css" />
+    <link rel="stylesheet" href="/assets/index-v3.css" />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              mono: ["Ubuntu Mono", "monospace"],
+              sans: ["Inter", "system-ui", "sans-serif"]
+            }
+          }
+        }
+      };
+    </script>
+  </head>
+  <body class="index-v3-page text-foreground antialiased font-mono min-h-screen">
+    <div class="lava-bg">
+      <div class="blob b1"></div>
+      <div class="blob b2"></div>
+      <div class="blob b3"></div>
+      <div class="blob b4"></div>
+    </div>
+    <div class="lava-grid"></div>
+    <div class="vignette"></div>
+    <div id="mouse-spotlight"></div>
+
+    <div id="loader">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="index-v3-shell">
+      <section class="index-v3-grid">
+        <article class="index-v3-glass index-v3-hero animate-on-load" style="animation-delay: 0.08s;">
+          <div class="index-v3-hero-head">
+            <p class="text-muted-foreground text-xs">Presentación oficial de la plataforma</p>
+            <span class="index-v3-version">v1.0</span>
+          </div>
+
+          <div class="mb-1.5">
+            <h2 class="glitch-title text-3xl text-foreground font-bold leading-none">
+              <span class="glitch-main">Husky API</span>
+              <span class="glitch-layer glitch-layer-pink" aria-hidden="true">Husky API</span>
+              <span class="glitch-layer glitch-layer-blue" aria-hidden="true">Husky API</span>
+            </h2>
+          </div>
+
+          <p class="index-v3-subtitle text-muted-foreground text-xs">
+            API lista para integrar servicios modernos en una sola plataforma
+          </p>
+
+          <p class="index-v3-description">
+            Explora herramientas de inteligencia artificial, recursos multimedia,
+            utilidades de descarga y más, con una estructura clara, una documentación
+            directa y un diseño pensado para presentar la API de forma más fuerte y profesional.
+          </p>
+
+          <div class="index-v3-tag-row">
+            <span class="index-v3-tag">
+              <span class="material-icons text-sm">smart_toy</span>
+              IA y asistentes
+            </span>
+            <span class="index-v3-tag">
+              <span class="material-icons text-sm">image</span>
+              Imágenes y anime
+            </span>
+            <span class="index-v3-tag">
+              <span class="material-icons text-sm">download</span>
+              Descargas útiles
+            </span>
+          </div>
+
+          <div class="index-v3-action-grid">
+            <a href="/docs.html" class="index-v3-btn index-v3-btn--primary">
+              <i class="fas fa-rocket"></i>
+              <span>ENTRAR A LA DOCS</span>
+            </a>
+
+            <a href="https://huskydev.space" target="_blank" class="index-v3-btn index-v3-btn--secondary">
+              <i class="fas fa-globe"></i>
+              <span>VISITAR HUSKYDEV.SPACE</span>
+            </a>
+          </div>
+
+          <div class="index-v3-mini-links">
+            <a href="https://github.com/" target="_blank" class="index-v3-mini-link">
+              <span class="material-icons text-sm">code</span>
+              <span>GitHub</span>
+            </a>
+            <a href="https://whatsapp.com/channel/0029VbCGBnb2UPBF8LXws83u" target="_blank" class="index-v3-mini-link">
+              <span class="material-icons text-sm">campaign</span>
+              <span>Canal</span>
+            </a>
+            <a href="https://wa.me/6283191473712" target="_blank" class="index-v3-mini-link">
+              <span class="material-icons text-sm">forum</span>
+              <span>Contacto</span>
+            </a>
+            <a href="#steps" class="index-v3-mini-link">
+              <span class="material-icons text-sm">bolt</span>
+              <span>Primeros pasos</span>
+            </a>
+          </div>
+        </article>
+
+        <aside class="index-v3-glass index-v3-stats-card animate-on-load" style="animation-delay: 0.18s;">
+          <div class="index-v3-card-head">
+            <div class="index-v3-card-title">
+              <span class="material-icons text-base">insights</span>
+              <span>Resumen general</span>
+            </div>
+            <span id="indexV3CategoryMeta" class="index-v3-card-meta">Cargando…</span>
+          </div>
+
+          <div class="index-v3-stats">
+            <article class="index-v3-stat stat-item">
+              <div id="indexV3TotalEndpoints" class="index-v3-stat-value">0</div>
+              <div class="index-v3-stat-label">Endpoints</div>
+            </article>
+            <article class="index-v3-stat stat-item">
+              <div id="indexV3TotalCategories" class="index-v3-stat-value">0</div>
+              <div class="index-v3-stat-label">Categorías</div>
+            </article>
+            <article class="index-v3-stat stat-item">
+              <div class="index-v3-stat-value">24/7</div>
+              <div class="index-v3-stat-label">Soporte</div>
+            </article>
+          </div>
+
+          <div class="index-v3-card-copy">
+            Las categorías y los endpoints se leen directamente desde la información real de la API,
+            así que cualquier cambio nuevo se refleja aquí sin rehacer la portada.
+          </div>
+        </aside>
+      </section>
+
+      <section class="index-v3-glass index-v3-categories-card animate-on-scroll">
+        <div class="index-v3-card-head">
+          <div>
+            <div class="index-v3-card-title">
+              <span class="material-icons text-base">folder_special</span>
+              <span>Categorías disponibles</span>
+            </div>
+            <p class="index-v3-card-copy">
+              Vista automática de carpetas y endpoints principales.
+            </p>
+          </div>
+        </div>
+
+        <div id="indexV3CategoryGrid" class="index-v3-category-grid">
+          <div class="index-v3-empty">Cargando categorías y endpoints...</div>
+        </div>
+      </section>
+
+      <section class="index-v3-info-grid animate-on-scroll">
+        <article class="index-v3-info">
+          <div class="index-v3-card-title">
+            <span class="material-icons text-base">info</span>
+            <span>¿Qué es Husky API?</span>
+          </div>
+          <p class="index-v3-info-copy">
+            Es una plataforma que reúne diferentes servicios listos para integrarse en proyectos,
+            con categorías claras, acceso rápido a la documentación y una experiencia más cómoda para desarrolladores.
+          </p>
+        </article>
+
+        <article class="index-v3-info">
+          <div class="index-v3-card-title">
+            <span class="material-icons text-base">memory</span>
+            <span>¿Qué ofrece?</span>
+          </div>
+          <p class="index-v3-info-copy">
+            Endpoints de IA, recursos visuales, descargas, noticias y otras utilidades con estructura simple,
+            respuesta JSON y una base pensada para integraciones rápidas.
+          </p>
+        </article>
+      </section>
+
+      <section id="features" class="index-v3-category-grid animate-on-scroll">
+        <article class="index-v3-info">
+          <div class="index-v3-card-title">
+            <span class="material-icons text-base">flash_on</span>
+            <span>Rápida y confiable</span>
+          </div>
+          <p class="index-v3-info-copy">Endpoints de alto rendimiento con baja latencia.</p>
+        </article>
+
+        <article class="index-v3-info">
+          <div class="index-v3-card-title">
+            <span class="material-icons text-base">verified_user</span>
+            <span>Segura</span>
+          </div>
+          <p class="index-v3-info-copy">Seguridad y protección de nivel empresarial.</p>
+        </article>
+
+        <article class="index-v3-info">
+          <div class="index-v3-card-title">
+            <span class="material-icons text-base">integration_instructions</span>
+            <span>Integración sencilla</span>
+          </div>
+          <p class="index-v3-info-copy">API REST simple con documentación clara.</p>
+        </article>
+      </section>
+
+      <section id="steps" class="index-v3-glass index-v3-step-card animate-on-scroll">
+        <div class="index-v3-card-title mb-4">
+          <span class="material-icons text-base">bolt</span>
+          <span>Primeros pasos</span>
+        </div>
+
+        <div class="index-v3-step-grid">
+          <article class="index-v3-step">
+            <div class="index-v3-step-head">
+              <span class="index-v3-step-number">1</span>
+              <h4 class="index-v3-step-title">Elige una categoría</h4>
+            </div>
+            <p class="index-v3-step-copy">Explora las carpetas disponibles y entra en la que mejor se ajuste a tu integración.</p>
+          </article>
+
+          <article class="index-v3-step">
+            <div class="index-v3-step-head">
+              <span class="index-v3-step-number">2</span>
+              <h4 class="index-v3-step-title">Revisa la documentación</h4>
+            </div>
+            <p class="index-v3-step-copy">Consulta parámetros, formato de respuesta y ejemplos antes de conectar el endpoint.</p>
+          </article>
+
+          <article class="index-v3-step">
+            <div class="index-v3-step-head">
+              <span class="index-v3-step-number">3</span>
+              <h4 class="index-v3-step-title">Integra tu proyecto</h4>
+            </div>
+            <p class="index-v3-step-copy">Haz la solicitud HTTP y usa la respuesta JSON directamente en tu aplicación.</p>
+          </article>
+        </div>
+      </section>
+
+      <footer class="index-v3-footer flex flex-col text-center space-y-2 animate-on-scroll">
+        <p class="text-muted-foreground" style="font-size: 0.7rem; line-height: 1rem;">
+          © <span id="year"></span> Husky API — Todos los derechos reservados.
+        </p>
+        <p class="text-muted-foreground space-x-3" style="font-size: 0.7rem; line-height: 1rem;">
+          <a href="/privacy-policy" class="hover:underline hover:text-black">Política de privacidad</a>
+          <span aria-hidden="true">|</span>
+          <a href="/terms-of-service" class="hover:underline hover:text-black">Términos del servicio</a>
+        </p>
+      </footer>
+    </div>
+
+    <script src="/assets/index-v3.js"></script>
+    <script src="/assets/index-glitch-v2.js"></script>
+  </body>
+</html>
