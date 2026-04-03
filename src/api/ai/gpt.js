@@ -7,28 +7,20 @@ module.exports = function (app) {
   const API_KEY = 'VOKER_FREE_2026';
 
   async function chatgptChat(text) {
-    try {
-      const url = `${API_URL}/chat?q=${encodeURIComponent(text)}&apikey=${API_KEY}`;
-      const { data } = await axios.get(url, {
-        headers: {
-          'User-Agent': 'Husky-API/1.0',
-          'Accept': 'application/json'
-        }
-      });
+    const url = `${API_URL}/chat?q=${encodeURIComponent(text)}&apikey=${API_KEY}`;
 
-      if (!data || !data.success || !data.data || !data.data.content) {
-        throw new Error('Estructura de API inválida');
+    const { data } = await axios.get(url, {
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Husky-API/1.0'
       }
+    });
 
-      return data.data.content;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.error ||
-        error.response?.data?.message ||
-        error.message ||
-        'Error al conectar con ChatGPT'
-      );
+    if (!data?.success || !data?.data?.content) {
+      throw new Error('Estructura de API inválida');
     }
+
+    return data.data.content;
   }
 
   app.get('/ai/chatgpt', async (req, res) => {
@@ -57,7 +49,7 @@ module.exports = function (app) {
         status: false,
         creator: CREATOR,
         author: AUTHOR,
-        error: error.message
+        error: error.response?.data?.error || error.message || 'Error al conectar con ChatGPT'
       });
     }
   });
