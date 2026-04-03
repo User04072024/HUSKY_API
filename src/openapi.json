@@ -17,10 +17,9 @@
   ],
   "paths": {
     "/ai/chatgpt": {
-  "g"/ai/chatgpt": {
   "get": {
     "summary": "ChatGPT",
-    "description": "Envía una consulta a ChatGPT y devuelve la respuesta generada.",
+    "description": "Chat con ChatGPT envia dudas o texto para obtener respuesta.",
     "tags": ["IA"],
     "parameters": [
       {
