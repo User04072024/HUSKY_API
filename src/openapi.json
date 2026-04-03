@@ -17,42 +17,35 @@
   ],
   "paths": {
     "/ai/chatgpt": {
-      "get": {
-        "summary": "ChatGPT",
-        "description": "Envía una consulta a ChatGPT y devuelve la respuesta generada.",
-        "tags": ["IA"],
-        "parameters": [
-          {
-            "name": "text",
-            "in": "query",
-            "required": true,
-            "description": "Texto o pregunta para ChatGPT.",
-            "schema": { "type": "string" }
-          },
-          {
-            "name": "model",
-            "in": "query",
-            "required": false,
-            "description": "Modelo a usar. Por defecto: default.",
-            "schema": {
-              "type": "string",
-              "default": "default"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Respuesta correcta"
-          },
-          "400": {
-            "description": "Falta el parámetro text"
-          },
-          "500": {
-            "description": "Error interno"
-          }
+  "get": {
+    "summary": "ChatGPT",
+    "description": "Envía una consulta a ChatGPT y devuelve la respuesta generada.",
+    "tags": ["IA"],
+    "parameters": [
+      {
+        "name": "text",
+        "in": "query",
+        "required": true,
+        "description": "Texto o pregunta para ChatGPT.",
+        "schema": {
+          "type": "string",
+          "example": "Hola, ¿cómo estás?"
         }
       }
-    },
+    ],
+    "responses": {
+      "200": {
+        "description": "Respuesta correcta"
+      },
+      "400": {
+        "description": "Falta el parámetro text"
+      },
+      "500": {
+        "description": "Error interno"
+      }
+    }
+  }
+},
     "/ai/copilot": {
       "get": {
         "summary": "Copilot",
