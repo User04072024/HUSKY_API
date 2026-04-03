@@ -11,25 +11,16 @@ module.exports = function (app) {
 
       const { data } = await axios.get(url, {
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'User-Agent': 'Husky-API/1.0'
         }
       });
 
-      const result =
-        data?.result ||
-        data?.response ||
-        data?.message ||
-        data?.data?.result ||
-        data?.data?.response ||
-        data?.data?.message ||
-        data?.data?.content;
-
-      if (!result) {
-        throw new Error('Estructura de API inválida');
+      if (!data || data.status !== true || !data.data) {
+        throw new Error('Estructura de la API inválida');
       }
 
-      return result;
+      return data.data;
     } catch (error) {
       throw new Error(
         error.response?.data?.error ||
