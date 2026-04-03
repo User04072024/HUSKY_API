@@ -17,6 +17,7 @@
   ],
   "paths": {
     "/ai/chatgpt": {
+  "g"/ai/chatgpt": {
   "get": {
     "summary": "ChatGPT",
     "description": "Envía una consulta a ChatGPT y devuelve la respuesta generada.",
@@ -29,7 +30,7 @@
         "description": "Texto o pregunta para ChatGPT.",
         "schema": {
           "type": "string",
-          "example": "Hola, ¿cómo estás?"
+          "example": "Hola"
         }
       }
     ],
