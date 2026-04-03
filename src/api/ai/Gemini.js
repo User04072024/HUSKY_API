@@ -5,22 +5,71 @@ module.exports = function (app) {
   const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ';
   const API_URL = 'https://api.delirius.store';
 
+  function extractResult(data) {
+    if (!data) return null;
+
+    if (typeof data.data === 'string' && data.data.trim()) {
+      return data.data.trim();
+    }
+
+    if (typeof data.result === 'string' && data.result.trim()) {
+      return data.result.trim();
+    }
+
+    if (typeof data.response === 'string' && data.response.trim()) {
+      return data.response.trim();
+    }
+
+    if (typeof data.message === 'string' && data.message.trim()) {
+      return data.message.trim();
+    }
+
+    if (typeof data.content === 'string' && data.content.trim()) {
+      return data.content.trim();
+    }
+
+    if (typeof data.data?.content === 'string' && data.data.content.trim()) {
+      return data.data.content.trim();
+    }
+
+    if (typeof data.data?.result === 'string' && data.data.result.trim()) {
+      return data.data.result.trim();
+    }
+
+    return null;
+  }
+
   async function geminiChat(text) {
     try {
       const url = `${API_URL}/ia/chatgpt?q=${encodeURIComponent(text)}`;
 
-      const { data } = await axios.get(url, {
+      const response = await axios.get(url, {
         headers: {
           Accept: 'application/json',
           'User-Agent': 'Husky-API/1.0'
-        }
+        },
+        timeout: 20000,
+        validateStatus: () => true
       });
 
-      if (!data || data.status !== true || !data.data) {
-        throw new Error('Estructura de la API inválida');
+      const data = response.data;
+
+      if (response.status < 200 || response.status >= 300) {
+        throw new Error(
+          data?.error ||
+          data?.message ||
+          `La API externa respondió con estado ${response.status}`
+        );
       }
 
-      return data.data;
+      const result = extractResult(data);
+
+      if (!result) {
+        console.log('Respuesta real de Delirius:', data);
+        throw new Error('Estructura de API inválida');
+      }
+
+      return result;
     } catch (error) {
       throw new Error(
         error.response?.data?.error ||
