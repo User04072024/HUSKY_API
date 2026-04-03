@@ -46,6 +46,36 @@
     }
   }
 },
+    "/ai/gemini": {
+  "get": {
+    "summary": "Gemini",
+    "description": "Envía una consulta a Gemini y devuelve la respuesta generada.",
+    "tags": ["IA"],
+    "parameters": [
+      {
+        "name": "text",
+        "in": "query",
+        "required": true,
+        "description": "Texto o pregunta para Gemini.",
+        "schema": {
+          "type": "string",
+          "example": "que ia eres"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Respuesta correcta"
+      },
+      "400": {
+        "description": "Falta el parámetro text"
+      },
+      "500": {
+        "description": "Error interno"
+      }
+    }
+  }
+    },
     "/ai/copilot": {
       "get": {
         "summary": "Copilot",
