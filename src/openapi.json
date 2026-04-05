@@ -190,6 +190,37 @@
       }
     },
 
+"/image/search": {
+  "get": {
+    "summary": "Images Search",
+    "description": "Busca imágenes según el texto enviado y devuelve resultados con metadatos.",
+    "tags": ["Imagen"],
+    "parameters": [
+      {
+        "name": "text",
+        "in": "query",
+        "required": true,
+        "description": "Texto de búsqueda para imágenes.",
+        "schema": {
+          "type": "string",
+          "example": "Gato pixel art"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Respuesta correcta"
+      },
+      "400": {
+        "description": "Falta el parámetro text"
+      },
+      "500": {
+        "description": "Error interno"
+      }
+    }
+  }
+}
+    
     "/download/tiktok": {
       "get": {
         "summary": "TikTok",
