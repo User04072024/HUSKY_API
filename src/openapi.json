@@ -220,6 +220,37 @@
     }
   }
 },
+
+"/download/spotify": {
+  "get": {
+    "summary": "Spotify Download",
+    "description": "Descarga audio desde un enlace de Spotify.",
+    "tags": ["Descargar"],
+    "parameters": [
+      {
+        "name": "url",
+        "in": "query",
+        "required": true,
+        "description": "URL del track de Spotify.",
+        "schema": {
+          "type": "string",
+          "example": "https://open.spotify.com/track/xxxxxxxx"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Respuesta correcta"
+      },
+      "400": {
+        "description": "Falta el parámetro url o la URL no es válida"
+      },
+      "500": {
+        "description": "Error interno"
+      }
+    }
+  }
+},
     
     "/download/tiktok": {
       "get": {
