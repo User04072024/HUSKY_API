@@ -25,7 +25,7 @@ module.exports = function (app) {
       }
 
       return {
-        total: data.contar || data.datos.length || 0,
+        total: Number(data.contar) || data.datos.length || 0,
         results: data.datos.map((item) => ({
           title: item.titulo || 'Sin título',
           description: item.descripcion || 'Sin descripción',
