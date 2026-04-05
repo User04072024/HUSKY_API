@@ -5,8 +5,45 @@ module.exports = function (app) {
   const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ';
   const API_URL = 'https://api.dix.lat';
 
-  function isValidEstado(value) {
-    return value === true || value === 'true' || value === 'verdadero';
+  function isTruthyStatus(value) {
+    return (
+      value === true ||
+      value === 'true' ||
+      value === 'verdadero' ||
+      value === 'success' ||
+      value === 'ok'
+    );
+  }
+
+  function pickArray(data) {
+    if (Array.isArray(data?.datos)) return data.datos;
+    if (Array.isArray(data?.data)) return data.data;
+    if (Array.isArray(data?.results)) return data.results;
+    if (Array.isArray(data?.result)) return data.result;
+    return null;
+  }
+
+  function pickCount(data, items) {
+    return (
+      Number(data?.contar) ||
+      Number(data?.count) ||
+      Number(data?.total) ||
+      items.length ||
+      0
+    );
+  }
+
+  function mapItem(item) {
+    return {
+      title: item?.titulo || item?.title || 'Sin título',
+      description: item?.descripcion || item?.description || 'Sin descripción',
+      image: item?.url_hd || item?.url || item?.image || null,
+      metadata: {
+        id: item?.metadatos?.id || item?.metadata?.id || null,
+        author: item?.metadatos?.autor || item?.metadata?.author || null,
+        dimensions: item?.metadatos?.dimensiones || item?.metadata?.dimensions || null
+      }
+    };
   }
 
   async function searchImages(text) {
@@ -20,22 +57,20 @@ module.exports = function (app) {
         }
       });
 
-      if (!data || !isValidEstado(data.estado) || !Array.isArray(data.datos)) {
+      const items = pickArray(data);
+      const ok =
+        isTruthyStatus(data?.estado) ||
+        isTruthyStatus(data?.status) ||
+        items !== null;
+
+      if (!data || !ok || !Array.isArray(items)) {
+        console.log('Respuesta real de /images:', data);
         throw new Error('Estructura de API inválida');
       }
 
       return {
-        total: Number(data.contar) || data.datos.length || 0,
-        results: data.datos.map((item) => ({
-          title: item.titulo || 'Sin título',
-          description: item.descripcion || 'Sin descripción',
-          image: item.url_hd || null,
-          metadata: {
-            id: item.metadatos?.id || null,
-            author: item.metadatos?.autor || null,
-            dimensions: item.metadatos?.dimensiones || null
-          }
-        }))
+        total: pickCount(data, items),
+        results: items.map(mapItem)
       };
     } catch (error) {
       throw new Error(
