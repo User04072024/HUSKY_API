@@ -281,6 +281,36 @@
           }
         }
       }
+    },
+    "/download/mediafire": {
+  "get": {
+    "summary": "MediaFire Download",
+    "description": "Extrae metadatos y enlace de descarga directa desde una URL de MediaFire.",
+    "tags": ["Descargar"],
+    "parameters": [
+      {
+        "name": "url",
+        "in": "query",
+        "required": true,
+        "description": "URL del archivo en MediaFire.",
+        "schema": {
+          "type": "string",
+          "example": "https://www.mediafire.com/file/abc123/archivo.zip/file"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Respuesta correcta"
+      },
+      "400": {
+        "description": "Falta el parámetro url o la URL no es válida"
+      },
+      "500": {
+        "description": "Error interno"
+        }
+      }
     }
+  }
   }
     }
