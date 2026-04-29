@@ -10,23 +10,22 @@ module.exports = function (app) {
   async function getToken() {
     if (accessToken && Date.now() < tokenExpires) return accessToken;
 
-    const { data } = await axios.post(
-      'https://accounts.spotify.com/api/token',
-      'grant_type=client_credentials',
-      {
-        headers: {
-          'Authorization': 'Basic ' + Buffer.from(
-            // Client ID y Secret públicos del web player de Spotify
-            'd8a5ed958d274c2e8ee717e6a4b0971d:2f634bbc79d14e849f9d8a5e8b16c07e'
-          ).toString('base64'),
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36'
-        }
+    const { data: html } = await axios.get('https://open.spotify.com/', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
       }
-    );
+    });
 
-    accessToken = data.access_token;
-    tokenExpires = Date.now() + (data.expires_in - 60) * 1000;
+    // Extraer token del HTML
+    const tokenMatch = html.match(/"accessToken":"([^"]+)"/);
+    const expiresMatch = html.match(/"accessTokenExpirationTimestampMs":(\d+)/);
+
+    if (!tokenMatch) throw new Error('No se pudo extraer el token de Spotify');
+
+    accessToken = tokenMatch[1];
+    tokenExpires = expiresMatch ? parseInt(expiresMatch[1]) - 5000 : Date.now() + 3300000;
     return accessToken;
   }
 
@@ -59,7 +58,8 @@ module.exports = function (app) {
         },
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'app-platform': 'WebPlayer'
         }
       });
 
@@ -86,8 +86,13 @@ module.exports = function (app) {
       });
 
     } catch (error) {
-      // Log para ver el error exacto
       console.error('Spotify error:', error.response?.data || error.message);
+
+      // Si el token expiró, forzar renovación
+      if (error.response?.status === 401) {
+        accessToken = null;
+        tokenExpires = 0;
+      }
 
       return res.status(500).json({
         status: false,
