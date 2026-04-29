@@ -13,7 +13,7 @@
     { "name": "IA" },
     { "name": "Anime" },
     { "name": "Imagen" },
-    { "name": "Descargar" }
+    { "name": "Descargar" },
     { "name": "Buscar" }
   ],
   "paths": {
@@ -312,13 +312,12 @@
         }
       }
     }
-  }
   },
   "/search/spotify": {
   "get": {
     "summary": "Spotify Search",
     "description": "Busca canciones en Spotify y devuelve links directos.",
-    "tags": ["Search"],
+    "tags": ["Buscar"],
     "parameters": [
       {
         "name": "text",
@@ -336,6 +335,7 @@
       "400": { "description": "Falta el parámetro text" },
       "500": { "description": "Error interno" }
     }
+  }
   }
   }
     }
