@@ -4,35 +4,35 @@ module.exports = function (app) {
   const CREATOR = 'Husky API';
   const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ';
 
+  const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
+  const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
+
   let accessToken = null;
   let tokenExpires = 0;
 
-  async function getToken() {
-    if (accessToken && Date.now() < tokenExpires) return accessToken;
+  async function fetchSpotify(endpoint, params = {}) {
+    if (!accessToken || Date.now() >= tokenExpires) {
+      const credentials = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
+      const { data } = await axios.post(
+        'https://accounts.spotify.com/api/token',
+        'grant_type=client_credentials',
+        {
+          headers: {
+            'Authorization': `Basic ${credentials}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }
+      );
+      accessToken = data.access_token;
+      tokenExpires = Date.now() + (data.expires_in - 60) * 1000;
+    }
 
-    const { data } = await axios.get('https://open.spotify.com/get_access_token', {
-      params: {
-        reason: 'transport',
-        productType: 'web_player'
-      },
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        'Accept': 'application/json',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Referer': 'https://open.spotify.com/',
-        'Origin': 'https://open.spotify.com',
-        'app-platform': 'WebPlayer',
-        'spotify-app-version': '1.2.46.467.g9a796c0d',
-        // Cookie de sesión anónima que Spotify asigna a cualquier visitante
-        'Cookie': 'sp_t=anonymous; sp_landing=https%3A%2F%2Fopen.spotify.com%2F; sp_dc='
-      }
+    const { data } = await axios.get(`https://api.spotify.com/${endpoint}`, {
+      params,
+      headers: { 'Authorization': `Bearer ${accessToken}` }
     });
 
-    if (!data?.accessToken) throw new Error('No se pudo obtener el token');
-
-    accessToken = data.accessToken;
-    tokenExpires = data.accessTokenExpirationTimestampMs - 5000;
-    return accessToken;
+    return data;
   }
 
   function msToMinutes(ms) {
@@ -54,21 +54,11 @@ module.exports = function (app) {
     }
 
     try {
-      const token = await getToken();
-
-      const { data } = await axios.get('https://api.spotify.com/v1/search', {
-        params: {
-          q: text,
-          type: 'track',
-          limit: 10,
-          market: 'ES'
-        },
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json',
-          'app-platform': 'WebPlayer',
-          'spotify-app-version': '1.2.46.467.g9a796c0d'
-        }
+      const data = await fetchSpotify('v1/search', {
+        q: text,
+        type: 'track',
+        limit: 10,
+        market: 'ES'
       });
 
       if (!data?.tracks?.items?.length) {
@@ -94,8 +84,6 @@ module.exports = function (app) {
       });
 
     } catch (error) {
-      console.error('Error:', error.response?.status, error.response?.data || error.message);
-
       if (error.response?.status === 401) {
         accessToken = null;
         tokenExpires = 0;
