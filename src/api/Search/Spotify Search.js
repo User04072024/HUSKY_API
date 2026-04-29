@@ -3,43 +3,7 @@ const axios = require('axios');
 module.exports = function (app) {
   const CREATOR = 'Husky API';
   const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ';
-
-  const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
-  const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-
-  let accessToken = null;
-  let tokenExpires = 0;
-
-  async function fetchSpotify(endpoint, params = {}) {
-    if (!accessToken || Date.now() >= tokenExpires) {
-      const credentials = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
-      const { data } = await axios.post(
-        'https://accounts.spotify.com/api/token',
-        'grant_type=client_credentials',
-        {
-          headers: {
-            'Authorization': `Basic ${credentials}`,
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        }
-      );
-      accessToken = data.access_token;
-      tokenExpires = Date.now() + (data.expires_in - 60) * 1000;
-    }
-
-    const { data } = await axios.get(`https://api.spotify.com/${endpoint}`, {
-      params,
-      headers: { 'Authorization': `Bearer ${accessToken}` }
-    });
-
-    return data;
-  }
-
-  function msToMinutes(ms) {
-    const m = Math.floor(ms / 60000);
-    const s = Math.floor((ms % 60000) / 1000);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  }
+  const API_URL = 'https://api.delirius.store';
 
   app.get('/search/spotify', async (req, res) => {
     const { text } = req.query;
@@ -54,24 +18,23 @@ module.exports = function (app) {
     }
 
     try {
-      const data = await fetchSpotify('v1/search', {
-        q: text,
-        type: 'track',
-        limit: 10,
-        market: 'ES'
+      const { data } = await axios.get(`${API_URL}/search/spotify`, {
+        params: { q: text },
+        headers: {
+          Accept: 'application/json',
+          'User-Agent': 'Husky-API/1.0'
+        }
       });
 
-      if (!data?.tracks?.items?.length) {
+      if (!data?.status || !data?.data?.length) {
         throw new Error('No se encontraron resultados');
       }
 
-      const results = data.tracks.items.map(track => ({
-        title:    track.name,
-        artist:   track.artists.map(a => a.name).join(', '),
-        album:    track.album.name,
-        duration: msToMinutes(track.duration_ms),
-        image:    track.album.images[0]?.url || null,
-        link:     track.external_urls.spotify
+      const results = data.data.map(track => ({
+        title: track.title || track.name,
+        artist: track.artist || track.artists,
+        duration: track.duration,
+        link: track.url || `https://open.spotify.com/track/${track.id}`
       }));
 
       return res.json({
@@ -84,16 +47,11 @@ module.exports = function (app) {
       });
 
     } catch (error) {
-      if (error.response?.status === 401) {
-        accessToken = null;
-        tokenExpires = 0;
-      }
-
       return res.status(500).json({
         status: false,
         creator: CREATOR,
         author: AUTHOR,
-        error: error.response?.data?.error?.message || error.message || 'Error al buscar en Spotify'
+        error: error.response?.data?.error || error.message || 'Error al buscar en Spotify'
       });
     }
   });
