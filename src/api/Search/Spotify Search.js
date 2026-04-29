@@ -4,24 +4,29 @@ module.exports = function (app) {
   const CREATOR = 'Husky API';
   const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ';
 
-  // Token en memoria
   let accessToken = null;
   let tokenExpires = 0;
 
   async function getToken() {
     if (accessToken && Date.now() < tokenExpires) return accessToken;
 
-    const { data } = await axios.get('https://open.spotify.com/get_access_token?reason=transport&productType=web_player', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36',
-        'Accept': 'application/json',
-        'spotify-app-version': '1.2.30.1135.g1c9a9a1b',
-        'app-platform': 'WebPlayer'
+    const { data } = await axios.post(
+      'https://accounts.spotify.com/api/token',
+      'grant_type=client_credentials',
+      {
+        headers: {
+          'Authorization': 'Basic ' + Buffer.from(
+            // Client ID y Secret públicos del web player de Spotify
+            'd8a5ed958d274c2e8ee717e6a4b0971d:2f634bbc79d14e849f9d8a5e8b16c07e'
+          ).toString('base64'),
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36'
+        }
       }
-    });
+    );
 
-    accessToken = data.accessToken;
-    tokenExpires = data.accessTokenExpirationTimestampMs - 5000;
+    accessToken = data.access_token;
+    tokenExpires = Date.now() + (data.expires_in - 60) * 1000;
     return accessToken;
   }
 
@@ -53,11 +58,8 @@ module.exports = function (app) {
           limit: 10
         },
         headers: {
-          Authorization: `Bearer ${token}`,
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36',
-          'Accept': 'application/json',
-          'app-platform': 'WebPlayer',
-          'spotify-app-version': '1.2.30.1135.g1c9a9a1b'
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
         }
       });
 
@@ -84,6 +86,9 @@ module.exports = function (app) {
       });
 
     } catch (error) {
+      // Log para ver el error exacto
+      console.error('Spotify error:', error.response?.data || error.message);
+
       return res.status(500).json({
         status: false,
         creator: CREATOR,
