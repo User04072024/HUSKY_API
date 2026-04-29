@@ -7,25 +7,46 @@ module.exports = function (app) {
   let accessToken = null;
   let tokenExpires = 0;
 
+  const USER_AGENTS = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+  ];
+
+  function randomUA() {
+    return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
+  }
+
   async function getToken() {
     if (accessToken && Date.now() < tokenExpires) return accessToken;
 
-    const { data: html } = await axios.get('https://open.spotify.com/', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+    // Endpoint interno que usa la web de Spotify
+    const { data } = await axios.get(
+      'https://open.spotify.com/get_access_token',
+      {
+        params: {
+          reason: 'transport',
+          productType: 'web_player'
+        },
+        headers: {
+          'User-Agent': randomUA(),
+          'Accept': 'application/json',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Referer': 'https://open.spotify.com/',
+          'Origin': 'https://open.spotify.com',
+          'spotify-app-version': '1.2.46.467.g9a796c0d',
+          'app-platform': 'WebPlayer',
+          'sec-fetch-dest': 'empty',
+          'sec-fetch-mode': 'cors',
+          'sec-fetch-site': 'same-origin'
+        }
       }
-    });
+    );
 
-    // Extraer token del HTML
-    const tokenMatch = html.match(/"accessToken":"([^"]+)"/);
-    const expiresMatch = html.match(/"accessTokenExpirationTimestampMs":(\d+)/);
+    if (!data?.accessToken) throw new Error('No se pudo obtener el token');
 
-    if (!tokenMatch) throw new Error('No se pudo extraer el token de Spotify');
-
-    accessToken = tokenMatch[1];
-    tokenExpires = expiresMatch ? parseInt(expiresMatch[1]) - 5000 : Date.now() + 3300000;
+    accessToken = data.accessToken;
+    tokenExpires = data.accessTokenExpirationTimestampMs - 5000;
     return accessToken;
   }
 
@@ -49,17 +70,20 @@ module.exports = function (app) {
 
     try {
       const token = await getToken();
+      console.log('Token:', token.substring(0, 30) + '...');
 
       const { data } = await axios.get('https://api.spotify.com/v1/search', {
         params: {
           q: text,
           type: 'track',
-          limit: 10
+          limit: 10,
+          market: 'ES'
         },
         headers: {
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json',
-          'app-platform': 'WebPlayer'
+          'app-platform': 'WebPlayer',
+          'spotify-app-version': '1.2.46.467.g9a796c0d'
         }
       });
 
@@ -86,9 +110,8 @@ module.exports = function (app) {
       });
 
     } catch (error) {
-      console.error('Spotify error:', error.response?.data || error.message);
+      console.error('Error completo:', error.response?.status, error.response?.data || error.message);
 
-      // Si el token expiró, forzar renovación
       if (error.response?.status === 401) {
         accessToken = null;
         tokenExpires = 0;
