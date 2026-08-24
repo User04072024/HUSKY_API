@@ -5,62 +5,33 @@ module.exports = function(app) {
     async function venicechat(question) {
         try {
             if (!question) throw new Error('Question is required');
+            if (!process.env.VENICE_API_KEY) {
+                const error = new Error('VENICE_API_KEY no está configurada');
+                error.statusCode = 503;
+                throw error;
+            }
 
             const { data } = await axios.request({
                 method: 'POST',
-                url: 'https://outerface.venice.ai/api/inference/chat',
+                url: 'https://api.venice.ai/api/v1/chat/completions',
                 headers: {
-                    accept: '*/*',
                     'content-type': 'application/json',
-                    origin: 'https://venice.ai',
-                    referer: 'https://venice.ai/',
-                    'sec-fetch-dest': 'empty',
-                    'sec-fetch-mode': 'cors',
-                    'sec-fetch-site': 'same-origin',
-                    'user-agent': 'Mozilla/5.0 (Android 10; Mobile; rv:131.0) Gecko/131.0 Firefox/131.0',
-                    'x-venice-version': 'interface@20250523.214528+393d253'
+                    authorization: `Bearer ${process.env.VENICE_API_KEY}`
                 },
                 data: {
-                    requestId: 'nekorinn',
-                    modelId: 'dolphin-3.0-mistral-24b',
-                    prompt: [
-                        { content: question, role: 'user' }
-                    ],
-                    systemPrompt: '',
-                    conversationType: 'text',
+                    model: process.env.VENICE_MODEL || 'venice-uncensored',
+                    messages: [{ role: 'user', content: question }],
                     temperature: 0.8,
-                    webEnabled: true,
-                    topP: 0.9,
-                    isCharacter: false,
-                    clientProcessingTime: 15
+                    top_p: 0.9
                 }
             });
 
-            // Parsing chunks
-            const chunks = data
-                .split('\n')
-                .filter(Boolean)
-                .map(chunk => {
-                    try { return JSON.parse(chunk); } 
-                    catch { return null; }
-                })
-                .filter(Boolean);
-
-            let result = chunks.map(chunk => chunk?.content ?? '').join('');
-
-            // Bersihkan escape & whitespace berlebih
-            result = result.replace(/\\"/g, '"')
-                           .replace(/^"(.*)"$/, '$1')
-                           .replace(/\\n/g, ' ')
-                           .replace(/\\r/g, '')
-                           .replace(/\\t/g, ' ')
-                           .replace(/\s+/g, ' ')
-                           .trim();
-
-            return result;
+            return data.choices?.[0]?.message?.content?.trim() || '';
 
         } catch (err) {
-            throw new Error(err.message || 'Unknown error');
+            const error = new Error(err.response?.data?.error?.message || err.message || 'Unknown error');
+            error.statusCode = err.statusCode || (err.response?.status >= 400 ? 502 : 500);
+            throw error;
         }
     }
 
@@ -79,11 +50,11 @@ module.exports = function(app) {
             const result = await venicechat(message);
             res.json({
                 status: true,
-                creator: "ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ",
+                creator: "Z7:林企业",
                 result
             });
         } catch (error) {
-            res.status(500).json({
+            res.status(error.statusCode || 500).json({
                 status: false,
                 error: error.message
             });
