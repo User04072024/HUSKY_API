@@ -3,7 +3,7 @@ const axios = require('axios');
 module.exports = function (app) {
   const CREATOR = 'Husky API';
   const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ';
-  const API_URL = 'https://api.delirius.store';
+  const API_URL = 'https://api.delirius.online';
 
   function isSpotifyUrl(text = '') {
     return /^(https?:\/\/)?(www\.)?(open\.spotify\.com|spotify\.link)\/.+$/i.test(text);
