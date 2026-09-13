@@ -6,24 +6,6 @@ module.exports = function (app) {
   const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєv舘٨ـ舘';
   const SPOTIDOWN_URL = 'https://spotidown.app';
 
-  // =========================================================
-  // DECODIFICAR BASE64 UTF-8
-  // =========================================================
-
-  function decodificarBase64(base64) {
-    try {
-      return Buffer
-        .from(base64, 'base64')
-        .toString('utf8');
-    } catch {
-      return null;
-    }
-  }
-
-  // =========================================================
-  // BUSCAR EN SPOTIDOWN
-  // =========================================================
-
   async function buscarSpotidown(text) {
     const params = new URLSearchParams();
 
@@ -46,18 +28,12 @@ module.exports = function (app) {
       }
     );
 
-    if (!response.data) {
-      throw new Error(
-        'SpotiDown no devolvió respuesta'
-      );
-    }
-
     if (
-      response.data.error ||
-      typeof response.data.data !== 'string'
+      response.data?.error ||
+      typeof response.data?.data !== 'string'
     ) {
       throw new Error(
-        response.data.message ||
+        response.data?.message ||
         'SpotiDown no encontró resultados'
       );
     }
@@ -81,13 +57,12 @@ module.exports = function (app) {
         let track;
 
         try {
-          const decoded =
-            decodificarBase64(encoded);
 
-          if (!decoded) return;
-
-          track =
-            JSON.parse(decoded);
+          track = JSON.parse(
+            Buffer
+              .from(encoded, 'base64')
+              .toString('utf8')
+          );
 
         } catch {
           return;
@@ -101,48 +76,96 @@ module.exports = function (app) {
           track.track_id ||
           '';
 
-        const title =
-          track.name ||
-          track.title ||
-          '';
-
-        const artist =
-          track.artist ||
-          track.artists ||
-          '';
-
-        const album =
-          track.album ||
-          '';
-
-        const duration =
-          track.duration ||
-          '';
-
-        const date =
-          track.date ||
-          '';
-
-        const cover =
+        let cover =
           track.cover ||
           track.image ||
           track.thumbnail ||
+          track.album_cover ||
           '';
 
-        const link =
-          id
-            ? `https://open.spotify.com/track/${id}`
-            : '';
+        const img =
+          $(element)
+            .find('img')
+            .first();
+
+        if (!cover) {
+          cover =
+            img.attr('src') ||
+            img.attr('data-src') ||
+            img.attr('data-lazy-src') ||
+            img.attr('data-original') ||
+            '';
+        }
+
+        if (!cover) {
+
+          const srcset =
+            img.attr('srcset');
+
+          if (srcset) {
+
+            const opciones =
+              srcset
+                .split(',')
+                .map(x => x.trim())
+                .filter(Boolean);
+
+            if (opciones.length) {
+              cover =
+                opciones[
+                  opciones.length - 1
+                ].split(/\s+/)[0];
+            }
+          }
+        }
+
+        if (
+          cover &&
+          cover.startsWith('//')
+        ) {
+          cover =
+            `https:${cover}`;
+        }
+
+        if (
+          cover &&
+          cover.startsWith('/')
+        ) {
+          cover =
+            `${SPOTIDOWN_URL}${cover}`;
+        }
 
         results.push({
-          title,
-          artist,
-          album,
-          duration,
-          date,
+          title:
+            track.name ||
+            track.title ||
+            '',
+
+          artist:
+            track.artist ||
+            track.artists ||
+            '',
+
+          album:
+            track.album ||
+            '',
+
+          duration:
+            track.duration ||
+            '',
+
+          date:
+            track.date ||
+            '',
+
           cover,
+
           id,
-          link
+
+          link:
+            id
+              ? `https://open.spotify.com/track/${id}`
+              : ''
         });
       }
     );
@@ -155,10 +178,6 @@ module.exports = function (app) {
 
     return results;
   }
-
-  // =========================================================
-  // ENDPOINT
-  // =========================================================
 
   app.get('/search/spotify', async (req, res) => {
 
@@ -193,7 +212,7 @@ module.exports = function (app) {
     } catch (error) {
 
       console.error(
-        '❌ Error Spotify:',
+        '❌ SpotiDown:',
         error.message
       );
 
