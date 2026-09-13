@@ -26,29 +26,57 @@ module.exports = function (app) {
   }
 
   // =========================================================
-  // OBTENER PORTADA DEL HTML
+  // NORMALIZAR URL DE PORTADA
   // =========================================================
 
-  function extraerPortada($, element, coverActual = '') {
+  function normalizarCover(url) {
 
-    let cover =
-      coverActual || '';
+    if (!url) {
+      return '';
+    }
+
+    url = String(url).trim();
+
+    if (
+      url.startsWith('//')
+    ) {
+
+      return 'https:' + url;
+    }
+
+    if (
+      url.startsWith('/')
+    ) {
+
+      return SPOTIDOWN_URL + url;
+    }
+
+    return url;
+  }
+
+  // =========================================================
+  // EXTRAER PORTADA
+  // =========================================================
+
+  function extraerCover($, form) {
+
+    let cover = '';
 
     // -------------------------------------------------------
-    // IMG DEL FORMULARIO
+    // IMG PRINCIPAL
     // -------------------------------------------------------
 
-    const imagen =
-      $(element).find('img').first();
+    const img =
+      $(form).find('img').first();
 
-    if (imagen.length) {
+    if (img.length) {
 
       cover =
-        imagen.attr('src') ||
-        imagen.attr('data-src') ||
-        imagen.attr('data-lazy-src') ||
-        imagen.attr('data-original') ||
-        cover;
+        img.attr('src') ||
+        img.attr('data-src') ||
+        img.attr('data-lazy-src') ||
+        img.attr('data-original') ||
+        '';
 
       // -----------------------------------------------------
       // SRCSET
@@ -56,12 +84,11 @@ module.exports = function (app) {
 
       if (
         !cover &&
-        imagen.attr('srcset')
+        img.attr('srcset')
       ) {
 
         const srcset =
-          imagen
-            .attr('srcset')
+          img.attr('srcset')
             .split(',');
 
         if (srcset.length) {
@@ -77,31 +104,33 @@ module.exports = function (app) {
     }
 
     // -------------------------------------------------------
-    // CUALQUIER IMG DEL FORMULARIO
+    // CUALQUIER IMAGEN DENTRO DEL FORM
     // -------------------------------------------------------
 
     if (!cover) {
 
-      $(element)
+      $(form)
         .find('img')
-        .each((i, img) => {
+        .each((i, element) => {
 
-          if (cover) return;
+          if (cover) {
+            return;
+          }
 
           cover =
-            $(img).attr('src') ||
-            $(img).attr('data-src') ||
-            $(img).attr('data-lazy-src') ||
-            $(img).attr('data-original') ||
+            $(element).attr('src') ||
+            $(element).attr('data-src') ||
+            $(element).attr('data-lazy-src') ||
+            $(element).attr('data-original') ||
             '';
 
           if (
             !cover &&
-            $(img).attr('srcset')
+            $(element).attr('srcset')
           ) {
 
             const srcset =
-              $(img)
+              $(element)
                 .attr('srcset')
                 .split(',');
 
@@ -117,28 +146,32 @@ module.exports = function (app) {
     }
 
     // -------------------------------------------------------
-    // NORMALIZAR URL
+    // OG IMAGE DEL DOCUMENTO
     // -------------------------------------------------------
 
-    if (
-      cover &&
-      cover.startsWith('//')
-    ) {
+    if (!cover) {
 
       cover =
-        'https:' + cover;
+        $('meta[property="og:image"]')
+          .first()
+          .attr('content') || '';
     }
 
-    if (
-      cover &&
-      cover.startsWith('/')
-    ) {
+    // -------------------------------------------------------
+    // TWITTER IMAGE
+    // -------------------------------------------------------
+
+    if (!cover) {
 
       cover =
-        SPOTIDOWN_URL + cover;
+        $('meta[name="twitter:image"]')
+          .first()
+          .attr('content') || '';
     }
 
-    return cover;
+    return normalizarCover(
+      cover
+    );
   }
 
   // =========================================================
@@ -200,137 +233,166 @@ module.exports = function (app) {
       );
     }
 
+    const html =
+      response.data.data;
+
     const $ =
-      cheerio.load(
-        response.data.data
-      );
+      cheerio.load(html);
 
     const results = [];
 
     // =======================================================
-    // EXTRAER TODAS LAS CANCIONES
+    // EXTRAER CANCIONES
     // =======================================================
 
     $('form[name="submitspurl"]').each(
       (index, element) => {
 
-        const encoded =
-          $(element)
-            .find(
-              'input[name="data"]'
-            )
-            .attr('value');
-
-        if (!encoded) return;
-
-        let track;
-
         try {
+
+          const encoded =
+            $(element)
+              .find(
+                'input[name="data"]'
+              )
+              .attr('value');
+
+          if (!encoded) {
+            return;
+          }
 
           const decoded =
             decodificarBase64(
               encoded
             );
 
-          if (!decoded) return;
+          if (!decoded) {
+            return;
+          }
 
-          track =
-            JSON.parse(
-              decoded
+          let track;
+
+          try {
+
+            track =
+              JSON.parse(
+                decoded
+              );
+
+          } catch {
+
+            return;
+          }
+
+          if (!track) {
+            return;
+          }
+
+          // -------------------------------------------------
+          // DATOS ORIGINALES
+          // -------------------------------------------------
+
+          const id =
+            track.tid ||
+            track.id ||
+            track.track_id ||
+            '';
+
+          const title =
+            track.name ||
+            track.title ||
+            '';
+
+          const artist =
+            track.artist ||
+            track.artists ||
+            '';
+
+          const album =
+            track.album ||
+            '';
+
+          const duration =
+            track.duration ||
+            '';
+
+          const date =
+            track.date ||
+            '';
+
+          // -------------------------------------------------
+          // PORTADA
+          // -------------------------------------------------
+
+          let cover =
+            track.cover ||
+            track.image ||
+            track.thumbnail ||
+            '';
+
+          if (!cover) {
+
+            cover =
+              extraerCover(
+                $,
+                element
+              );
+          }
+
+          cover =
+            normalizarCover(
+              cover
             );
 
-        } catch {
+          // -------------------------------------------------
+          // LINK DIRECTO SPOTIFY
+          // -------------------------------------------------
 
-          return;
-        }
+          const link =
+            id
+              ? `https://open.spotify.com/track/${id}`
+              : '';
 
-        if (!track) return;
+          // -------------------------------------------------
+          // RESULTADO
+          // -------------------------------------------------
 
-        // ---------------------------------------------------
-        // DATOS DE LA CANCIÓN
-        // ---------------------------------------------------
+          results.push({
 
-        const id =
-          track.tid ||
-          track.id ||
-          track.track_id ||
-          '';
+            index:
+              index + 1,
 
-        const title =
-          track.name ||
-          track.title ||
-          '';
+            title,
 
-        const artist =
-          track.artist ||
-          track.artists ||
-          '';
+            artist,
 
-        const album =
-          track.album ||
-          '';
+            album,
 
-        const duration =
-          track.duration ||
-          '';
+            duration,
 
-        const date =
-          track.date ||
-          '';
+            date,
 
-        // ---------------------------------------------------
-        // PORTADA DIRECTA DEL TRACK
-        // ---------------------------------------------------
+            cover,
 
-        let cover =
-          track.cover ||
-          track.image ||
-          track.thumbnail ||
-          '';
+            id,
 
-        // ---------------------------------------------------
-        // FALLBACKS DEL HTML
-        // ---------------------------------------------------
+            link
+          });
 
-        cover =
-          extraerPortada(
-            $,
-            element,
-            cover
+        } catch (error) {
+
+          console.error(
+            '❌ Error procesando canción:',
+            error.message
           );
 
-        // ---------------------------------------------------
-        // LINK DIRECTO DE SPOTIFY
-        // ---------------------------------------------------
-
-        const link =
-          id
-            ? `https://open.spotify.com/track/${id}`
-            : '';
-
-        results.push({
-
-          index:
-            index + 1,
-
-          title,
-
-          artist,
-
-          album,
-
-          duration,
-
-          date,
-
-          cover,
-
-          id,
-
-          link
-        });
+        }
       }
     );
+
+    // =======================================================
+    // SI NO ENCONTRÓ RESULTADOS
+    // =======================================================
 
     if (!results.length) {
 
@@ -350,9 +412,8 @@ module.exports = function (app) {
     '/search/spotify',
     async (req, res) => {
 
-      const {
-        text
-      } = req.query;
+      const text =
+        req.query.text;
 
       if (!text) {
 
@@ -406,7 +467,7 @@ module.exports = function (app) {
 
         console.error(
           '❌ Error Spotify:',
-          error.message
+          error
         );
 
         return res
@@ -433,28 +494,24 @@ module.exports = function (app) {
   );
 };
 
-El resultado quedaría así
+Qué devuelve ahora
+
+Por cada canción:
 
 {
-  "status": true,
-  "creator": "Husky API",
-  "author": "ﮩ٨ـнυѕĸy_Dєv舘٨ـ舘",
-  "query": "Imagine Dragons Believer",
-  "source": "spotidown",
-  "search_url": "https://open.spotify.com/search/results/Imagine%20Dragons%20Believer",
-  "results": [
-    {
-      "index": 1,
-      "title": "Believer",
-      "artist": "Imagine Dragons",
-      "album": "Evolve",
-      "duration": "3:24",
-      "date": "...",
-      "cover": "URL_DIRECTA_DE_LA_PORTADA",
-      "id": "0pqnGHJpmpxLKifKRmU6WP",
-      "link": "https://open.spotify.com/track/0pqnGHJpmpxLKifKRmU6WP"
-    }
-  ]
+  "index": 1,
+  "title": "Believer",
+  "artist": "Imagine Dragons",
+  "album": "Evolve",
+  "duration": "3:24",
+  "date": "2017-06-23",
+  "cover": "https://...",
+  "id": "0pqnGHJpmpxLKifKRmU6WP",
+  "link": "https://open.spotify.com/track/0pqnGHJpmpxLKifKRmU6WP"
 }
 
-Importante: aquí "cover" queda como la URL directa de la imagen, mientras que "link" es el enlace directo a la canción en Spotify. No se añade "/action/track", MP3, tokens ni descarga, porque este endpoint es únicamente para obtener la información de búsqueda.
+La prioridad para "cover" es:
+
+"track.cover" → "track.image" → "track.thumbnail" → imagen del formulario → "srcset" → "og:image" → "twitter:image"
+
+Así no modificamos la forma en que SpotiDown entrega los datos y solamente ampliamos la obtención de la portada.
