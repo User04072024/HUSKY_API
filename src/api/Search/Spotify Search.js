@@ -4,7 +4,7 @@ const cheerio = require('cheerio');
 module.exports = function (app) {
 
   const CREATOR = 'Husky API';
-  const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєv舘٨ـ舘';
+  const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєv٨ـ';
   const SPOTIDOWN_URL = 'https://spotidown.app';
 
   // =========================================================
