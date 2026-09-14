@@ -1,4 +1,3 @@
-const axios = require('axios');
 const cheerio = require('cheerio');
 
 module.exports = function (app) {
@@ -6,37 +5,9 @@ module.exports = function (app) {
   const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ';
   const SPOTIDOWN_BASE = 'https://spotidown.app';
 
-  // Cabeceras exactas para simular un navegador real desde Vercel
-  const HEADERS_BASE = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    'Accept': 'application/json, text/javascript, */*; q=0.01',
-    'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
-    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    'X-Requested-With': 'XMLHttpRequest',
-    'Origin': SPOTIDOWN_BASE,
-    'Referer': `${SPOTIDOWN_BASE}/`,
-    'Sec-Ch-Ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-    'Sec-Ch-Ua-Mobile': '?0',
-    'Sec-Ch-Ua-Platform': '"Windows"',
-    'Sec-Fetch-Dest': 'empty',
-    'Sec-Fetch-Mode': 'cors',
-    'Sec-Fetch-Site': 'same-origin'
-  };
-
   function decodificarBase64UTF8(base64) {
     try {
-      const buffer = Buffer.from(base64, 'base64');
-      return buffer.toString('utf-8');
-    } catch {
-      return null;
-    }
-  }
-
-  function decodificarTrack(base64) {
-    try {
-      const texto = decodificarBase64UTF8(base64);
-      if (!texto) return null;
-      return JSON.parse(texto);
+      return Buffer.from(base64, 'base64').toString('utf-8');
     } catch {
       return null;
     }
@@ -46,123 +17,12 @@ module.exports = function (app) {
     try {
       const partes = token.split('.');
       if (partes.length < 2) return null;
-
       let payload = partes[1].replace(/-/g, '+').replace(/_/g, '/');
       while (payload.length % 4 !== 0) payload += '=';
-
       return JSON.parse(decodificarBase64UTF8(payload));
     } catch {
       return null;
     }
-  }
-
-  function analizarRapidURL(url) {
-    if (!url) return null;
-    try {
-      const parsed = new URL(url);
-      const token = parsed.searchParams.get('token');
-      if (!token) return { url, token: null, jwt: null };
-
-      return {
-        url,
-        token,
-        jwt: decodificarJWT(token)
-      };
-    } catch {
-      return { url, token: null, jwt: null };
-    }
-  }
-
-  function extraerCanciones(html) {
-    const $ = cheerio.load(html);
-    const canciones = [];
-
-    $('form[name="submitspurl"]').each((index, form) => {
-      const inputData = $(form).find('input[name="data"]').val();
-      if (!inputData) return;
-
-      const track = decodificarTrack(inputData);
-      if (!track) return;
-
-      const base = $(form).find('input[name="base"]').val() || '';
-      const token = $(form).find('input[name="token"]').val() || '';
-
-      canciones.push({
-        numero: index + 1,
-        titulo: track.name || '',
-        artista: track.artist || '',
-        album: track.album || '',
-        duracion: track.duration || '',
-        fecha: track.date || '',
-        cover: track.cover || '',
-        tid: track.tid || '',
-        spotify_url: track.tid ? `https://open.spotify.com/track/${track.tid}` : '',
-        data: inputData,
-        base,
-        token
-      });
-    });
-
-    return canciones;
-  }
-
-  function extraerResultadoTrack(html, cancionOriginal) {
-    const $ = cheerio.load(html);
-
-    const datos = {
-      titulo: cancionOriginal?.titulo || $('[itemprop="name"]').text().trim() || '',
-      artista: cancionOriginal?.artista || $('.spotidown-downloader-middle p span').text().trim() || '',
-      album: cancionOriginal?.album || '',
-      duracion: cancionOriginal?.duracion || '',
-      tid: cancionOriginal?.tid || '',
-      cover: cancionOriginal?.cover || $('.spotidown-downloader-left img').attr('src') || '',
-      mp3: null,
-      coverHD: null,
-      mp3Token: null,
-      coverToken: null,
-      mp3JWT: null,
-      coverJWT: null
-    };
-
-    $('a[href]').each((_, el) => {
-      const href = $(el).attr('href');
-      if (!href || !href.includes('rapid.spotidown.app')) return;
-
-      const texto = $(el).text().trim().toLowerCase();
-      const info = analizarRapidURL(href);
-
-      if (texto.includes('mp3') || info.jwt?.filename) {
-        if (!datos.mp3) {
-          datos.mp3 = href;
-          datos.mp3Token = info.token;
-          datos.mp3JWT = info.jwt;
-        }
-      } else if (texto.includes('cover') || info.jwt?.cover) {
-        if (!datos.coverHD) {
-          datos.coverHD = href;
-          datos.coverToken = info.token;
-          datos.coverJWT = info.jwt;
-        }
-        if (!datos.cover && info.jwt?.cover) {
-          datos.cover = info.jwt.cover;
-        }
-      }
-    });
-
-    if (!datos.mp3) {
-      $('a#popup').each((_, el) => {
-        const href = $(el).attr('href');
-        if (!href) return;
-        const info = analizarRapidURL(href);
-        if (info.jwt?.filename && !datos.mp3) {
-          datos.mp3 = href;
-          datos.mp3Token = info.token;
-          datos.mp3JWT = info.jwt;
-        }
-      });
-    }
-
-    return datos;
   }
 
   app.get('/search/spotify', async (req, res) => {
@@ -178,69 +38,131 @@ module.exports = function (app) {
     }
 
     try {
-      const client = axios.create({
-        baseURL: SPOTIDOWN_BASE,
-        headers: HEADERS_BASE,
-        timeout: 10000
+      // 1. Obtener la cookie de sesión inicial usando Fetch nativo de Node.js
+      const initRes = await fetch(SPOTIDOWN_BASE, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+          'Accept-Language': 'es-ES,es;q=0.9',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
       });
 
-      // 1. Enviar directamente el POST a /action capturando los 'set-cookie' recibidos
-      const bodyAction = new URLSearchParams({ url: text }).toString();
-      const responseAction = await client.post('/action', bodyAction);
+      const rawCookies = initRes.headers.getSetCookie 
+        ? initRes.headers.getSetCookie() 
+        : [initRes.headers.get('set-cookie')].filter(Boolean);
 
-      const responseCookies = responseAction.headers['set-cookie'] 
-        ? responseAction.headers['set-cookie'].map(c => c.split(';')[0]).join('; ')
-        : '';
+      const cookieHeader = rawCookies.map(c => c.split(';')[0]).join('; ');
 
-      let rawData = responseAction.data;
-      let htmlData = '';
+      // 2. Realizar el POST a /action con las cabeceras exactas de Chrome
+      const searchBody = new URLSearchParams({ url: text }).toString();
 
-      if (typeof rawData === 'object' && rawData?.data) {
-        htmlData = rawData.data;
-      } else if (typeof rawData === 'string') {
-        try {
-          const parsed = JSON.parse(rawData);
-          htmlData = parsed.data || rawData;
-        } catch {
-          htmlData = rawData;
-        }
+      const actionRes = await fetch(`${SPOTIDOWN_BASE}/action`, {
+        method: 'POST',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept': 'application/json, text/javascript, */*; q=0.01',
+          'Accept-Language': 'es-ES,es;q=0.9',
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'X-Requested-With': 'XMLHttpRequest',
+          'Origin': SPOTIDOWN_BASE,
+          'Referer': `${SPOTIDOWN_BASE}/`,
+          'Cookie': cookieHeader,
+          'Sec-Ch-Ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+          'Sec-Ch-Ua-Mobile': '?0',
+          'Sec-Ch-Ua-Platform': '"Windows"',
+          'Sec-Fetch-Dest': 'empty',
+          'Sec-Fetch-Mode': 'cors',
+          'Sec-Fetch-Site': 'same-origin'
+        },
+        body: searchBody
+      });
+
+      const actionJson = await actionRes.json().catch(() => null);
+      const htmlData = actionJson?.data;
+
+      if (!htmlData) {
+        return res.status(403).json({
+          status: false,
+          creator: CREATOR,
+          author: AUTHOR,
+          error: 'Servidor remoto bloqueó la solicitud (Cloudflare WAF)'
+        });
       }
 
-      if (!htmlData || typeof htmlData !== 'string') {
-        throw new Error('Bloqueo Cloudflare/Anti-Bot detectado en Spotidown');
-      }
+      const $ = cheerio.load(htmlData);
+      const primerForm = $('form[name="submitspurl"]').first();
 
-      const canciones = extraerCanciones(htmlData);
-
-      if (!canciones.length) {
+      if (!primerForm.length) {
         return res.status(404).json({
           status: false,
           creator: CREATOR,
           author: AUTHOR,
-          error: 'No se encontraron resultados para la búsqueda'
+          error: 'No se encontraron canciones para el término indicado'
         });
       }
 
-      // 2. Consultar únicamente el primer resultado para evitar el timeout en Vercel
-      const cancion = canciones[0];
+      const inputData = primerForm.find('input[name="data"]').val();
+      const base = primerForm.find('input[name="base"]').val() || '';
+      const token = primerForm.find('input[name="token"]').val() || '';
 
-      const bodyTrack = new URLSearchParams({
-        data: cancion.data,
-        base: cancion.base,
-        token: cancion.token
+      const trackMeta = JSON.parse(decodificarBase64UTF8(inputData) || '{}');
+
+      // 3. Petición para obtener el enlace final de descarga MP3
+      const trackBody = new URLSearchParams({
+        data: inputData,
+        base: base,
+        token: token
       }).toString();
 
-      const responseTrack = await client.post('/action/track', bodyTrack, {
+      const trackRes = await fetch(`${SPOTIDOWN_BASE}/action/track`, {
+        method: 'POST',
         headers: {
-          ...HEADERS_BASE,
-          ...(responseCookies ? { 'Cookie': responseCookies } : {})
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept': 'application/json, text/javascript, */*; q=0.01',
+          'Accept-Language': 'es-ES,es;q=0.9',
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          'X-Requested-With': 'XMLHttpRequest',
+          'Origin': SPOTIDOWN_BASE,
+          'Referer': `${SPOTIDOWN_BASE}/`,
+          'Cookie': cookieHeader,
+          'Sec-Ch-Ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+          'Sec-Ch-Ua-Mobile': '?0',
+          'Sec-Ch-Ua-Platform': '"Windows"',
+          'Sec-Fetch-Dest': 'empty',
+          'Sec-Fetch-Mode': 'cors',
+          'Sec-Fetch-Site': 'same-origin'
+        },
+        body: trackBody
+      });
+
+      const trackJson = await trackRes.json().catch(() => null);
+      const htmlTrack = trackJson?.data || '';
+
+      const $track = cheerio.load(htmlTrack);
+      let mp3Url = null;
+
+      $track('a[href]').each((_, el) => {
+        const href = $track(el).attr('href') || '';
+        if (href.includes('rapid.spotidown.app')) {
+          mp3Url = href;
         }
       });
 
-      let trackRaw = responseTrack.data;
-      let htmlTrack = typeof trackRaw === 'object' && trackRaw?.data ? trackRaw.data : trackRaw;
+      if (!mp3Url) {
+        mp3Url = $track('a#popup').attr('href') || null;
+      }
 
-      const trackInfo = extraerResultadoTrack(htmlTrack, cancion);
+      let jwtData = null;
+      if (mp3Url) {
+        try {
+          const parsed = new URL(mp3Url);
+          const tParam = parsed.searchParams.get('token');
+          if (tParam) jwtData = decodificarJWT(tParam);
+        } catch {}
+      }
 
       return res.json({
         status: true,
@@ -249,19 +171,18 @@ module.exports = function (app) {
         query: text,
         results: [
           {
-            title: trackInfo.titulo,
-            artist: trackInfo.artista,
-            album: trackInfo.album,
-            duration: trackInfo.duracion,
-            tid: trackInfo.tid,
-            spotify_url: cancion.spotify_url,
-            cover: trackInfo.cover,
+            title: trackMeta.name || '',
+            artist: trackMeta.artist || '',
+            album: trackMeta.album || '',
+            duration: trackMeta.duration || '',
+            tid: trackMeta.tid || '',
+            spotify_url: trackMeta.tid ? `https://open.spotify.com/track/${trackMeta.tid}` : '',
+            cover: trackMeta.cover || '',
             download: {
-              mp3_link: trackInfo.mp3,
-              cover_hd_link: trackInfo.coverHD,
-              filename: trackInfo.mp3JWT?.filename || null,
-              expires_at: trackInfo.mp3JWT?.exp ? new Date(trackInfo.mp3JWT.exp * 1000).toISOString() : null,
-              internal_url: trackInfo.mp3JWT?.url || null
+              mp3_link: mp3Url,
+              filename: jwtData?.filename || null,
+              expires_at: jwtData?.exp ? new Date(jwtData.exp * 1000).toISOString() : null,
+              internal_url: jwtData?.url || null
             }
           }
         ]
@@ -272,7 +193,7 @@ module.exports = function (app) {
         status: false,
         creator: CREATOR,
         author: AUTHOR,
-        error: error.response?.data?.error || error.message || 'Error al procesar la petición'
+        error: error.message || 'Error interno en la ejecución del scraping'
       });
     }
   });
