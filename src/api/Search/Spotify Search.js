@@ -6,6 +6,23 @@ module.exports = function (app) {
   const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ';
   const SPOTIDOWN_BASE = 'https://spotidown.app';
 
+  // Cabeceras exactas para simular un navegador real desde Vercel
+  const HEADERS_BASE = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    'X-Requested-With': 'XMLHttpRequest',
+    'Origin': SPOTIDOWN_BASE,
+    'Referer': `${SPOTIDOWN_BASE}/`,
+    'Sec-Ch-Ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+    'Sec-Ch-Ua-Mobile': '?0',
+    'Sec-Ch-Ua-Platform': '"Windows"',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin'
+  };
+
   function decodificarBase64UTF8(base64) {
     try {
       const buffer = Buffer.from(base64, 'base64');
@@ -132,7 +149,6 @@ module.exports = function (app) {
       }
     });
 
-    // Fallback si no capturó por texto directo
     if (!datos.mp3) {
       $('a#popup').each((_, el) => {
         const href = $(el).attr('href');
@@ -164,37 +180,34 @@ module.exports = function (app) {
     try {
       const client = axios.create({
         baseURL: SPOTIDOWN_BASE,
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-          'Accept': 'application/json, text/javascript, */*; q=0.01',
-          'Accept-Language': 'es-ES,es;q=0.9',
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'X-Requested-With': 'XMLHttpRequest',
-          'Origin': SPOTIDOWN_BASE,
-          'Referer': `${SPOTIDOWN_BASE}/`
-        }
+        headers: HEADERS_BASE,
+        timeout: 10000
       });
 
-      // 1. Obtener la página principal e inicializar la cadena de cookies
-      const initResponse = await client.get('/');
-      let currentCookies = initResponse.headers['set-cookie'] || [];
-
-      const getCookieHeader = () => currentCookies.map(c => c.split(';')[0]).join('; ');
-
-      // 2. Enviar la petición de búsqueda
+      // 1. Enviar directamente el POST a /action capturando los 'set-cookie' recibidos
       const bodyAction = new URLSearchParams({ url: text }).toString();
-      const responseAction = await client.post('/action', bodyAction, {
-        headers: { Cookie: getCookieHeader() }
-      });
+      const responseAction = await client.post('/action', bodyAction);
 
-      if (responseAction.headers['set-cookie']) {
-        currentCookies = responseAction.headers['set-cookie'];
+      const responseCookies = responseAction.headers['set-cookie'] 
+        ? responseAction.headers['set-cookie'].map(c => c.split(';')[0]).join('; ')
+        : '';
+
+      let rawData = responseAction.data;
+      let htmlData = '';
+
+      if (typeof rawData === 'object' && rawData?.data) {
+        htmlData = rawData.data;
+      } else if (typeof rawData === 'string') {
+        try {
+          const parsed = JSON.parse(rawData);
+          htmlData = parsed.data || rawData;
+        } catch {
+          htmlData = rawData;
+        }
       }
 
-      const htmlData = responseAction.data?.data || (typeof responseAction.data === 'string' ? responseAction.data : null);
-
-      if (!htmlData) {
-        throw new Error('Respuesta vacía o bloqueada por el servidor de Spotidown');
+      if (!htmlData || typeof htmlData !== 'string') {
+        throw new Error('Bloqueo Cloudflare/Anti-Bot detectado en Spotidown');
       }
 
       const canciones = extraerCanciones(htmlData);
@@ -208,28 +221,34 @@ module.exports = function (app) {
         });
       }
 
-      // 3. Procesamiento secuencial para evitar rate-limit o invalidación de sesión
-      const results = [];
-      for (const cancion of canciones) {
-        try {
-          const bodyTrack = new URLSearchParams({
-            data: cancion.data,
-            base: cancion.base,
-            token: cancion.token
-          }).toString();
+      // 2. Consultar únicamente el primer resultado para evitar el timeout en Vercel
+      const cancion = canciones[0];
 
-          const responseTrack = await client.post('/action/track', bodyTrack, {
-            headers: { Cookie: getCookieHeader() }
-          });
+      const bodyTrack = new URLSearchParams({
+        data: cancion.data,
+        base: cancion.base,
+        token: cancion.token
+      }).toString();
 
-          if (responseTrack.headers['set-cookie']) {
-            currentCookies = responseTrack.headers['set-cookie'];
-          }
+      const responseTrack = await client.post('/action/track', bodyTrack, {
+        headers: {
+          ...HEADERS_BASE,
+          ...(responseCookies ? { 'Cookie': responseCookies } : {})
+        }
+      });
 
-          const htmlTrack = responseTrack.data?.data || responseTrack.data || '';
-          const trackInfo = extraerResultadoTrack(htmlTrack, cancion);
+      let trackRaw = responseTrack.data;
+      let htmlTrack = typeof trackRaw === 'object' && trackRaw?.data ? trackRaw.data : trackRaw;
 
-          results.push({
+      const trackInfo = extraerResultadoTrack(htmlTrack, cancion);
+
+      return res.json({
+        status: true,
+        creator: CREATOR,
+        author: AUTHOR,
+        query: text,
+        results: [
+          {
             title: trackInfo.titulo,
             artist: trackInfo.artista,
             album: trackInfo.album,
@@ -244,28 +263,8 @@ module.exports = function (app) {
               expires_at: trackInfo.mp3JWT?.exp ? new Date(trackInfo.mp3JWT.exp * 1000).toISOString() : null,
               internal_url: trackInfo.mp3JWT?.url || null
             }
-          });
-        } catch {
-          results.push({
-            title: cancion.titulo,
-            artist: cancion.artista,
-            album: cancion.album,
-            duration: cancion.duracion,
-            tid: cancion.tid,
-            spotify_url: cancion.spotify_url,
-            cover: cancion.cover,
-            download: null
-          });
-        }
-      }
-
-      return res.json({
-        status: true,
-        creator: CREATOR,
-        author: AUTHOR,
-        query: text,
-        total_results: results.length,
-        results
+          }
+        ]
       });
 
     } catch (error) {
