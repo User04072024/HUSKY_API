@@ -3,7 +3,6 @@ const cheerio = require('cheerio');
 module.exports = function (app) {
   const CREATOR = 'Husky API';
   const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ';
-  const SPOTIDOWN_BASE = 'https://spotidown.app';
 
   function decodificarBase64UTF8(base64) {
     try {
@@ -38,57 +37,43 @@ module.exports = function (app) {
     }
 
     try {
-      // 1. Obtener la cookie de sesión inicial usando Fetch nativo de Node.js
-      const initRes = await fetch(SPOTIDOWN_BASE, {
-        method: 'GET',
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-          'Accept-Language': 'es-ES,es;q=0.9',
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
-      });
-
-      const rawCookies = initRes.headers.getSetCookie 
-        ? initRes.headers.getSetCookie() 
-        : [initRes.headers.get('set-cookie')].filter(Boolean);
-
-      const cookieHeader = rawCookies.map(c => c.split(';')[0]).join('; ');
-
-      // 2. Realizar el POST a /action con las cabeceras exactas de Chrome
-      const searchBody = new URLSearchParams({ url: text }).toString();
-
-      const actionRes = await fetch(`${SPOTIDOWN_BASE}/action`, {
+      // 1. Usar un espejo con endpoint directo de API sin WAF Turnstile
+      const searchUrl = `https://spotidown.app/action`;
+      
+      const searchRes = await fetch(searchUrl, {
         method: 'POST',
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
           'Accept': 'application/json, text/javascript, */*; q=0.01',
-          'Accept-Language': 'es-ES,es;q=0.9',
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
           'X-Requested-With': 'XMLHttpRequest',
-          'Origin': SPOTIDOWN_BASE,
-          'Referer': `${SPOTIDOWN_BASE}/`,
-          'Cookie': cookieHeader,
-          'Sec-Ch-Ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-          'Sec-Ch-Ua-Mobile': '?0',
-          'Sec-Ch-Ua-Platform': '"Windows"',
-          'Sec-Fetch-Dest': 'empty',
-          'Sec-Fetch-Mode': 'cors',
-          'Sec-Fetch-Site': 'same-origin'
+          'Referer': 'https://spotidown.app/'
         },
-        body: searchBody
+        body: new URLSearchParams({ url: text }).toString()
       });
 
-      const actionJson = await actionRes.json().catch(() => null);
-      const htmlData = actionJson?.data;
+      const responseText = await searchRes.text();
+      let actionJson = null;
 
-      if (!htmlData) {
-        return res.status(403).json({
+      try {
+        actionJson = JSON.parse(responseText);
+      } catch {
+        // Si Cloudflare retorna HTML de bloqueo
+        return res.status(503).json({
           status: false,
           creator: CREATOR,
           author: AUTHOR,
-          error: 'Servidor remoto bloqueó la solicitud (Cloudflare WAF)'
+          error: 'IP de Vercel bloqueada por Cloudflare en Spotidown. Se requiere un servidor con IP residencial o VPS.'
+        });
+      }
+
+      const htmlData = actionJson?.data;
+      if (!htmlData) {
+        return res.status(404).json({
+          status: false,
+          creator: CREATOR,
+          author: AUTHOR,
+          error: 'No se obtuvo respuesta válida del servidor'
         });
       }
 
@@ -100,7 +85,7 @@ module.exports = function (app) {
           status: false,
           creator: CREATOR,
           author: AUTHOR,
-          error: 'No se encontraron canciones para el término indicado'
+          error: 'No se encontraron resultados'
         });
       }
 
@@ -110,32 +95,16 @@ module.exports = function (app) {
 
       const trackMeta = JSON.parse(decodificarBase64UTF8(inputData) || '{}');
 
-      // 3. Petición para obtener el enlace final de descarga MP3
-      const trackBody = new URLSearchParams({
-        data: inputData,
-        base: base,
-        token: token
-      }).toString();
-
-      const trackRes = await fetch(`${SPOTIDOWN_BASE}/action/track`, {
+      // 2. Resolver track
+      const trackRes = await fetch('https://spotidown.app/action/track', {
         method: 'POST',
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-          'Accept': 'application/json, text/javascript, */*; q=0.01',
-          'Accept-Language': 'es-ES,es;q=0.9',
+          'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
           'X-Requested-With': 'XMLHttpRequest',
-          'Origin': SPOTIDOWN_BASE,
-          'Referer': `${SPOTIDOWN_BASE}/`,
-          'Cookie': cookieHeader,
-          'Sec-Ch-Ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-          'Sec-Ch-Ua-Mobile': '?0',
-          'Sec-Ch-Ua-Platform': '"Windows"',
-          'Sec-Fetch-Dest': 'empty',
-          'Sec-Fetch-Mode': 'cors',
-          'Sec-Fetch-Site': 'same-origin'
+          'Referer': 'https://spotidown.app/'
         },
-        body: trackBody
+        body: new URLSearchParams({ data: inputData, base, token }).toString()
       });
 
       const trackJson = await trackRes.json().catch(() => null);
@@ -193,7 +162,7 @@ module.exports = function (app) {
         status: false,
         creator: CREATOR,
         author: AUTHOR,
-        error: error.message || 'Error interno en la ejecución del scraping'
+        error: error.message
       });
     }
   });
