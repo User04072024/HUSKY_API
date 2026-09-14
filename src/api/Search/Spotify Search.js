@@ -6,10 +6,6 @@ module.exports = function (app) {
   const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ';
   const SPOTIDOWN_BASE = 'https://spotidown.app';
 
-  // ==========================================
-  // HELPER FUNCTIONS (Decodificadores)
-  // ==========================================
-
   function decodificarBase64UTF8(base64) {
     try {
       const buffer = Buffer.from(base64, 'base64');
@@ -136,12 +132,22 @@ module.exports = function (app) {
       }
     });
 
+    // Fallback si no capturó por texto directo
+    if (!datos.mp3) {
+      $('a#popup').each((_, el) => {
+        const href = $(el).attr('href');
+        if (!href) return;
+        const info = analizarRapidURL(href);
+        if (info.jwt?.filename && !datos.mp3) {
+          datos.mp3 = href;
+          datos.mp3Token = info.token;
+          datos.mp3JWT = info.jwt;
+        }
+      });
+    }
+
     return datos;
   }
-
-  // ==========================================
-  // ENDPOINT EXPRESS
-  // ==========================================
 
   app.get('/search/spotify', async (req, res) => {
     const { text } = req.query;
@@ -156,10 +162,8 @@ module.exports = function (app) {
     }
 
     try {
-      // Instancia de axios para mantener cookies de sesión entre peticiones
       const client = axios.create({
         baseURL: SPOTIDOWN_BASE,
-        withCredentials: true,
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
           'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -171,15 +175,21 @@ module.exports = function (app) {
         }
       });
 
-      // 1. Obtener la página principal para establecer la cookie de sesión inicial
+      // 1. Obtener la página principal e inicializar la cadena de cookies
       const initResponse = await client.get('/');
-      const cookies = initResponse.headers['set-cookie'];
+      let currentCookies = initResponse.headers['set-cookie'] || [];
 
-      const requestHeaders = cookies ? { Cookie: cookies.join('; ') } : {};
+      const getCookieHeader = () => currentCookies.map(c => c.split(';')[0]).join('; ');
 
-      // 2. Realizar la búsqueda enviando la URL o texto
+      // 2. Enviar la petición de búsqueda
       const bodyAction = new URLSearchParams({ url: text }).toString();
-      const responseAction = await client.post('/action', bodyAction, { headers: requestHeaders });
+      const responseAction = await client.post('/action', bodyAction, {
+        headers: { Cookie: getCookieHeader() }
+      });
+
+      if (responseAction.headers['set-cookie']) {
+        currentCookies = responseAction.headers['set-cookie'];
+      }
 
       const htmlData = responseAction.data?.data || (typeof responseAction.data === 'string' ? responseAction.data : null);
 
@@ -190,7 +200,7 @@ module.exports = function (app) {
       const canciones = extraerCanciones(htmlData);
 
       if (!canciones.length) {
-        return res.status(444).json({
+        return res.status(404).json({
           status: false,
           creator: CREATOR,
           author: AUTHOR,
@@ -198,51 +208,56 @@ module.exports = function (app) {
         });
       }
 
-      // 3. Procesar las canciones para extraer el link de audio y portada HD
-      const results = await Promise.all(
-        canciones.map(async (cancion) => {
-          try {
-            const bodyTrack = new URLSearchParams({
-              data: cancion.data,
-              base: cancion.base,
-              token: cancion.token
-            }).toString();
+      // 3. Procesamiento secuencial para evitar rate-limit o invalidación de sesión
+      const results = [];
+      for (const cancion of canciones) {
+        try {
+          const bodyTrack = new URLSearchParams({
+            data: cancion.data,
+            base: cancion.base,
+            token: cancion.token
+          }).toString();
 
-            const responseTrack = await client.post('/action/track', bodyTrack, { headers: requestHeaders });
-            const htmlTrack = responseTrack.data?.data || '';
+          const responseTrack = await client.post('/action/track', bodyTrack, {
+            headers: { Cookie: getCookieHeader() }
+          });
 
-            const trackInfo = extraerResultadoTrack(htmlTrack, cancion);
-
-            return {
-              title: trackInfo.titulo,
-              artist: trackInfo.artista,
-              album: trackInfo.album,
-              duration: trackInfo.duracion,
-              tid: trackInfo.tid,
-              spotify_url: cancion.spotify_url,
-              cover: trackInfo.cover,
-              download: {
-                mp3_link: trackInfo.mp3,
-                cover_hd_link: trackInfo.coverHD,
-                filename: trackInfo.mp3JWT?.filename || null,
-                expires_at: trackInfo.mp3JWT?.exp ? new Date(trackInfo.mp3JWT.exp * 1000).toISOString() : null,
-                internal_url: trackInfo.mp3JWT?.url || null
-              }
-            };
-          } catch {
-            return {
-              title: cancion.titulo,
-              artist: cancion.artista,
-              album: cancion.album,
-              duration: cancion.duracion,
-              tid: cancion.tid,
-              spotify_url: cancion.spotify_url,
-              cover: cancion.cover,
-              download: null
-            };
+          if (responseTrack.headers['set-cookie']) {
+            currentCookies = responseTrack.headers['set-cookie'];
           }
-        })
-      );
+
+          const htmlTrack = responseTrack.data?.data || responseTrack.data || '';
+          const trackInfo = extraerResultadoTrack(htmlTrack, cancion);
+
+          results.push({
+            title: trackInfo.titulo,
+            artist: trackInfo.artista,
+            album: trackInfo.album,
+            duration: trackInfo.duracion,
+            tid: trackInfo.tid,
+            spotify_url: cancion.spotify_url,
+            cover: trackInfo.cover,
+            download: {
+              mp3_link: trackInfo.mp3,
+              cover_hd_link: trackInfo.coverHD,
+              filename: trackInfo.mp3JWT?.filename || null,
+              expires_at: trackInfo.mp3JWT?.exp ? new Date(trackInfo.mp3JWT.exp * 1000).toISOString() : null,
+              internal_url: trackInfo.mp3JWT?.url || null
+            }
+          });
+        } catch {
+          results.push({
+            title: cancion.titulo,
+            artist: cancion.artista,
+            album: cancion.album,
+            duration: cancion.duracion,
+            tid: cancion.tid,
+            spotify_url: cancion.spotify_url,
+            cover: cancion.cover,
+            download: null
+          });
+        }
+      }
 
       return res.json({
         status: true,
