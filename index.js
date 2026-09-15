@@ -6,7 +6,12 @@ const path = require("path");
 const http = require("http");
 const crypto = require("crypto");
 const { WebSocketServer } = require("ws");
-const { createCanvas } = require("@napi-rs/canvas");
+let createCanvas = null;
+try {
+    ({ createCanvas } = require("@napi-rs/canvas"));
+} catch {
+    createCanvas = null;
+}
 const { createClient } = require("@supabase/supabase-js");
 require("dotenv").config();
 
@@ -285,6 +290,11 @@ function getRequestLog(req, duration, statusCode) {
 }
 
 function drawStatusImage(metrics) {
+    if (!createCanvas) {
+        const text = `HUSKY API // STATUS\nUptime: ${metrics.uptimePercent}%\nRequests: ${metrics.totalRequests}`;
+        return Buffer.from(text, "utf8");
+    }
+
     const canvas = createCanvas(1200, 630);
     const context = canvas.getContext("2d");
     const gradient = context.createLinearGradient(0, 0, 1200, 630);
@@ -453,7 +463,11 @@ server.on("upgrade", (request, socket, head) => {
     dashboardWss.handleUpgrade(request, socket, head, (client) => dashboardWss.emit("connection", client, request));
 });
 
-server.listen(PORT, () => {
-    console.log(chalk.bgGreen.black(`Server running on port ${PORT}`));
-    console.log(chalk.blue(`Total Routes Loaded: ${totalRoutes}`));
-});
+if (process.env.VERCEL) {
+    module.exports = app;
+} else {
+    server.listen(PORT, () => {
+        console.log(chalk.bgGreen.black(`Server running on port ${PORT}`));
+        console.log(chalk.blue(`Total Routes Loaded: ${totalRoutes}`));
+    });
+}
