@@ -16,6 +16,9 @@ export function useApiMetrics() {
     fetch("/api/metrics").then((response) => response.json()).then((payload) => {
       if (!disposed) { setMetrics(payload.metrics); setRequests(payload.requests || []); }
     }).catch(() => {});
+    if (!location.hostname.includes("localhost") && !location.hostname.includes("127.0.0.1")) {
+      return () => { disposed = true; };
+    }
     const protocol = location.protocol === "https:" ? "wss" : "ws";
     const socket = new WebSocket(`${protocol}://${location.host}/ws`);
     socketRef.current = socket;
