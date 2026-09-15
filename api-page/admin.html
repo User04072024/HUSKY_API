@@ -174,10 +174,17 @@
       statusBox.textContent = `${result.files.length} archivos disponibles. Rama: ${result.branch}`;
     };
 
-    const openFirstAvailable = (paths, accessToken) => {
-      const available = paths.find((filePath) => [...fileList.children].some((button) => button.dataset.path === filePath));
-      if (available) return loadFile(available, accessToken);
-      statusBox.textContent = 'No se encontró el archivo solicitado en GitHub.';
+    const openFirstAvailable = async (paths, accessToken) => {
+      let lastError = null;
+      for (const filePath of paths) {
+        try {
+          await loadFile(filePath, accessToken);
+          return;
+        } catch (error) {
+          lastError = error;
+        }
+      }
+      statusBox.textContent = lastError?.message || 'No se encontró el archivo solicitado en GitHub.';
     };
 
     const saveContent = async (accessToken) => {
@@ -310,12 +317,12 @@
         endpointForm.addEventListener('submit', (event) => { event.preventDefault(); applyEndpoint(); });
         document.getElementById('removeEndpoint').addEventListener('click', removeEndpoint);
         document.getElementById('refreshFiles').addEventListener('click', () => refreshFiles(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
-        document.getElementById('editDashboard').addEventListener('click', () => openFirstAvailable(['api-page/dashboard.html', 'api-page/assets/dashboard.mjs', 'api-page/assets/dashboard.css'], data.session.access_token));
-        document.getElementById('editDocs').addEventListener('click', () => openFirstAvailable(['api-page/docs.html', 'api-page/docs-code.html', 'api-page/assets/docs-future-v2.js', 'api-page/assets/docs.css'], data.session.access_token));
+        document.getElementById('editDashboard').addEventListener('click', () => openFirstAvailable(['api-page/dashboard.html', 'api-page/assets/dashboard.mjs', 'api-page/assets/dashboard.css'], data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
+        document.getElementById('editDocs').addEventListener('click', () => openFirstAvailable(['api-page/docs.html', 'api-page/docs-code.html', 'api-page/assets/docs-future-v2.js', 'api-page/assets/docs.css'], data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
         document.getElementById('newFile').addEventListener('click', () => createFile(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
         document.getElementById('saveContent').addEventListener('click', () => saveContent(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
         document.getElementById('deleteFile').addEventListener('click', () => deleteFile(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
-        await refreshFiles(data.session.access_token);
+        await refreshFiles(data.session.access_token).catch((error) => { statusBox.textContent = `Archivos: ${error.message}`; });
         await loadApiGraphic(data.session.access_token).catch((error) => { statusBox.textContent = error.message; });
       } else {
         await supabase.auth.signOut();
