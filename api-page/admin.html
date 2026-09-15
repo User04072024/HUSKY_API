@@ -45,6 +45,13 @@
     .field input, .field select, .field textarea { box-sizing: border-box; width: 100%; border: 1px solid #24506a; background: #0c1827; color: #d8f3ff; padding: 10px; font: 12px/1.5 "JetBrains Mono", monospace; outline: none; }
     .field textarea { min-height: 86px; resize: vertical; }
     .json-small { min-height: 130px !important; }
+    .parameter-builder { border: 1px solid #24506a; background: #0c1827; padding: 10px; }
+    .parameter-row { display: grid; grid-template-columns: 1.1fr .8fr .7fr 1.5fr .9fr auto; gap: 6px; align-items: center; margin-bottom: 7px; }
+    .parameter-row input, .parameter-row select { min-width: 0; border: 1px solid #24506a; background: #07101d; color: #d8f3ff; padding: 8px; font: 11px "JetBrains Mono", monospace; }
+    .parameter-remove { border: 1px solid #7f1d1d; background: #2a1015; color: #fca5a5; padding: 7px 9px; cursor: pointer; }
+    .parameter-add { border: 1px solid #22d3ee; background: #123149; color: #67e8f9; padding: 8px 10px; cursor: pointer; font: 700 10px "JetBrains Mono", monospace; }
+    .builder-empty { color: #7890a8; font: 11px "JetBrains Mono", monospace; padding: 8px 0; }
+    @media (max-width: 760px) { .parameter-row { grid-template-columns: 1fr 1fr; } .parameter-remove { grid-column: 2; } }
     @media (max-width: 760px) { .admin-workspace, .graphic-layout { grid-template-columns: 1fr; } .field-grid { grid-template-columns: 1fr; } }
     .admin-status { min-height: 18px; margin-top: 10px; color: #86efac; font: 11px "JetBrains Mono", monospace; }
   </style>
@@ -81,7 +88,7 @@
                 <div class="field"><label for="endpointCategory">Categoría</label><input id="endpointCategory" placeholder="IA"></div>
                 <div class="field"><label for="endpointSummary">Nombre / resumen</label><input id="endpointSummary" placeholder="Nombre visible del endpoint"></div>
                 <div class="field full"><label for="endpointDescription">Descripción</label><textarea id="endpointDescription" placeholder="Explica qué hace este endpoint"></textarea></div>
-                <div class="field full"><label for="endpointParameters">Parámetros JSON</label><textarea class="json-small" id="endpointParameters">[]</textarea></div>
+                <div class="field full"><label>Parámetros del endpoint</label><div class="parameter-builder" id="parameterBuilder"></div><button class="parameter-add" id="addParameter" type="button">+ AÑADIR PARÁMETRO</button><textarea class="json-small" id="endpointParameters" hidden>[]</textarea></div>
                 <div class="field full"><label for="endpointResponses">Respuestas JSON</label><textarea class="json-small" id="endpointResponses">{"200":{"description":"Respuesta correcta"}}</textarea></div>
               </div>
               <div class="admin-actions"><button class="admin-save" type="submit">APLICAR CAMBIOS</button><button class="admin-save admin-danger" id="removeEndpoint" type="button">ELIMINAR ENDPOINT</button></div>
@@ -133,6 +140,7 @@
       path: document.getElementById('endpointPath'), method: document.getElementById('endpointMethod'), category: document.getElementById('endpointCategory'),
       summary: document.getElementById('endpointSummary'), description: document.getElementById('endpointDescription'), parameters: document.getElementById('endpointParameters'), responses: document.getElementById('endpointResponses')
     };
+    const parameterBuilder = document.getElementById('parameterBuilder');
 
     const configResponse = await fetch('/api/auth/config');
     const config = await configResponse.json();
@@ -217,7 +225,7 @@
       endpointFields.category.value = item.operation.tags?.[0] || '';
       endpointFields.summary.value = item.operation.summary || '';
       endpointFields.description.value = item.operation.description || '';
-      endpointFields.parameters.value = JSON.stringify(item.operation.parameters || [], null, 2);
+      renderParameterBuilder(item.operation.parameters || []);
       endpointFields.responses.value = JSON.stringify(item.operation.responses || { 200: { description: 'Respuesta correcta' } }, null, 2);
       [...endpointList.querySelectorAll('.endpoint-item')].forEach((button) => button.classList.toggle('active', button.dataset.key === `${item.method}:${item.path}`));
     };
@@ -229,9 +237,37 @@
       endpointFields.category.value = 'IA';
       endpointFields.summary.value = '';
       endpointFields.description.value = '';
-      endpointFields.parameters.value = '[]';
+      renderParameterBuilder([]);
       endpointFields.responses.value = '{\n  "200": { "description": "Respuesta correcta" }\n}';
       [...endpointList.querySelectorAll('.endpoint-item')].forEach((button) => button.classList.remove('active'));
+    };
+
+    const syncParameters = () => {
+      const parameters = [...parameterBuilder.querySelectorAll('.parameter-row')].map((row) => ({
+        name: row.querySelector('[data-field="name"]').value.trim(),
+        in: row.querySelector('[data-field="in"]').value,
+        required: row.querySelector('[data-field="required"]').checked,
+        description: row.querySelector('[data-field="description"]').value.trim(),
+        schema: { type: row.querySelector('[data-field="type"]').value, example: row.querySelector('[data-field="example"]').value }
+      })).filter((parameter) => parameter.name);
+      endpointFields.parameters.value = JSON.stringify(parameters, null, 2);
+      return parameters;
+    };
+
+    const renderParameterBuilder = (parameters) => {
+      parameterBuilder.replaceChildren();
+      if (!parameters.length) { const empty = document.createElement('div'); empty.className = 'builder-empty'; empty.textContent = 'Este endpoint no tiene parámetros.'; parameterBuilder.appendChild(empty); }
+      parameters.forEach((parameter) => {
+        const row = document.createElement('div'); row.className = 'parameter-row';
+        row.innerHTML = `<input data-field="name" placeholder="nombre" value="${String(parameter.name || '').replaceAll('"', '&quot;')}"><select data-field="in"><option value="query">query</option><option value="path">path</option><option value="header">header</option><option value="cookie">cookie</option></select><select data-field="type"><option value="string">string</option><option value="number">number</option><option value="integer">integer</option><option value="boolean">boolean</option></select><input data-field="description" placeholder="descripción" value="${String(parameter.description || '').replaceAll('"', '&quot;')}"><input data-field="example" placeholder="ejemplo" value="${String(parameter.schema?.example || '').replaceAll('"', '&quot;')}"><label><input data-field="required" type="checkbox"> requerido</label><button class="parameter-remove" type="button">X</button>`;
+        row.querySelector('[data-field="in"]').value = parameter.in || 'query';
+        row.querySelector('[data-field="type"]').value = parameter.schema?.type || 'string';
+        row.querySelector('[data-field="required"]').checked = Boolean(parameter.required);
+        row.querySelector('.parameter-remove').addEventListener('click', () => { row.remove(); syncParameters(); });
+        row.querySelectorAll('input, select').forEach((field) => field.addEventListener('input', syncParameters));
+        parameterBuilder.appendChild(row);
+      });
+      syncParameters();
     };
 
     const loadApiGraphic = async (accessToken) => {
@@ -251,8 +287,8 @@
     };
 
     const applyEndpoint = async (accessToken) => {
-      let parameters; let responses;
-      try { parameters = JSON.parse(endpointFields.parameters.value); responses = JSON.parse(endpointFields.responses.value); } catch { statusBox.textContent = 'Parámetros o respuestas no contienen JSON válido.'; return; }
+      const parameters = syncParameters(); let responses;
+      try { responses = JSON.parse(endpointFields.responses.value); } catch { statusBox.textContent = 'Las respuestas no contienen JSON válido.'; return; }
       if (!openapiData) { statusBox.textContent = 'La API todavía está cargando.'; return; }
       const path = endpointFields.path.value.trim(); const method = endpointFields.method.value; const category = endpointFields.category.value.trim() || 'Sin categoría';
       if (!path.startsWith('/')) { statusBox.textContent = 'La ruta debe comenzar con /. '; return; }
@@ -315,6 +351,7 @@
         document.getElementById('apiMode').addEventListener('click', async () => { graphicEditor.style.display = 'block'; fileEditor.style.display = 'none'; document.getElementById('apiMode').classList.add('active'); document.getElementById('filesMode').classList.remove('active'); try { await loadApiGraphic(data.session.access_token); } catch (error) { statusBox.textContent = error.message; } });
         document.getElementById('filesMode').addEventListener('click', () => { graphicEditor.style.display = 'none'; fileEditor.style.display = 'block'; document.getElementById('filesMode').classList.add('active'); document.getElementById('apiMode').classList.remove('active'); });
         document.getElementById('newEndpoint').addEventListener('click', clearEndpointForm);
+        document.getElementById('addParameter').addEventListener('click', () => { const parameters = [...parameterBuilder.querySelectorAll('.parameter-row')].map((row) => ({ name: row.querySelector('[data-field="name"]').value, in: row.querySelector('[data-field="in"]').value, required: row.querySelector('[data-field="required"]').checked, description: row.querySelector('[data-field="description"]').value, schema: { type: row.querySelector('[data-field="type"]').value, example: row.querySelector('[data-field="example"]').value } })); parameters.push({ name: '', in: 'query', required: false, description: '', schema: { type: 'string', example: '' } }); renderParameterBuilder(parameters); });
         document.getElementById('newCategory').addEventListener('click', addCategory);
         document.getElementById('saveApi').addEventListener('click', () => saveApiGraphic(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
         document.getElementById('reloadApi').addEventListener('click', () => loadApiGraphic(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
