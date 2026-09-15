@@ -93,17 +93,7 @@ function createSimulationRequest() {
   const endpoint = SIMULATION_ENDPOINTS[Math.floor(Math.random() * SIMULATION_ENDPOINTS.length)];
   const latency = Math.floor(Math.random() * 150) + 40;
   const id = `sim-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-  return {
-    id,
-    method: "GET",
-    statusCode: 200,
-    endpoint,
-    latency,
-    ip: location.ip,
-    location,
-    simulation: true,
-    log: `[IP: ${location.ip}] > GET ${endpoint} > 200 OK - ${latency}ms`
-  };
+  return { id, method: "GET", statusCode: 200, endpoint, latency, ip: location.ip, location, simulation: true, log: `[IP: ${location.ip}] > GET ${endpoint} > 200 OK - ${latency}ms` };
 }
 
 function WorldMap({ requests }) {
@@ -115,10 +105,7 @@ function WorldMap({ requests }) {
   const mapHeight = 560;
   const projection = useMemo(() => geoNaturalEarth1().scale(165).translate([mapWidth / 2, mapHeight / 2 + 22]), []);
   const pathGenerator = useMemo(() => geoPath(projection), [projection]);
-  const toPoint = (location) => {
-    const [x, y] = projection([location.lng, location.lat]);
-    return { x: `${(x / mapWidth) * 100}%`, y: `${(y / mapHeight) * 100}%` };
-  };
+  const toPoint = (location) => { const [x, y] = projection([location.lng, location.lat]); return { x: `${(x / mapWidth) * 100}%`, y: `${(y / mapHeight) * 100}%` }; };
   const connectionPath = (origin, destination) => {
     const [startX, startY] = projection([origin.lng, origin.lat]);
     const [endX, endY] = projection(destination);
@@ -128,51 +115,24 @@ function WorldMap({ requests }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
-      .then((response) => {
-        if (!response.ok) throw new Error("No se pudo cargar el mapa mundial");
-        return response.json();
-      })
-      .then((topology) => {
-        if (!cancelled) setWorld(feature(topology, topology.objects.countries));
-      })
-      .catch((error) => console.error("Mapa mundial:", error));
+    fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then((response) => { if (!response.ok) throw new Error("No se pudo cargar el mapa mundial"); return response.json(); }).then((topology) => { if (!cancelled) setWorld(feature(topology, topology.objects.countries)); }).catch((error) => console.error("Mapa mundial:", error));
     return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
     const arrivalTimers = new Set();
     const expirationTimers = new Set();
-
     const emit = () => {
       const request = createSimulationRequest();
       setSimulatedRequests((current) => [request, ...current].slice(0, 6));
-
-      const arrivalTimer = setTimeout(() => {
-        setRevealedIds((current) => new Set(current).add(request.id));
-        arrivalTimers.delete(arrivalTimer);
-      }, 900);
+      const arrivalTimer = setTimeout(() => { setRevealedIds((current) => new Set(current).add(request.id)); arrivalTimers.delete(arrivalTimer); }, 900);
       arrivalTimers.add(arrivalTimer);
-
-      const expirationTimer = setTimeout(() => {
-        setSimulatedRequests((current) => current.filter((item) => item.id !== request.id));
-        setRevealedIds((current) => {
-          const next = new Set(current);
-          next.delete(request.id);
-          return next;
-        });
-        expirationTimers.delete(expirationTimer);
-      }, 4000);
+      const expirationTimer = setTimeout(() => { setSimulatedRequests((current) => current.filter((item) => item.id !== request.id)); setRevealedIds((current) => { const next = new Set(current); next.delete(request.id); return next; }); expirationTimers.delete(expirationTimer); }, 4000);
       expirationTimers.add(expirationTimer);
     };
-
     emit();
     const interval = setInterval(emit, 3200);
-    return () => {
-      clearInterval(interval);
-      arrivalTimers.forEach((timer) => clearTimeout(timer));
-      expirationTimers.forEach((timer) => clearTimeout(timer));
-    };
+    return () => { clearInterval(interval); arrivalTimers.forEach((timer) => clearTimeout(timer)); expirationTimers.forEach((timer) => clearTimeout(timer)); };
   }, []);
 
   return h("div", { className: "map" },
@@ -182,28 +142,18 @@ function WorldMap({ requests }) {
       active.flatMap((request) => NETWORK_DESTINATIONS.map((destination, index) => h("path", { key: `route-${request.id}-${index}`, className: "route route-white", d: connectionPath(request.location || { lat: 20, lng: -70 }, destination) }))),
       h("circle", { className: "node server", cx: projection(SIMULATION_SERVER)[0], cy: projection(SIMULATION_SERVER)[1], r: "5" }),
       NETWORK_DESTINATIONS.slice(1).map((destination, index) => h("circle", { key: `network-node-${index}`, className: "node", cx: projection(destination)[0], cy: projection(destination)[1], r: "3" })),
-      active.map((request) => {
-        const location = request.location || { lat: 20, lng: -70 };
-        const [x, y] = projection([location.lng, location.lat]);
-        return h("circle", { key: `node-${request.id}`, className: "node node-origin", cx: x, cy: y, r: "4" });
-      })
+      active.map((request) => { const location = request.location || { lat: 20, lng: -70 }; const [x, y] = projection([location.lng, location.lat]); return h("circle", { key: `node-${request.id}`, className: "node node-origin", cx: x, cy: y, r: "4" }); })
     ),
     active.filter((request) => !request.simulation || revealedIds.has(request.id)).map((request) => { const point = toPoint(request.location || { lat: 20, lng: -70 }); return h(motion.div, { key: `popup-${request.id}`, className: "event-pop", initial: { opacity: 0, scale: .7 }, animate: { opacity: 1, scale: 1 }, style: { left: point.x, top: point.y, transform: "translate(-50%, -50%)" } }, h("strong", null, `${request.method} ${request.statusCode} // ${request.location?.name || "NODE"}`), h("span", null, `IP: ${request.ip || "unknown"}`), h("span", null, `> ${request.endpoint}`), h("span", { className: "event-code" }, `> 200 OK - ${request.latency}ms`), h("span", { className: "cmd-cursor" }, "_")); })
   );
 }
 
-function LiveLogs({ requests }) {
-  return h("div", { className: "log-column" }, h("div", { className: "log-list" }, requests.slice(0, 30).map((item) => h("div", { className: `log ${item.status === "ERROR" ? "error" : ""}`, key: item.id }, h("b", null, `${item.method} ${item.statusCode}`), ` ${item.endpoint} `, h("span", null, `${item.latency}ms`), h("br"), `ip:${item.ip}`))))
-}
-
-function LivePanel({ requests, connected }) {
-  return h("section", { id: "network", className: "panel" }, h("div", { className: "panel-heading" }, h("h3", null, "Global request triangulation"), h("span", null, connected ? "● STREAM CONNECTED" : "○ RECONNECTING")), h("div", { className: "map-layout" }, h(WorldMap, { requests }), h(LiveLogs, { requests })));
-}
+function LiveLogs({ requests }) { return h("div", { className: "log-column" }, h("div", { className: "log-list" }, requests.slice(0, 30).map((item) => h("div", { className: `log ${item.status === "ERROR" ? "error" : ""}`, key: item.id }, h("b", null, `${item.method} ${item.statusCode}`), ` ${item.endpoint} `, h("span", null, `${item.latency}ms`), h("br"), `ip:${item.ip}`)))); }
+function LivePanel({ requests, connected }) { return h("section", { id: "network", className: "panel" }, h("div", { className: "panel-heading" }, h("h3", null, "Global request triangulation"), h("span", null, connected ? "● STREAM CONNECTED" : "○ RECONNECTING")), h("div", { className: "map-layout" }, h(WorldMap, { requests }), h(LiveLogs, { requests }))); }
 
 function App() {
   const { metrics, requests, connected } = useApiMetrics();
   const viewContent = h(motion.div, { key: "map", initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 } }, h(LivePanel, { requests, connected }));
-
   return h("div", { className: "shell" },
     h("header", { className: "topbar" },
       h("div", { className: "brand" }, h("div", { className: "brand-mark" }, "//"), h("div", null, h("div", { className: "eyebrow" }, "secure api command center"), h("h1", null, "HUSKY API v1.0"))),
@@ -232,23 +182,9 @@ function App() {
       )
     ),
     h("footer", { className: "dashboard-footer" },
-      h("div", { className: "footer-brand" },
-        h("span", { className: "footer-mark" }, "//"),
-        h("div", null,
-          h("strong", null, "HUSKY API"),
-          h("span", null, "Secure tools for modern integrations")
-        )
-      ),
-      h("div", { className: "footer-links" },
-        h("a", { href: "/docs.html" }, "Documentación"),
-        h("a", { href: "https://huskydev.space", target: "_blank", rel: "noopener noreferrer" }, "HuskyDev.space ↗"),
-        h("a", { href: "mailto:contacto@huskydev.space" }, "Contacto"),
-        h("a", { href: "#network" }, "Estado en vivo")
-      ),
-      h("div", { className: "footer-meta" },
-        h("span", null, connected ? "● SYSTEM ONLINE" : "○ SYSTEM OFFLINE"),
-        h("span", null, `© ${new Date().getFullYear()} Husky API`)
-      )
+      h("div", { className: "footer-brand" }, h("span", { className: "footer-mark" }, "//"), h("div", null, h("strong", null, "HUSKY API"), h("span", null, "Secure tools for modern integrations"))),
+      h("div", { className: "footer-links" }, h("a", { href: "/docs.html" }, "Documentación"), h("a", { href: "https://huskydev.space", target: "_blank", rel: "noopener noreferrer" }, "HuskyDev.space ↗"), h("a", { href: "mailto:contacto@huskydev.space" }, "Contacto"), h("a", { href: "#network" }, "Estado en vivo")),
+      h("div", { className: "footer-meta" }, h("span", null, connected ? "● SYSTEM ONLINE" : "○ SYSTEM OFFLINE"), h("span", null, `© ${new Date().getFullYear()} Husky API`))
     )
   );
 }
