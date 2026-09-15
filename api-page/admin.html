@@ -44,8 +44,8 @@
       <div class="admin-user" id="adminUser"></div>
       <div class="admin-editor" id="adminEditor">
         <nav class="admin-nav" aria-label="Enlaces administrativos">
-          <a href="/dashboard">ABRIR DASHBOARD</a>
-          <a href="/docs">VER DOCUMENTACIÓN</a>
+          <button class="admin-tab" id="editDashboard" type="button">EDITAR DASHBOARD</button>
+          <button class="admin-tab" id="editDocs" type="button">EDITAR DOCUMENTACIÓN</button>
           <button class="admin-tab" id="newFile" type="button">NUEVO ARCHIVO</button>
           <button class="admin-tab" id="refreshFiles" type="button">ACTUALIZAR LISTA</button>
         </nav>
@@ -117,6 +117,12 @@
       statusBox.textContent = `${result.files.length} archivos disponibles. Rama: ${result.branch}`;
     };
 
+    const openFirstAvailable = (paths, accessToken) => {
+      const available = paths.find((filePath) => [...fileList.children].some((button) => button.dataset.path === filePath));
+      if (available) return loadFile(available, accessToken);
+      statusBox.textContent = 'No se encontró el archivo solicitado en GitHub.';
+    };
+
     const saveContent = async (accessToken) => {
       if (!activePath) { statusBox.textContent = 'Selecciona un archivo.'; return; }
       statusBox.textContent = 'Guardando...';
@@ -153,6 +159,8 @@
         userBox.innerHTML = `<img src="${admin.user.avatar || ''}" alt=""><span>Sesión activa: ${admin.user.email}</span>`;
         editorBox.style.display = 'block';
         document.getElementById('refreshFiles').addEventListener('click', () => refreshFiles(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
+        document.getElementById('editDashboard').addEventListener('click', () => openFirstAvailable(['api-page/dashboard.html', 'api-page/assets/dashboard.mjs', 'api-page/assets/dashboard.css'], data.session.access_token));
+        document.getElementById('editDocs').addEventListener('click', () => openFirstAvailable(['api-page/docs.html', 'api-page/docs-code.html', 'api-page/assets/docs-future-v2.js', 'api-page/assets/docs.css'], data.session.access_token));
         document.getElementById('newFile').addEventListener('click', () => createFile(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
         document.getElementById('saveContent').addEventListener('click', () => saveContent(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
         document.getElementById('deleteFile').addEventListener('click', () => deleteFile(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
