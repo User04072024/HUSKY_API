@@ -28,6 +28,24 @@
     .admin-editor textarea { width: 100%; min-height: 420px; box-sizing: border-box; resize: vertical; border: 1px solid #24506a; background: #07101d; color: #d8f3ff; padding: 14px; font: 12px/1.6 "JetBrains Mono", monospace; outline: none; }
     .admin-path { color: #67e8f9; font: 11px "JetBrains Mono", monospace; margin-bottom: 8px; }
     .admin-danger { border-color: #7f1d1d !important; background: #2a1015 !important; color: #fca5a5 !important; }
+    .admin-mode { display: flex; gap: 8px; margin: 20px 0 12px; border-bottom: 1px solid #24506a; padding-bottom: 10px; }
+    .admin-mode button { border: 1px solid #24506a; background: #101c2b; color: #b9d8e8; padding: 10px 13px; font: 700 10px "JetBrains Mono", monospace; cursor: pointer; }
+    .admin-mode button.active { border-color: #22d3ee; background: #22d3ee; color: #031018; }
+    .graphic-editor { display: none; }
+    .graphic-layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 14px; }
+    .endpoint-list, .graphic-form { border: 1px solid #24506a; background: #07101d; padding: 14px; }
+    .endpoint-list { min-height: 420px; }
+    .endpoint-category { margin: 12px 0 6px; color: #22d3ee; font: 700 10px "JetBrains Mono", monospace; text-transform: uppercase; }
+    .endpoint-item { display: block; width: 100%; border: 0; background: transparent; color: #b9d8e8; padding: 8px; text-align: left; font: 11px "JetBrains Mono", monospace; cursor: pointer; }
+    .endpoint-item:hover, .endpoint-item.active { background: #123149; color: #67e8f9; }
+    .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .field { display: grid; gap: 6px; margin-bottom: 12px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { color: #7890a8; font: 10px "JetBrains Mono", monospace; text-transform: uppercase; }
+    .field input, .field select, .field textarea { box-sizing: border-box; width: 100%; border: 1px solid #24506a; background: #0c1827; color: #d8f3ff; padding: 10px; font: 12px/1.5 "JetBrains Mono", monospace; outline: none; }
+    .field textarea { min-height: 86px; resize: vertical; }
+    .json-small { min-height: 130px !important; }
+    @media (max-width: 760px) { .admin-workspace, .graphic-layout { grid-template-columns: 1fr; } .field-grid { grid-template-columns: 1fr; } }
     .admin-status { min-height: 18px; margin-top: 10px; color: #86efac; font: 11px "JetBrains Mono", monospace; }
   </style>
 </head>
@@ -43,6 +61,34 @@
         </div>
       <div class="admin-user" id="adminUser"></div>
       <div class="admin-editor" id="adminEditor">
+        <div class="admin-mode" aria-label="Modo de administración">
+          <button class="active" id="apiMode" type="button">API GRÁFICA</button>
+          <button id="filesMode" type="button">PÁGINAS Y CÓDIGO</button>
+        </div>
+        <section class="graphic-editor" id="graphicEditor">
+          <nav class="admin-nav">
+            <button class="admin-save" id="newEndpoint" type="button">NUEVO ENDPOINT</button>
+            <button class="admin-tab" id="newCategory" type="button">NUEVA CATEGORÍA</button>
+            <button class="admin-tab" id="saveApi" type="button">GUARDAR API EN GITHUB</button>
+            <button class="admin-tab" id="reloadApi" type="button">RECARGAR API</button>
+          </nav>
+          <div class="graphic-layout">
+            <div class="endpoint-list" id="endpointList"></div>
+            <form class="graphic-form" id="endpointForm">
+              <div class="field-grid">
+                <div class="field"><label for="endpointPath">Ruta del endpoint</label><input id="endpointPath" placeholder="/ai/nuevo" required></div>
+                <div class="field"><label for="endpointMethod">Método</label><select id="endpointMethod"><option>get</option><option>post</option><option>put</option><option>patch</option><option>delete</option></select></div>
+                <div class="field"><label for="endpointCategory">Categoría</label><input id="endpointCategory" placeholder="IA"></div>
+                <div class="field"><label for="endpointSummary">Nombre / resumen</label><input id="endpointSummary" placeholder="Nombre visible del endpoint"></div>
+                <div class="field full"><label for="endpointDescription">Descripción</label><textarea id="endpointDescription" placeholder="Explica qué hace este endpoint"></textarea></div>
+                <div class="field full"><label for="endpointParameters">Parámetros JSON</label><textarea class="json-small" id="endpointParameters">[]</textarea></div>
+                <div class="field full"><label for="endpointResponses">Respuestas JSON</label><textarea class="json-small" id="endpointResponses">{"200":{"description":"Respuesta correcta"}}</textarea></div>
+              </div>
+              <div class="admin-actions"><button class="admin-save" type="submit">APLICAR CAMBIOS</button><button class="admin-save admin-danger" id="removeEndpoint" type="button">ELIMINAR ENDPOINT</button></div>
+            </form>
+          </div>
+        </section>
+        <section id="fileEditor">
         <nav class="admin-nav" aria-label="Enlaces administrativos">
           <button class="admin-tab" id="editDashboard" type="button">EDITAR DASHBOARD</button>
           <button class="admin-tab" id="editDocs" type="button">EDITAR DOCUMENTACIÓN</button>
@@ -61,6 +107,7 @@
             <div class="admin-status" id="adminStatus"></div>
           </div>
         </div>
+        </section>
       </div>
     </section>
   </main>
@@ -76,6 +123,16 @@
     const fileList = document.getElementById('fileList');
     const activePathBox = document.getElementById('activePath');
     let activePath = '';
+    let openapiData = null;
+    let selectedEndpoint = null;
+    const endpointList = document.getElementById('endpointList');
+    const graphicEditor = document.getElementById('graphicEditor');
+    const fileEditor = document.getElementById('fileEditor');
+    const endpointForm = document.getElementById('endpointForm');
+    const endpointFields = {
+      path: document.getElementById('endpointPath'), method: document.getElementById('endpointMethod'), category: document.getElementById('endpointCategory'),
+      summary: document.getElementById('endpointSummary'), description: document.getElementById('endpointDescription'), parameters: document.getElementById('endpointParameters'), responses: document.getElementById('endpointResponses')
+    };
 
     const configResponse = await fetch('/api/auth/config');
     const config = await configResponse.json();
@@ -131,6 +188,90 @@
       statusBox.textContent = result.message || 'Cambios guardados.';
     };
 
+    const renderEndpoints = () => {
+      endpointList.replaceChildren();
+      const groups = new Map();
+      Object.entries(openapiData?.paths || {}).forEach(([path, methods]) => Object.entries(methods).forEach(([method, operation]) => {
+        const category = operation.tags?.[0] || 'Sin categoría';
+        if (!groups.has(category)) groups.set(category, []);
+        groups.get(category).push({ path, method, operation });
+      }));
+      groups.forEach((items, category) => {
+        const heading = document.createElement('div'); heading.className = 'endpoint-category'; heading.textContent = category; endpointList.appendChild(heading);
+        items.forEach((item) => { const button = document.createElement('button'); button.className = 'endpoint-item'; button.dataset.key = `${item.method}:${item.path}`; button.textContent = `${item.method.toUpperCase()}  ${item.path}`; button.addEventListener('click', () => selectEndpoint(item)); endpointList.appendChild(button); });
+      });
+      if (!groups.size) endpointList.textContent = 'No hay endpoints. Crea el primero.';
+    };
+
+    const selectEndpoint = (item) => {
+      selectedEndpoint = item;
+      endpointFields.path.value = item.path;
+      endpointFields.method.value = item.method;
+      endpointFields.category.value = item.operation.tags?.[0] || '';
+      endpointFields.summary.value = item.operation.summary || '';
+      endpointFields.description.value = item.operation.description || '';
+      endpointFields.parameters.value = JSON.stringify(item.operation.parameters || [], null, 2);
+      endpointFields.responses.value = JSON.stringify(item.operation.responses || { 200: { description: 'Respuesta correcta' } }, null, 2);
+      [...endpointList.querySelectorAll('.endpoint-item')].forEach((button) => button.classList.toggle('active', button.dataset.key === `${item.method}:${item.path}`));
+    };
+
+    const clearEndpointForm = () => {
+      selectedEndpoint = null;
+      endpointFields.path.value = '';
+      endpointFields.method.value = 'get';
+      endpointFields.category.value = 'IA';
+      endpointFields.summary.value = '';
+      endpointFields.description.value = '';
+      endpointFields.parameters.value = '[]';
+      endpointFields.responses.value = '{\n  "200": { "description": "Respuesta correcta" }\n}';
+      [...endpointList.querySelectorAll('.endpoint-item')].forEach((button) => button.classList.remove('active'));
+    };
+
+    const loadApiGraphic = async (accessToken) => {
+      const response = await fetch('/api/admin/file?path=src%2Fopenapi.json', { headers: { Authorization: `Bearer ${accessToken}` } });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'No se pudo cargar OpenAPI desde GitHub.');
+      openapiData = JSON.parse(result.file.content);
+      renderEndpoints();
+      statusBox.textContent = `${Object.keys(openapiData.paths || {}).length} rutas cargadas gráficamente.`;
+    };
+
+    const saveApiGraphic = async (accessToken) => {
+      const response = await fetch('/api/admin/file', { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify({ path: 'src/openapi.json', content: `${JSON.stringify(openapiData, null, 2)}\n` }) });
+      const result = await response.json();
+      statusBox.textContent = result.message || 'OpenAPI guardado.';
+    };
+
+    const applyEndpoint = () => {
+      let parameters; let responses;
+      try { parameters = JSON.parse(endpointFields.parameters.value); responses = JSON.parse(endpointFields.responses.value); } catch { statusBox.textContent = 'Parámetros o respuestas no contienen JSON válido.'; return; }
+      const path = endpointFields.path.value.trim(); const method = endpointFields.method.value; const category = endpointFields.category.value.trim() || 'Sin categoría';
+      if (!path.startsWith('/')) { statusBox.textContent = 'La ruta debe comenzar con /. '; return; }
+      if (selectedEndpoint && (selectedEndpoint.path !== path || selectedEndpoint.method !== method)) delete openapiData.paths[selectedEndpoint.path][selectedEndpoint.method];
+      if (selectedEndpoint && Object.keys(openapiData.paths[selectedEndpoint.path] || {}).length === 0) delete openapiData.paths[selectedEndpoint.path];
+      openapiData.paths[path] ||= {};
+      openapiData.paths[path][method] = { ...((selectedEndpoint && selectedEndpoint.operation) || {}), summary: endpointFields.summary.value.trim(), description: endpointFields.description.value.trim(), tags: [category], parameters, responses };
+      renderEndpoints();
+      selectEndpoint({ path, method, operation: openapiData.paths[path][method] });
+      statusBox.textContent = 'Cambios aplicados localmente. Pulsa GUARDAR API EN GITHUB.';
+    };
+
+    const removeEndpoint = () => {
+      if (!selectedEndpoint || !confirm(`¿Eliminar ${selectedEndpoint.method.toUpperCase()} ${selectedEndpoint.path}?`)) return;
+      delete openapiData.paths[selectedEndpoint.path][selectedEndpoint.method];
+      if (Object.keys(openapiData.paths[selectedEndpoint.path]).length === 0) delete openapiData.paths[selectedEndpoint.path];
+      renderEndpoints(); clearEndpointForm(); statusBox.textContent = 'Endpoint eliminado localmente. Guarda la API para publicar.';
+    };
+
+    const addCategory = () => {
+      const category = prompt('Nombre de la nueva categoría:')?.trim();
+      if (!category || !openapiData) return;
+      openapiData.tags ||= [];
+      if (!openapiData.tags.some((tag) => tag.name === category)) openapiData.tags.push({ name: category });
+      endpointFields.category.value = category;
+      statusBox.textContent = `Categoría ${category} creada localmente. Guarda la API para publicar.`;
+    };
+
     const createFile = async (accessToken) => {
       const filePath = prompt('Ruta nueva (api-page/... o src/api/...):');
       if (!filePath) return;
@@ -158,6 +299,16 @@
         userBox.style.display = 'flex';
         userBox.innerHTML = `<img src="${admin.user.avatar || ''}" alt=""><span>Sesión activa: ${admin.user.email}</span>`;
         editorBox.style.display = 'block';
+        graphicEditor.style.display = 'block';
+        fileEditor.style.display = 'none';
+        document.getElementById('apiMode').addEventListener('click', async () => { graphicEditor.style.display = 'block'; fileEditor.style.display = 'none'; document.getElementById('apiMode').classList.add('active'); document.getElementById('filesMode').classList.remove('active'); try { await loadApiGraphic(data.session.access_token); } catch (error) { statusBox.textContent = error.message; } });
+        document.getElementById('filesMode').addEventListener('click', () => { graphicEditor.style.display = 'none'; fileEditor.style.display = 'block'; document.getElementById('filesMode').classList.add('active'); document.getElementById('apiMode').classList.remove('active'); });
+        document.getElementById('newEndpoint').addEventListener('click', clearEndpointForm);
+        document.getElementById('newCategory').addEventListener('click', addCategory);
+        document.getElementById('saveApi').addEventListener('click', () => saveApiGraphic(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
+        document.getElementById('reloadApi').addEventListener('click', () => loadApiGraphic(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
+        endpointForm.addEventListener('submit', (event) => { event.preventDefault(); applyEndpoint(); });
+        document.getElementById('removeEndpoint').addEventListener('click', removeEndpoint);
         document.getElementById('refreshFiles').addEventListener('click', () => refreshFiles(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
         document.getElementById('editDashboard').addEventListener('click', () => openFirstAvailable(['api-page/dashboard.html', 'api-page/assets/dashboard.mjs', 'api-page/assets/dashboard.css'], data.session.access_token));
         document.getElementById('editDocs').addEventListener('click', () => openFirstAvailable(['api-page/docs.html', 'api-page/docs-code.html', 'api-page/assets/docs-future-v2.js', 'api-page/assets/docs.css'], data.session.access_token));
@@ -165,6 +316,7 @@
         document.getElementById('saveContent').addEventListener('click', () => saveContent(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
         document.getElementById('deleteFile').addEventListener('click', () => deleteFile(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
         await refreshFiles(data.session.access_token);
+        await loadApiGraphic(data.session.access_token).catch((error) => { statusBox.textContent = error.message; });
       } else {
         await supabase.auth.signOut();
         alert('Esta cuenta de GitHub o Google no tiene permisos de editor.');
