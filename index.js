@@ -104,41 +104,95 @@ async function requireAdmin(req, res, next) {
 }
 
 app.get("/api/admin/session", requireAdmin, (req, res) => {
-    res.json({ status: true, user: req.admin, publish: { enabled: false, message: "La publicación requiere configurar GitHub App y aprobación de cambios." } });
+    const configured = Boolean(process.env.GITHUB_TOKEN && process.env.GITHUB_OWNER && process.env.GITHUB_REPO);
+    res.json({ status: true, user: req.admin, publish: { enabled: configured, message: configured ? "Los cambios se guardan como commits en GitHub." : "Configura GITHUB_TOKEN, GITHUB_OWNER y GITHUB_REPO para publicar cambios." } });
 });
 
-const adminContentFiles = {
-    openapi: path.join(__dirname, "src", "openapi.json"),
-    notifications: path.join(__dirname, "src", "data", "notifications.json")
-};
+const editablePathPrefixes = ["api-page/", "src/api/", "src/data/"];
+const editableExactPaths = new Set(["src/openapi.json"]);
 
-function readAdminContent(content) {
-    const filePath = adminContentFiles[content];
-    if (!filePath) return null;
-    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+function normalizeEditablePath(value) {
+    const filePath = String(value || "").replaceAll("\\", "/").replace(/^\/+/, "");
+    if (!filePath || filePath.includes("..") || (!editableExactPaths.has(filePath) && !editablePathPrefixes.some((prefix) => filePath.startsWith(prefix)))) return null;
+    return filePath;
 }
 
-app.get("/api/admin/content/:content", requireAdmin, (req, res) => {
+function githubConfig() {
+    const token = String(process.env.GITHUB_TOKEN || "").trim();
+    const owner = String(process.env.GITHUB_OWNER || "").trim();
+    const repo = String(process.env.GITHUB_REPO || "").trim();
+    if (!token || !owner || !repo) throw new Error("GitHub no está configurado para publicar cambios.");
+    return { token, owner, repo, branch: process.env.GITHUB_BASE_BRANCH || "main" };
+}
+
+async function githubRequest(method, filePath, body = null) {
+    const config = githubConfig();
+    const [requestPath, query = ""] = String(filePath || "").split("?");
+    const prefix = requestPath.startsWith("git/") ? "" : "/contents";
+    const url = `https://api.github.com/repos/${encodeURIComponent(config.owner)}/${encodeURIComponent(config.repo)}${prefix}${requestPath ? `/${requestPath.split("/").map(encodeURIComponent).join("/")}` : ""}${query ? `?${query}` : ""}`;
+    const response = await fetch(url, { method, headers: { Accept: "application/vnd.github+json", Authorization: `Bearer ${config.token}`, "X-GitHub-Api-Version": "2022-11-28", "User-Agent": "husky-api-admin" }, body: body ? JSON.stringify(body) : undefined });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || `GitHub respondió ${response.status}`);
+    return data;
+}
+
+async function getGithubFile(filePath) {
+    const config = githubConfig();
+    const data = await githubRequest("GET", filePath, null);
+    if (Array.isArray(data)) return { type: "directory", entries: data.map((entry) => ({ path: entry.path, type: entry.type, size: entry.size })) };
+    return { type: "file", path: filePath, sha: data.sha, content: Buffer.from(String(data.content || "").replace(/\n/g, ""), "base64").toString("utf8"), branch: config.branch };
+}
+
+app.get("/api/admin/files", requireAdmin, async (req, res) => {
     try {
-        const data = readAdminContent(req.params.content);
-        if (data === null) return res.status(404).json({ status: false, message: "Contenido no encontrado." });
-        res.json({ status: true, content: req.params.content, data });
+        const config = githubConfig();
+        const ref = await githubRequest("GET", `git/ref/heads/${encodeURIComponent(config.branch)}`);
+        const tree = await githubRequest("GET", `git/trees/${ref.object.sha}?recursive=1`);
+        const files = (tree.tree || []).filter((entry) => entry.type === "blob" && normalizeEditablePath(entry.path)).map((entry) => ({ path: entry.path, size: entry.size }));
+        res.json({ status: true, branch: config.branch, files });
     } catch (error) {
-        res.status(500).json({ status: false, message: `No se pudo leer el contenido: ${error.message}` });
+        res.status(503).json({ status: false, message: error.message });
     }
 });
 
-app.put("/api/admin/content/:content", requireAdmin, (req, res) => {
+app.get("/api/admin/file", requireAdmin, async (req, res) => {
+    const filePath = normalizeEditablePath(req.query.path);
+    if (!filePath) return res.status(400).json({ status: false, message: "Ruta no permitida." });
+    try { res.json({ status: true, file: await getGithubFile(filePath) }); } catch (error) { res.status(404).json({ status: false, message: error.message }); }
+});
+
+app.put("/api/admin/file", requireAdmin, async (req, res) => {
+    const filePath = normalizeEditablePath(req.body?.path);
+    const content = typeof req.body?.content === "string" ? req.body.content : null;
+    if (!filePath || content === null) return res.status(400).json({ status: false, message: "Ruta o contenido inválido." });
     try {
-        const filePath = adminContentFiles[req.params.content];
-        if (!filePath) return res.status(404).json({ status: false, message: "Contenido no encontrado." });
-        if (req.body === null || typeof req.body !== "object") return res.status(400).json({ status: false, message: "El contenido debe ser JSON válido." });
-        fs.writeFileSync(filePath, `${JSON.stringify(req.body, null, 2)}\n`, "utf8");
-        if (req.params.content === "openapi") openApi = req.body;
-        res.json({ status: true, message: "Contenido guardado correctamente." });
-    } catch (error) {
-        res.status(500).json({ status: false, message: `No se pudo guardar el contenido: ${error.message}` });
-    }
+        const current = await getGithubFile(filePath);
+        const config = githubConfig();
+        const result = await githubRequest("PUT", filePath, { message: String(req.body.message || `admin: update ${filePath}`).slice(0, 200), content: Buffer.from(content, "utf8").toString("base64"), sha: current.sha, branch: config.branch });
+        res.json({ status: true, message: "Cambios guardados en GitHub.", commit: result.commit?.html_url || null });
+    } catch (error) { res.status(502).json({ status: false, message: error.message }); }
+});
+
+app.post("/api/admin/file", requireAdmin, async (req, res) => {
+    const filePath = normalizeEditablePath(req.body?.path);
+    const content = typeof req.body?.content === "string" ? req.body.content : null;
+    if (!filePath || content === null) return res.status(400).json({ status: false, message: "Ruta o contenido inválido." });
+    try {
+        const config = githubConfig();
+        const result = await githubRequest("PUT", filePath, { message: String(req.body.message || `admin: create ${filePath}`).slice(0, 200), content: Buffer.from(content, "utf8").toString("base64"), branch: config.branch });
+        res.status(201).json({ status: true, message: "Archivo creado en GitHub.", commit: result.commit?.html_url || null });
+    } catch (error) { res.status(502).json({ status: false, message: error.message }); }
+});
+
+app.delete("/api/admin/file", requireAdmin, async (req, res) => {
+    const filePath = normalizeEditablePath(req.body?.path);
+    if (!filePath) return res.status(400).json({ status: false, message: "Ruta no permitida." });
+    try {
+        const current = await getGithubFile(filePath);
+        const config = githubConfig();
+        const result = await githubRequest("DELETE", filePath, { message: String(req.body.message || `admin: delete ${filePath}`).slice(0, 200), sha: current.sha, branch: config.branch });
+        res.json({ status: true, message: "Archivo eliminado de GitHub.", commit: result.commit?.html_url || null });
+    } catch (error) { res.status(502).json({ status: false, message: error.message }); }
 });
 
 app.get("/auth/github", (req, res) => {

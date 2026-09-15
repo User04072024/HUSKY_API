@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="./assets/dashboard.css" />
   <style>
     .admin-shell { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
-    .admin-card { width: min(520px, 100%); border: 1px solid rgba(34,211,238,.3); background: #0c121e; padding: 28px; box-shadow: 0 0 36px rgba(34,211,238,.08); }
+    .admin-card { width: min(1120px, 100%); border: 1px solid rgba(34,211,238,.3); background: #0c121e; padding: 28px; box-shadow: 0 0 36px rgba(34,211,238,.08); }
     .admin-card h1 { margin: 6px 0 12px; font-family: "Space Grotesk", sans-serif; }
     .admin-card p { color: #7890a8; font-size: 12px; line-height: 1.6; }
     .admin-login { display: inline-block; margin-top: 18px; border: 1px solid #22d3ee; background: #22d3ee; color: #031018; padding: 12px 16px; font: 700 11px "JetBrains Mono", monospace; text-decoration: none; }
@@ -21,7 +21,13 @@
     .admin-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
     .admin-nav a, .admin-tab, .admin-save { border: 1px solid #24506a; background: #101c2b; color: #b9d8e8; padding: 10px 12px; font: 700 10px "JetBrains Mono", monospace; text-decoration: none; cursor: pointer; }
     .admin-tab.active, .admin-save { border-color: #22d3ee; background: #22d3ee; color: #031018; }
-    .admin-editor textarea { width: 100%; min-height: 360px; box-sizing: border-box; resize: vertical; border: 1px solid #24506a; background: #07101d; color: #d8f3ff; padding: 14px; font: 12px/1.6 "JetBrains Mono", monospace; outline: none; }
+    .admin-workspace { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 14px; }
+    .admin-files { min-height: 420px; border: 1px solid #24506a; background: #07101d; padding: 10px; overflow: auto; }
+    .admin-file { display: block; width: 100%; border: 0; background: transparent; color: #b9d8e8; padding: 8px; text-align: left; font: 11px "JetBrains Mono", monospace; cursor: pointer; }
+    .admin-file:hover, .admin-file.active { background: #123149; color: #67e8f9; }
+    .admin-editor textarea { width: 100%; min-height: 420px; box-sizing: border-box; resize: vertical; border: 1px solid #24506a; background: #07101d; color: #d8f3ff; padding: 14px; font: 12px/1.6 "JetBrains Mono", monospace; outline: none; }
+    .admin-path { color: #67e8f9; font: 11px "JetBrains Mono", monospace; margin-bottom: 8px; }
+    .admin-danger { border-color: #7f1d1d !important; background: #2a1015 !important; color: #fca5a5 !important; }
     .admin-status { min-height: 18px; margin-top: 10px; color: #86efac; font: 11px "JetBrains Mono", monospace; }
   </style>
 </head>
@@ -40,13 +46,20 @@
         <nav class="admin-nav" aria-label="Enlaces administrativos">
           <a href="/dashboard">ABRIR DASHBOARD</a>
           <a href="/docs">VER DOCUMENTACIÓN</a>
-          <button class="admin-tab active" data-content="openapi" type="button">OPENAPI</button>
-          <button class="admin-tab" data-content="notifications" type="button">NOTIFICACIONES</button>
+          <button class="admin-tab" id="newFile" type="button">NUEVO ARCHIVO</button>
+          <button class="admin-tab" id="refreshFiles" type="button">ACTUALIZAR LISTA</button>
         </nav>
-        <textarea id="contentEditor" spellcheck="false" aria-label="Editor JSON"></textarea>
-        <div>
-          <button class="admin-save" id="saveContent" type="button">GUARDAR CAMBIOS</button>
-          <div class="admin-status" id="adminStatus"></div>
+        <div class="admin-workspace">
+          <div class="admin-files" id="fileList" aria-label="Archivos editables"></div>
+          <div>
+            <div class="admin-path" id="activePath">Selecciona un archivo editable.</div>
+            <textarea id="contentEditor" spellcheck="false" aria-label="Editor de código"></textarea>
+            <div class="admin-actions">
+              <button class="admin-save" id="saveContent" type="button">GUARDAR COMMIT</button>
+              <button class="admin-save admin-danger" id="deleteFile" type="button">ELIMINAR ARCHIVO</button>
+            </div>
+            <div class="admin-status" id="adminStatus"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -60,8 +73,9 @@
     const editorBox = document.getElementById('adminEditor');
     const contentEditor = document.getElementById('contentEditor');
     const statusBox = document.getElementById('adminStatus');
-    const tabs = [...document.querySelectorAll('.admin-tab')];
-    let activeContent = 'openapi';
+    const fileList = document.getElementById('fileList');
+    const activePathBox = document.getElementById('activePath');
+    let activePath = '';
 
     const configResponse = await fetch('/api/auth/config');
     const config = await configResponse.json();
@@ -83,24 +97,49 @@
     loginButton.addEventListener('click', () => signIn('google'));
     githubButton.addEventListener('click', () => signIn('github'));
 
-    const loadContent = async (content, accessToken) => {
-      activeContent = content;
+    const loadFile = async (filePath, accessToken) => {
+      activePath = filePath;
       statusBox.textContent = 'Cargando...';
-      const response = await fetch(`/api/admin/content/${content}`, { headers: { Authorization: `Bearer ${accessToken}` } });
+      const response = await fetch(`/api/admin/file?path=${encodeURIComponent(filePath)}`, { headers: { Authorization: `Bearer ${accessToken}` } });
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || 'No se pudo cargar el contenido.');
-      contentEditor.value = JSON.stringify(result.data, null, 2);
-      statusBox.textContent = `Editando ${content}.`;
-      tabs.forEach((tab) => tab.classList.toggle('active', tab.dataset.content === content));
+      contentEditor.value = result.file.content;
+      activePathBox.textContent = filePath;
+      statusBox.textContent = 'Archivo cargado.';
+      [...fileList.children].forEach((button) => button.classList.toggle('active', button.dataset.path === filePath));
+    };
+
+    const refreshFiles = async (accessToken) => {
+      const response = await fetch('/api/admin/files', { headers: { Authorization: `Bearer ${accessToken}` } });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'No se pudo listar GitHub.');
+      fileList.replaceChildren(...result.files.map((file) => { const button = document.createElement('button'); button.className = 'admin-file'; button.dataset.path = file.path; button.textContent = file.path; button.addEventListener('click', () => loadFile(file.path, accessToken).catch((error) => { statusBox.textContent = error.message; })); return button; }));
+      statusBox.textContent = `${result.files.length} archivos disponibles. Rama: ${result.branch}`;
     };
 
     const saveContent = async (accessToken) => {
-      let payload;
-      try { payload = JSON.parse(contentEditor.value); } catch { statusBox.textContent = 'Error: el JSON no es válido.'; return; }
+      if (!activePath) { statusBox.textContent = 'Selecciona un archivo.'; return; }
       statusBox.textContent = 'Guardando...';
-      const response = await fetch(`/api/admin/content/${activeContent}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify(payload) });
+      const response = await fetch('/api/admin/file', { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify({ path: activePath, content: contentEditor.value }) });
       const result = await response.json();
       statusBox.textContent = result.message || 'Cambios guardados.';
+    };
+
+    const createFile = async (accessToken) => {
+      const filePath = prompt('Ruta nueva (api-page/... o src/api/...):');
+      if (!filePath) return;
+      const response = await fetch('/api/admin/file', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify({ path: filePath, content: '// Nuevo archivo\n' }) });
+      const result = await response.json();
+      statusBox.textContent = result.message || 'Archivo creado.';
+      if (response.ok) await refreshFiles(accessToken);
+    };
+
+    const deleteFile = async (accessToken) => {
+      if (!activePath || !confirm(`¿Eliminar ${activePath} y crear un commit?`)) return;
+      const response = await fetch('/api/admin/file', { method: 'DELETE', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify({ path: activePath }) });
+      const result = await response.json();
+      statusBox.textContent = result.message || 'Archivo eliminado.';
+      if (response.ok) { activePath = ''; activePathBox.textContent = 'Selecciona un archivo editable.'; contentEditor.value = ''; await refreshFiles(accessToken); }
     };
 
     const { data } = await supabase.auth.getSession();
@@ -113,9 +152,11 @@
         userBox.style.display = 'flex';
         userBox.innerHTML = `<img src="${admin.user.avatar || ''}" alt=""><span>Sesión activa: ${admin.user.email}</span>`;
         editorBox.style.display = 'block';
-        tabs.forEach((tab) => tab.addEventListener('click', () => loadContent(tab.dataset.content, data.session.access_token).catch((error) => { statusBox.textContent = error.message; })));
+        document.getElementById('refreshFiles').addEventListener('click', () => refreshFiles(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
+        document.getElementById('newFile').addEventListener('click', () => createFile(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
         document.getElementById('saveContent').addEventListener('click', () => saveContent(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
-        await loadContent(activeContent, data.session.access_token);
+        document.getElementById('deleteFile').addEventListener('click', () => deleteFile(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
+        await refreshFiles(data.session.access_token);
       } else {
         await supabase.auth.signOut();
         alert('Esta cuenta de GitHub o Google no tiene permisos de editor.');
