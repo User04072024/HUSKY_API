@@ -550,3 +550,61 @@ body.future-docs-body::before {
     line-height: 1.45;
   }
 }
+
+/* The cat has its own row so it never lies over the notification card. */
+.docs-notify-photo .notify-scene {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 0.25rem;
+  min-height: 0;
+  height: auto;
+}
+
+.docs-notify-photo .notify-right {
+  position: relative;
+  inset: auto;
+  justify-self: end;
+  align-items: flex-start;
+  min-height: var(--cat-height);
+  transform: none;
+}
+
+.docs-notify-photo .docs-cat-photo-wrap {
+  flex: 0 0 var(--cat-width);
+}
+
+.docs-notify-photo .docs-cat-photo-wrap svg {
+  transform: scaleX(1) translateY(0);
+}
+
+.docs-notify-photo #notificationsList {
+  grid-row: 2;
+  width: 100%;
+  max-height: none;
+  min-width: 0;
+}
+
+.docs-notify-photo #notificationsList > *:first-child {
+  width: 100%;
+  margin-top: 0 !important;
+  padding-right: 0.85rem;
+}
+
+@media (max-width: 700px) {
+  .docs-notify-photo .notify-scene {
+    --cat-height: 3.2rem;
+    --cat-width: 6rem;
+    min-height: 0;
+  }
+
+  .docs-notify-photo .notify-right {
+    min-height: 3.2rem;
+    gap: 0.2rem;
+  }
+
+  .docs-notify-photo .notify-count #unreadCount {
+    min-width: 2.2rem;
+    min-height: 2.7rem;
+    font-size: 0.9rem;
+  }
+}
