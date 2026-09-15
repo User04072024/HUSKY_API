@@ -423,11 +423,79 @@ body.future-docs-body::before {
 .future-folder-card.is-open { grid-column: 1 / -1; }
 .future-empty { border-radius: 0.35rem; background: #0c121e; }
 
+/* Keep every documentation surface inside the viewport. */
+.future-page-shell,
+.future-page-shell > main,
+.future-page-shell section,
+.future-page-shell article,
+.future-page-shell #apiList,
+.future-page-shell .future-folder-card {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.future-page-shell img,
+.future-page-shell svg,
+.future-page-shell canvas {
+  max-width: 100%;
+}
+
+.future-page-shell pre,
+.future-page-shell code,
+.future-page-shell .future-endpoint-summary,
+.future-page-shell .future-endpoint-path,
+.future-page-shell .future-folder-name {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.future-page-shell pre {
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
 @media (max-width: 700px) {
   #apiList { grid-template-columns: 1fr; }
   .future-folder-card.is-open { grid-column: auto; }
   .future-page-shell > main { padding-top: 1rem; }
   .future-hero-card-v2 { padding: 1rem; }
+
+  .future-page-shell > main {
+    width: 100%;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .future-topbar > div {
+    width: 100%;
+    min-width: 0;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .future-topbar .future-brand-kicker,
+  .future-topbar h1 {
+    max-width: 42vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #apiList {
+    display: grid;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .future-folder-toggle {
+    min-width: 0;
+    gap: 0.55rem;
+  }
+
+  .future-folder-toggle > * {
+    min-width: 0;
+  }
 
   .docs-notify-photo {
     width: 100%;
