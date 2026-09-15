@@ -246,12 +246,14 @@
     const saveApiGraphic = async (accessToken) => {
       const response = await fetch('/api/admin/file', { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify({ path: 'src/openapi.json', content: `${JSON.stringify(openapiData, null, 2)}\n` }) });
       const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'GitHub rechazó el commit.');
       statusBox.textContent = result.message || 'OpenAPI guardado.';
     };
 
-    const applyEndpoint = () => {
+    const applyEndpoint = async (accessToken) => {
       let parameters; let responses;
       try { parameters = JSON.parse(endpointFields.parameters.value); responses = JSON.parse(endpointFields.responses.value); } catch { statusBox.textContent = 'Parámetros o respuestas no contienen JSON válido.'; return; }
+      if (!openapiData) { statusBox.textContent = 'La API todavía está cargando.'; return; }
       const path = endpointFields.path.value.trim(); const method = endpointFields.method.value; const category = endpointFields.category.value.trim() || 'Sin categoría';
       if (!path.startsWith('/')) { statusBox.textContent = 'La ruta debe comenzar con /. '; return; }
       if (selectedEndpoint && (selectedEndpoint.path !== path || selectedEndpoint.method !== method)) delete openapiData.paths[selectedEndpoint.path][selectedEndpoint.method];
@@ -260,7 +262,9 @@
       openapiData.paths[path][method] = { ...((selectedEndpoint && selectedEndpoint.operation) || {}), summary: endpointFields.summary.value.trim(), description: endpointFields.description.value.trim(), tags: [category], parameters, responses };
       renderEndpoints();
       selectEndpoint({ path, method, operation: openapiData.paths[path][method] });
-      statusBox.textContent = 'Cambios aplicados localmente. Pulsa GUARDAR API EN GITHUB.';
+      statusBox.textContent = 'Guardando endpoint en GitHub...';
+      await saveApiGraphic(accessToken);
+      statusBox.textContent = 'Endpoint guardado en GitHub.';
     };
 
     const removeEndpoint = () => {
@@ -314,7 +318,7 @@
         document.getElementById('newCategory').addEventListener('click', addCategory);
         document.getElementById('saveApi').addEventListener('click', () => saveApiGraphic(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
         document.getElementById('reloadApi').addEventListener('click', () => loadApiGraphic(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
-        endpointForm.addEventListener('submit', (event) => { event.preventDefault(); applyEndpoint(); });
+        endpointForm.addEventListener('submit', (event) => { event.preventDefault(); applyEndpoint(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }); });
         document.getElementById('removeEndpoint').addEventListener('click', removeEndpoint);
         document.getElementById('refreshFiles').addEventListener('click', () => refreshFiles(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
         document.getElementById('editDashboard').addEventListener('click', () => openFirstAvailable(['api-page/dashboard.html', 'api-page/assets/dashboard.mjs', 'api-page/assets/dashboard.css'], data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
