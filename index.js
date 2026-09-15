@@ -326,13 +326,12 @@ function getMetricsSnapshot() {
         memory: Math.round(process.memoryUsage().rss / 1024 / 1024),
         requestsPerMinute: recentRequests.filter((item) => Date.now() - item.timestamp < 60000).length,
         uptimeSeconds,
-        endpoints: Object.entries(endpointStats).map(([endpoint, stats]) => ({
-            endpoint,
-            total: stats.total,
-            errors: stats.errors,
-            latency: Math.round(stats.totalDuration / Math.max(stats.total, 1)),
-            status: stats.errors / Math.max(stats.total, 1) > 0.5 ? "OFFLINE" : "ONLINE"
-        }))
+        endpoints: [...new Set([...Object.keys(openApi.paths || {}), ...Object.keys(endpointStats)])].map((endpoint) => {
+            const stats = endpointStats[endpoint] || { total: 0, errors: 0, totalDuration: 0 };
+            return { endpoint, total: stats.total, errors: stats.errors, latency: Math.round(stats.totalDuration / Math.max(stats.total, 1)), status: stats.errors / Math.max(stats.total, 1) > 0.5 ? "OFFLINE" : "ONLINE" };
+        }),
+        endpointCount: Object.keys(openApi.paths || {}).length,
+        categoryCount: new Set(Object.values(openApi.paths || {}).flatMap((methods) => Object.values(methods).flatMap((operation) => operation.tags || []))).size
     };
 }
 
@@ -378,10 +377,10 @@ function getRequestLog(req, duration, statusCode) {
 }
 
 function drawStatusImage(metrics) {
-    if (!createCanvas) {
+    if (!createCanvas || process.env.STATUS_IMAGE_FORMAT !== "png") {
         const escapeXml = (value) => String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[character]);
-        const cards = [["UPTIME", `${metrics.uptimePercent}%`], ["AVG LATENCY", `${metrics.averageLatency} ms`], ["ACTIVE REQUESTS", String(metrics.activeRequests)], ["TOTAL REQUESTS", String(metrics.totalRequests)]];
-        const cardMarkup = cards.map(([label, value], index) => { const x = 72 + (index % 2) * 530; const y = 290 + Math.floor(index / 2) * 126; return `<rect x="${x}" y="${y}" width="470" height="92" fill="#0b1828" stroke="#164e63"/><text x="${x + 22}" y="${y + 30}" fill="#67e8f9" font-family="Arial, sans-serif" font-size="18">${escapeXml(label)}</text><text x="${x + 22}" y="${y + 70}" fill="#f8fafc" font-family="Arial, sans-serif" font-size="34" font-weight="700">${escapeXml(value)}</text>`; }).join("");
+        const cards = [["UPTIME", `${metrics.uptimePercent}%`], ["AVG LATENCY", `${metrics.averageLatency} ms`], ["REQUESTS / MIN", String(metrics.requestsPerMinute)], ["TOTAL REQUESTS", String(metrics.totalRequests)], ["ERROR RATE", `${metrics.errorRate}%`], ["ENDPOINTS", String(metrics.endpointCount || 0)]];
+        const cardMarkup = cards.map(([label, value], index) => { const x = 72 + (index % 3) * 360; const y = 290 + Math.floor(index / 3) * 126; return `<rect x="${x}" y="${y}" width="320" height="92" fill="#0b1828" stroke="#164e63"/><text x="${x + 22}" y="${y + 30}" fill="#67e8f9" font-family="Arial, sans-serif" font-size="16">${escapeXml(label)}</text><text x="${x + 22}" y="${y + 70}" fill="#f8fafc" font-family="Arial, sans-serif" font-size="30" font-weight="700">${escapeXml(value)}</text>`; }).join("");
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#070b13"/><stop offset="1" stop-color="#0b1828"/></linearGradient></defs><rect width="1200" height="630" fill="url(#bg)"/><text x="72" y="86" fill="#20d3ee" font-family="Arial, sans-serif" font-size="24" font-weight="700">HUSKY API // SYSTEM STATUS</text><text x="72" y="170" fill="#f8fafc" font-family="Arial, sans-serif" font-size="64" font-weight="700">OPERATIONAL</text>${cardMarkup}<text x="72" y="586" fill="#94a3b8" font-family="Arial, sans-serif" font-size="16">Generated ${escapeXml(new Date().toISOString())} // husky-api</text></svg>`;
         return { type: "image/svg+xml", buffer: Buffer.from(svg, "utf8") };
     }
