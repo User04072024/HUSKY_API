@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!leftPupil || !rightPupil) return;
 
   const resetEyes = () => {
-    leftPupil.style.transform = '';
-    rightPupil.style.transform = '';
-    if (leftHighlight) leftHighlight.style.transform = '';
-    if (rightHighlight) rightHighlight.style.transform = '';
+    leftPupil.removeAttribute('style');
+    rightPupil.removeAttribute('style');
+    if (leftHighlight) leftHighlight.removeAttribute('style');
+    if (rightHighlight) rightHighlight.removeAttribute('style');
   };
 
   const track = (clientX, clientY) => {
@@ -21,16 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const rect = cat.getBoundingClientRect();
     const x = Math.max(-1, Math.min(1, (clientX - (rect.left + rect.width * 0.5)) / (rect.width * 0.5)));
     const y = Math.max(-1, Math.min(1, (clientY - (rect.top + rect.height * 0.45)) / (rect.height * 0.55)));
-    const pupilX = (x * 2.2).toFixed(2);
-    const pupilY = (y * 1.7).toFixed(2);
-    const highlightX = (x * 0.8).toFixed(2);
-    const highlightY = (y * 0.6).toFixed(2);
-
-    leftPupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
-    rightPupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
-    if (leftHighlight) leftHighlight.style.transform = `translate(${highlightX}px, ${highlightY}px)`;
-    if (rightHighlight) rightHighlight.style.transform = `translate(${highlightX}px, ${highlightY}px)`;
-
     const near = Math.hypot(clientX - (rect.left + rect.width / 2), clientY - (rect.top + rect.height / 2)) < 145;
     cat.classList.toggle('is-near', near);
     cat.classList.toggle('is-awake', !near);
