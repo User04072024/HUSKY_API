@@ -221,7 +221,7 @@ function normalizeCategories(spec) {
   return Object.values(map)
     .map((category, index) => ({
       ...category,
-      open: index < 2,
+      open: false,
       items: category.items.sort((a, b) => a.displayName.localeCompare(b.displayName))
     }))
     .filter((category) => category.items.length > 0)
@@ -720,8 +720,8 @@ async function loadNotifications() {
 async function loadApis() {
   try {
     const spec = await fetchFirstJson([
-      "/openapi.json",
-      "/src/openapi.json",
+      "./openapi.json",
+      "./src/openapi.json",
       "/src/config/openapi.json"
     ]);
 

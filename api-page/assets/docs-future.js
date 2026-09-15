@@ -703,8 +703,8 @@ async function loadNotifications() {
 async function loadApis() {
   try {
     const spec = await fetchFirstJson([
-      "/openapi.json",
-      "/src/openapi.json",
+      "./openapi.json",
+      "./src/openapi.json",
       "/src/config/openapi.json"
     ]);
 

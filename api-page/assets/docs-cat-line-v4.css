@@ -194,7 +194,9 @@
 
 .docs-cat-photo-wrap .cat-pupil,
 .docs-cat-photo-wrap .cat-highlight{
-  transition:all .07s ease;
+  transform-box:fill-box;
+  transform-origin:center;
+  transition:transform .07s ease;
 }
 
 @keyframes docsCatSleepLineV4{

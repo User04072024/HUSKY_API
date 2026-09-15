@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#070a11" />
+  <title>Husky API // Admin</title>
+  <link rel="stylesheet" href="./assets/dashboard.css" />
+  <style>
+    .admin-shell { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+    .admin-card { width: min(520px, 100%); border: 1px solid rgba(34,211,238,.3); background: #0c121e; padding: 28px; box-shadow: 0 0 36px rgba(34,211,238,.08); }
+    .admin-card h1 { margin: 6px 0 12px; font-family: "Space Grotesk", sans-serif; }
+    .admin-card p { color: #7890a8; font-size: 12px; line-height: 1.6; }
+    .admin-login { display: inline-block; margin-top: 18px; border: 1px solid #22d3ee; background: #22d3ee; color: #031018; padding: 12px 16px; font: 700 11px "JetBrains Mono", monospace; text-decoration: none; }
+    .admin-login:hover { background: #a5f3fc; }
+    .admin-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .admin-login--github { border-color: #c4b5fd; background: #c4b5fd; }
+    .admin-user { display: none; align-items: center; gap: 12px; margin-top: 20px; color: #86efac; font: 12px "JetBrains Mono", monospace; }
+    .admin-user img { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #22d3ee; }
+  </style>
+</head>
+<body>
+  <main class="admin-shell">
+    <section class="admin-card">
+      <div class="eyebrow">husky api // protected area</div>
+      <h1>Editor administrativo</h1>
+      <p>Accede al editor con tu cuenta autorizada de Google (Gmail) o GitHub mediante Supabase.</p>
+        <div class="admin-actions">
+          <button class="admin-login" id="googleLogin" type="button">CONTINUAR CON GOOGLE</button>
+          <button class="admin-login admin-login--github" id="githubLogin" type="button">CONTINUAR CON GITHUB</button>
+        </div>
+      <div class="admin-user" id="adminUser"></div>
+    </section>
+  </main>
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+    const loginButton = document.getElementById('googleLogin');
+    const githubButton = document.getElementById('githubLogin');
+    const userBox = document.getElementById('adminUser');
+
+    const configResponse = await fetch('/api/auth/config');
+    const config = await configResponse.json();
+    if (!configResponse.ok) {
+      loginButton.disabled = true;
+      githubButton.disabled = true;
+      loginButton.textContent = 'SUPABASE NO CONFIGURADO';
+      throw new Error(config.message);
+    }
+    const supabase = createClient(config.url, config.anonKey);
+
+    const signIn = async (provider) => {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${location.origin}/admin` }
+      });
+      if (error) alert(error.message);
+    };
+    loginButton.addEventListener('click', () => signIn('google'));
+    githubButton.addEventListener('click', () => signIn('github'));
+
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      const response = await fetch('/api/admin/session', { headers: { Authorization: `Bearer ${data.session.access_token}` } });
+      if (response.ok) {
+        const admin = await response.json();
+        loginButton.style.display = 'none';
+        githubButton.style.display = 'none';
+        userBox.style.display = 'flex';
+        userBox.innerHTML = `<img src="${admin.user.avatar || ''}" alt=""><span>Sesión activa: ${admin.user.email}</span>`;
+      } else {
+        await supabase.auth.signOut();
+        alert('Esta cuenta de GitHub o Google no tiene permisos de editor.');
+      }
+    }
+  </script>
+</body>
+</html>

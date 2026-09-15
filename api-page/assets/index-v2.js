@@ -51,8 +51,8 @@ function buildCategories(spec) {
 async function loadIndexStats() {
   try {
     const spec = await fetchFirstJson([
-      "/openapi.json",
-      "/src/openapi.json",
+      "./openapi.json",
+      "./src/openapi.json",
       "/src/config/openapi.json"
     ]);
 

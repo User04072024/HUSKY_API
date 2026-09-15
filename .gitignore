@@ -1,0 +1,9 @@
+node_modules
+
+# Secretos (nunca subir credenciales)
+.env
+.env.*
+!.env.example
+
+# Editor
+.vscode/

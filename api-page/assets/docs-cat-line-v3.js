@@ -2,141 +2,50 @@ document.addEventListener('DOMContentLoaded', () => {
   const cat = document.querySelector('.docs-cat-photo-wrap');
   if (!cat) return;
 
-  const leftWhite = cat.querySelector('#eyeWhiteLeft');
-  const rightWhite = cat.querySelector('#eyeWhiteRight');
   const leftPupil = cat.querySelector('#pupilLeft');
   const rightPupil = cat.querySelector('#pupilRight');
   const leftHighlight = cat.querySelector('#highlightLeft');
   const rightHighlight = cat.querySelector('#highlightRight');
-
-  if (!leftWhite || !rightWhite || !leftPupil || !rightPupil) return;
-
-  const base = {
-    left: {
-      cx: parseFloat(leftPupil.getAttribute('cx')),
-      cy: parseFloat(leftPupil.getAttribute('cy')),
-      hc: parseFloat(leftHighlight?.getAttribute('cx') || 0),
-      hy: parseFloat(leftHighlight?.getAttribute('cy') || 0)
-    },
-    right: {
-      cx: parseFloat(rightPupil.getAttribute('cx')),
-      cy: parseFloat(rightPupil.getAttribute('cy')),
-      hc: parseFloat(rightHighlight?.getAttribute('cx') || 0),
-      hy: parseFloat(rightHighlight?.getAttribute('cy') || 0)
-    }
-  };
+  if (!leftPupil || !rightPupil) return;
 
   const resetEyes = () => {
-    leftPupil.setAttribute('cx', base.left.cx);
-    leftPupil.setAttribute('cy', base.left.cy);
-    rightPupil.setAttribute('cx', base.right.cx);
-    rightPupil.setAttribute('cy', base.right.cy);
-
-    if (leftHighlight) {
-      leftHighlight.setAttribute('cx', base.left.hc);
-      leftHighlight.setAttribute('cy', base.left.hy);
-    }
-
-    if (rightHighlight) {
-      rightHighlight.setAttribute('cx', base.right.hc);
-      rightHighlight.setAttribute('cy', base.right.hy);
-    }
-  };
-
-  const wake = () => {
-    cat.classList.remove('is-sleeping', 'is-near');
-    cat.classList.add('is-awake');
-    resetEyes();
-  };
-
-  const sleep = () => {
-    cat.classList.remove('is-awake', 'is-near');
-    cat.classList.add('is-sleeping');
-    resetEyes();
+    leftPupil.style.transform = '';
+    rightPupil.style.transform = '';
+    if (leftHighlight) leftHighlight.style.transform = '';
+    if (rightHighlight) rightHighlight.style.transform = '';
   };
 
   const track = (clientX, clientY) => {
     if (cat.classList.contains('is-sleeping')) return;
 
     const rect = cat.getBoundingClientRect();
+    const x = Math.max(-1, Math.min(1, (clientX - (rect.left + rect.width * 0.5)) / (rect.width * 0.5)));
+    const y = Math.max(-1, Math.min(1, (clientY - (rect.top + rect.height * 0.45)) / (rect.height * 0.55)));
+    const pupilX = (x * 2.2).toFixed(2);
+    const pupilY = (y * 1.7).toFixed(2);
+    const highlightX = (x * 0.8).toFixed(2);
+    const highlightY = (y * 0.6).toFixed(2);
 
-    const normX = Math.max(
-      -1,
-      Math.min(1, (clientX - (rect.left + rect.width * 0.56)) / (rect.width * 0.18))
-    );
+    leftPupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+    rightPupil.style.transform = `translate(${pupilX}px, ${pupilY}px)`;
+    if (leftHighlight) leftHighlight.style.transform = `translate(${highlightX}px, ${highlightY}px)`;
+    if (rightHighlight) rightHighlight.style.transform = `translate(${highlightX}px, ${highlightY}px)`;
 
-    const normY = Math.max(
-      -1,
-      Math.min(1, (clientY - (rect.top + rect.height * 0.47)) / (rect.height * 0.16))
-    );
-
-    // Movimiento aumentado para que se note más
-    const pX = normX * 0.7;
-    const pY = normY * 0.55;
-
-    const hX = normX * 0.22;
-    const hY = normY * 0.18;
-
-    leftPupil.setAttribute('cx', (base.left.cx + pX).toFixed(3));
-    leftPupil.setAttribute('cy', (base.left.cy + pY).toFixed(3));
-    rightPupil.setAttribute('cx', (base.right.cx + pX).toFixed(3));
-    rightPupil.setAttribute('cy', (base.right.cy + pY).toFixed(3));
-
-    if (leftHighlight) {
-      leftHighlight.setAttribute('cx', (base.left.hc + hX).toFixed(3));
-      leftHighlight.setAttribute('cy', (base.left.hy + hY).toFixed(3));
-    }
-
-    if (rightHighlight) {
-      rightHighlight.setAttribute('cx', (base.right.hc + hX).toFixed(3));
-      rightHighlight.setAttribute('cy', (base.right.hy + hY).toFixed(3));
-    }
-
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dist = Math.hypot(clientX - cx, clientY - cy);
-
-    if (dist < 145) {
-      cat.classList.add('is-near');
-      cat.classList.remove('is-awake');
-    } else {
-      cat.classList.remove('is-near');
-      cat.classList.add('is-awake');
-    }
+    const near = Math.hypot(clientX - (rect.left + rect.width / 2), clientY - (rect.top + rect.height / 2)) < 145;
+    cat.classList.toggle('is-near', near);
+    cat.classList.toggle('is-awake', !near);
   };
 
-  wake();
-
-  document.addEventListener(
-    'pointermove',
-    e => track(e.clientX, e.clientY),
-    { passive: true }
-  );
-
-  document.addEventListener(
-    'touchstart',
-    e => {
-      const t = e.touches && e.touches[0];
-      if (t) track(t.clientX, t.clientY);
-    },
-    { passive: true }
-  );
-
-  document.addEventListener(
-    'touchmove',
-    e => {
-      const t = e.touches && e.touches[0];
-      if (t) track(t.clientX, t.clientY);
-    },
-    { passive: true }
-  );
-
-  document.addEventListener('pointerdown', e => {
-    if (cat.contains(e.target)) {
-      sleep();
-    } else {
-      wake();
-      track(e.clientX, e.clientY);
+  cat.classList.add('is-awake');
+  document.addEventListener('pointermove', (event) => track(event.clientX, event.clientY), { passive: true });
+  document.addEventListener('touchmove', (event) => {
+    const touch = event.touches && event.touches[0];
+    if (touch) track(touch.clientX, touch.clientY);
+  }, { passive: true });
+  document.addEventListener('pointerdown', (event) => {
+    if (cat.contains(event.target)) {
+      cat.classList.toggle('is-sleeping');
+      if (cat.classList.contains('is-sleeping')) resetEyes();
     }
   });
 });
