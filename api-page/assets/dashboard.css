@@ -125,6 +125,25 @@ button { cursor: pointer; }
 .endpoint-summary { border: 1px solid rgba(34, 211, 238, .16); background: rgba(5, 10, 18, .55); padding: 11px; min-width: 0; }
 .endpoint-summary strong { display: block; overflow: hidden; color: var(--cyan); font: 11px "JetBrains Mono", monospace; text-overflow: ellipsis; white-space: nowrap; }
 .endpoint-summary span { display: block; margin-top: 7px; color: var(--muted); font-size: 9px; }
+.telemetry-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+.telemetry-stat, .telemetry-chart { border: 1px solid rgba(34, 211, 238, .18); background: linear-gradient(145deg, rgba(12, 29, 45, .95), rgba(4, 11, 20, .92)); padding: 12px; min-width: 0; }
+.telemetry-stat { position: relative; overflow: hidden; }
+.telemetry-stat::after { content: ""; position: absolute; right: -18px; bottom: -26px; width: 70px; height: 70px; border: 1px solid currentColor; border-radius: 50%; opacity: .18; }
+.telemetry-stat span, .chart-label { display: block; color: var(--muted); font-size: 9px; letter-spacing: .12em; }
+.telemetry-stat strong { display: block; margin: 7px 0 4px; color: currentColor; font: 700 23px "Space Grotesk", sans-serif; }
+.telemetry-stat small { color: var(--muted); font-size: 9px; }
+.telemetry-stat--cyan { color: var(--cyan); } .telemetry-stat--green { color: var(--good); } .telemetry-stat--blue { color: var(--blue); } .telemetry-stat--red { color: var(--danger); }
+.telemetry-chart { grid-column: span 2; min-height: 142px; }
+.bar-chart { display: flex; align-items: end; gap: 6px; height: 92px; margin-top: 12px; padding: 0 4px; border-bottom: 1px solid rgba(34, 211, 238, .22); background: repeating-linear-gradient(to bottom, transparent 0, transparent 22px, rgba(34, 211, 238, .07) 23px); }
+.bar-chart i { flex: 1; min-width: 5px; background: linear-gradient(to top, #0e7490, var(--cyan)); box-shadow: 0 0 10px rgba(34, 211, 238, .28); animation: bar-in .55s ease both; }
+.latency-chart { min-height: 142px; }
+.latency-row { display: grid; grid-template-columns: minmax(80px, .8fr) 1.4fr; align-items: center; gap: 8px; margin-top: 10px; color: var(--muted); font-size: 9px; }
+.latency-row > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.latency-row i { display: flex; align-items: center; gap: 8px; height: 8px; background: #172333; }
+.latency-row b { display: block; height: 100%; background: linear-gradient(90deg, #0e7490, #facc15); box-shadow: 0 0 8px rgba(250, 204, 21, .2); }
+.latency-row em { color: #fef08a; font-size: 9px; font-style: normal; white-space: nowrap; }
+.chart-empty { display: block; margin-top: 35px; color: var(--muted); font-size: 10px; }
+@keyframes bar-in { from { transform: scaleY(0); transform-origin: bottom; } to { transform: scaleY(1); transform-origin: bottom; } }
 .endpoint-layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 16px; }
 .endpoint-list { display: grid; align-content: start; gap: 6px; max-height: 510px; overflow: auto; }
 .endpoint-item { border: 1px solid rgba(120, 144, 168, .18); background: rgba(5, 10, 18, .45); color: var(--text); padding: 10px; text-align: left; }
@@ -139,4 +158,5 @@ button { cursor: pointer; }
 @keyframes cursor-blink { 50% { opacity: 0; } }
 @media (max-width: 1000px) { .shell { overflow: auto; } .dashboard-grid { grid-template-columns: 1fr; } .dashboard-footer { margin-left: 0; } .sidebar { position: static; border-width: 0 0 1px; } .metric-stack { grid-template-columns: repeat(3, 1fr); max-width: 360px; } .map-layout { grid-template-columns: 1fr; } .log-column { border-left: 1px solid rgba(34, 211, 238, .16); border-top: 0; padding: 12px; max-height: 180px; min-height: 180px; } .endpoint-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 620px) { .topbar { padding: 14px 16px; } .brand { width: 100%; } .top-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; gap: 5px; overflow: visible; } .top-nav-link { min-width: 0; padding: 8px 4px; overflow: hidden; text-align: center; text-overflow: ellipsis; } .top-nav-link::before { position: static; display: inline; margin-right: 3px; transform: none; } .status-pill { display: none; } .main { padding: 18px 12px; } .hero { align-items: stretch; flex-direction: column; } .hero h2 { font-size: 29px; line-height: 1.1; } .hero-actions { width: 100%; flex-wrap: wrap; } .primary-button, .site-button, .icon-button { flex: 1 1 140px; min-width: 0; text-align: center; } .metric-stack { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; } .metric-ring { width: 64px; height: 64px; } .metric-value { font-size: 16px; } .map { min-height: 330px; aspect-ratio: 1.35; } .map-svg { inset: 6% 1%; width: 98%; height: 88%; } .event-pop { min-width: 108px; max-width: 132px; font-size: 8px; transform-origin: center; } .log-column { max-height: 150px; min-height: 150px; } .dashboard-footer { grid-template-columns: 1fr; gap: 14px; padding: 18px 16px; } .footer-links, .footer-meta { justify-content: flex-start; text-align: left; flex-wrap: wrap; } }
-@media (max-width: 380px) { .topbar { padding: 12px; } .brand h1 { font-size: 17px; } .eyebrow { font-size: 8px; letter-spacing: .1em; } .top-nav { grid-template-columns: 1fr 1fr; } .top-nav-link { font-size: 8px; } .metric-ring { width: 57px; height: 57px; } .metric-value { font-size: 14px; } .metric-ring-inner span { font-size: 6px; } .main { padding: 14px 9px; } .hero h2 { font-size: 25px; } .map { min-height: 280px; } .endpoint-overview-grid { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .telemetry-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } .telemetry-chart { grid-column: span 2; } }
+@media (max-width: 380px) { .topbar { padding: 12px; } .brand h1 { font-size: 17px; } .eyebrow { font-size: 8px; letter-spacing: .1em; } .top-nav { grid-template-columns: 1fr 1fr; } .top-nav-link { font-size: 8px; } .metric-ring { width: 57px; height: 57px; } .metric-value { font-size: 14px; } .metric-ring-inner span { font-size: 6px; } .main { padding: 14px 9px; } .hero h2 { font-size: 25px; } .map { min-height: 280px; } .endpoint-overview-grid { grid-template-columns: 1fr; } .telemetry-strip { grid-template-columns: 1fr 1fr; gap: 5px; } .telemetry-chart { grid-column: span 2; } .telemetry-stat strong { font-size: 19px; } }

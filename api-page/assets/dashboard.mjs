@@ -166,6 +166,26 @@ function EndpointOverview({ metrics }) {
   );
 }
 
+function TelemetryStrip({ metrics, requests }) {
+  const trafficBuckets = Array.from({ length: 12 }, (_, index) => {
+    const end = Date.now() - (11 - index) * 300000;
+    const start = end - 300000;
+    return requests.filter((request) => request.timestamp >= start && request.timestamp < end).length;
+  });
+  const maxTraffic = Math.max(...trafficBuckets, 1);
+  const latencyItems = (metrics.endpoints || []).filter((item) => item.total > 0).sort((a, b) => b.latency - a.latency).slice(0, 5);
+  const maxLatency = Math.max(...latencyItems.map((item) => item.latency), 1);
+  const stat = (label, value, detail, tone = "cyan") => h("div", { className: `telemetry-stat telemetry-stat--${tone}` }, h("span", null, label), h("strong", null, value), h("small", null, detail));
+  return h("section", { className: "telemetry-strip" },
+    stat("CPU PROCESS", `${metrics.cpuPercent || 0}%`, "uso medio del proceso", "green"),
+    stat("MEMORIA", `${metrics.memory || 0} MB`, "RSS del servidor", "blue"),
+    stat("UPTIME", `${Math.floor((metrics.uptimeSeconds || 0) / 60)}m`, `${metrics.uptimePercent}% disponible`, "cyan"),
+    stat("ERRORES", `${metrics.errorRate || 0}%`, `${metrics.errors || 0} respuestas fallidas`, metrics.errorRate ? "red" : "green"),
+    h("div", { className: "telemetry-chart" }, h("div", { className: "chart-label" }, "TRÁFICO / 60 MIN"), h("div", { className: "bar-chart" }, trafficBuckets.map((value, index) => h("i", { key: index, style: { height: `${Math.max(8, (value / maxTraffic) * 100)}%` }, title: `${value} solicitudes` })))),
+    h("div", { className: "telemetry-chart latency-chart" }, h("div", { className: "chart-label" }, "LATENCIA POR ENDPOINT"), latencyItems.length ? latencyItems.map((item) => h("div", { className: "latency-row", key: item.endpoint }, h("span", null, item.endpoint), h("i", null, h("b", { style: { width: `${Math.max(4, (item.latency / maxLatency) * 100)}%` } }), h("em", null, `${item.latency}ms`)))) : h("small", { className: "chart-empty" }, "Esperando solicitudes reales..."))
+  );
+}
+
 function App() {
   const { metrics, requests, connected } = useApiMetrics();
   const viewContent = h(motion.div, { key: "map", initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 } }, h(LivePanel, { requests, connected }));
@@ -194,6 +214,7 @@ function App() {
           )
         ),
         viewContent,
+        h(TelemetryStrip, { metrics, requests }),
         h(EndpointOverview, { metrics })
       )
     ),

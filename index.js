@@ -311,6 +311,7 @@ function getClientIp(req) {
 
 function getMetricsSnapshot() {
     const total = metricTotals.total || 1;
+    const cpuUsage = process.cpuUsage();
     const uptimeSeconds = Math.floor((Date.now() - startedAt) / 1000);
     const averageLatency = metricTotals.total
         ? Math.round(metricTotals.totalDuration / metricTotals.total)
@@ -324,6 +325,8 @@ function getMetricsSnapshot() {
         averageLatency,
         activeRequests: activeRequests.size,
         memory: Math.round(process.memoryUsage().rss / 1024 / 1024),
+        cpuPercent: Number(((cpuUsage.user + cpuUsage.system) / 10000 / Math.max((Date.now() - startedAt) / 1000, 1)).toFixed(2)),
+        errors: metricTotals.errors,
         requestsPerMinute: recentRequests.filter((item) => Date.now() - item.timestamp < 60000).length,
         uptimeSeconds,
         endpoints: [...new Set([...Object.keys(openApi.paths || {}), ...Object.keys(endpointStats)])].map((endpoint) => {
