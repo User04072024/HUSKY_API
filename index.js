@@ -379,8 +379,11 @@ function getRequestLog(req, duration, statusCode) {
 
 function drawStatusImage(metrics) {
     if (!createCanvas) {
-        const text = `HUSKY API // STATUS\nUptime: ${metrics.uptimePercent}%\nRequests: ${metrics.totalRequests}`;
-        return Buffer.from(text, "utf8");
+        const escapeXml = (value) => String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[character]);
+        const cards = [["UPTIME", `${metrics.uptimePercent}%`], ["AVG LATENCY", `${metrics.averageLatency} ms`], ["ACTIVE REQUESTS", String(metrics.activeRequests)], ["TOTAL REQUESTS", String(metrics.totalRequests)]];
+        const cardMarkup = cards.map(([label, value], index) => { const x = 72 + (index % 2) * 530; const y = 290 + Math.floor(index / 2) * 126; return `<rect x="${x}" y="${y}" width="470" height="92" fill="#0b1828" stroke="#164e63"/><text x="${x + 22}" y="${y + 30}" fill="#67e8f9" font-family="Arial, sans-serif" font-size="18">${escapeXml(label)}</text><text x="${x + 22}" y="${y + 70}" fill="#f8fafc" font-family="Arial, sans-serif" font-size="34" font-weight="700">${escapeXml(value)}</text>`; }).join("");
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#070b13"/><stop offset="1" stop-color="#0b1828"/></linearGradient></defs><rect width="1200" height="630" fill="url(#bg)"/><text x="72" y="86" fill="#20d3ee" font-family="Arial, sans-serif" font-size="24" font-weight="700">HUSKY API // SYSTEM STATUS</text><text x="72" y="170" fill="#f8fafc" font-family="Arial, sans-serif" font-size="64" font-weight="700">OPERATIONAL</text>${cardMarkup}<text x="72" y="586" fill="#94a3b8" font-family="Arial, sans-serif" font-size="16">Generated ${escapeXml(new Date().toISOString())} // husky-api</text></svg>`;
+        return { type: "image/svg+xml", buffer: Buffer.from(svg, "utf8") };
     }
 
     const canvas = createCanvas(1200, 630);
@@ -401,13 +404,13 @@ function drawStatusImage(metrics) {
     }
 
     context.fillStyle = "#20d3ee";
-    context.font = "700 24px monospace";
+    context.font = "700 24px Arial";
     context.fillText("HUSKY API // SYSTEM STATUS", 72, 86);
     context.fillStyle = "#f8fafc";
-    context.font = "700 64px monospace";
+    context.font = "700 64px Arial";
     context.fillText("OPERATIONAL", 72, 170);
     context.fillStyle = "#94a3b8";
-    context.font = "24px monospace";
+    context.font = "24px Arial";
     context.fillText("Realtime service telemetry", 76, 214);
 
     const cards = [
@@ -422,17 +425,17 @@ function drawStatusImage(metrics) {
         context.strokeStyle = "#164e63";
         context.strokeRect(x, y, 470, 92);
         context.fillStyle = "#67e8f9";
-        context.font = "18px monospace";
+        context.font = "18px Arial";
         context.fillText(label, x + 22, y + 30);
         context.fillStyle = "#f8fafc";
-        context.font = "700 34px monospace";
+        context.font = "700 34px Arial";
         context.fillText(value, x + 22, y + 70);
     });
 
     context.fillStyle = "#64748b";
     context.font = "16px monospace";
     context.fillText(`Generated ${new Date().toISOString()} // husky-api`, 72, 586);
-    return canvas.toBuffer("image/png");
+    return { type: "image/png", buffer: canvas.toBuffer("image/png") };
 }
 
 app.use(async (req, res, next) => {
@@ -525,7 +528,8 @@ app.get("/api/metrics", (req, res) => {
 });
 
 app.get("/v1/status/image", (req, res) => {
-    res.type("png").set("Cache-Control", "no-store").send(drawStatusImage(getMetricsSnapshot()));
+    const image = drawStatusImage(getMetricsSnapshot());
+    res.type(image.type).set("Cache-Control", "no-store").send(image.buffer);
 });
 
 app.use((req, res) => res.status(404).sendFile(path.join(__dirname, "api-page", "404.html")));
