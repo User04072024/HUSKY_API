@@ -8,7 +8,8 @@
     "node": "22.x"
   },
   "scripts": {
-    "start": "node --no-deprecation index.js"
+    "start": "node --no-deprecation index.js",
+    "postinstall": "node vercel-patch.js"
   },
   "author": "ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ",
   "license": "MIT",
