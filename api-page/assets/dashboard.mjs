@@ -54,13 +54,9 @@ function Sparkline({ requests }) {
 function Sidebar({ metrics, requests }) {
   const modules = useMemo(() => {
     const map = new Map();
-    (metrics.endpoints || []).forEach((item) => {
-      const key = item.endpoint.split("/").filter(Boolean)[0] || "root";
-      map.set(key, (map.get(key) || 0) + item.total);
-    });
     requests.forEach((item) => { const key = item.endpoint.split("/").slice(1, 3).join("/"); map.set(key, (map.get(key) || 0) + 1); });
     return [...map.entries()].slice(0, 5);
-  }, [metrics.endpoints, requests]);
+  }, [requests]);
   return h("aside", { className: "sidebar" },
     h("p", { className: "section-label" }, "telemetría local"),
     h("div", { className: "metric-stack" },
@@ -72,7 +68,7 @@ function Sidebar({ metrics, requests }) {
     h(Sparkline, { requests }),
     h("p", { className: "section-label", style: { marginTop: 18 } }, "uso de módulos"),
     h("table", { className: "module-table" }, h("thead", null, h("tr", null, h("th", null, "módulo"), h("th", null, "hits"))), h("tbody", null,
-      (modules.length ? modules : [["sin endpoints", 0]]).map(([name, count]) => h("tr", { key: name }, h("td", null, `/${name}`), h("td", null, count)))
+      (modules.length ? modules : [["sin tráfico", 0]]).map(([name, count]) => h("tr", { key: name }, h("td", null, `/${name}`), h("td", null, count)))
     ))
   );
 }
@@ -158,34 +154,6 @@ function WorldMap({ requests }) {
 function LiveLogs({ requests }) { return h("div", { className: "log-column" }, h("div", { className: "log-list" }, requests.slice(0, 30).map((item) => h("div", { className: `log ${item.status === "ERROR" ? "error" : ""}`, key: item.id }, h("b", null, `${item.method} ${item.statusCode}`), ` ${item.endpoint} `, h("span", null, `${item.latency}ms`), h("br"), `ip:${item.ip}`)))); }
 function LivePanel({ requests, connected }) { return h("section", { id: "network", className: "panel" }, h("div", { className: "panel-heading" }, h("h3", null, "Global request triangulation"), h("span", null, connected ? "● STREAM CONNECTED" : "○ RECONNECTING")), h("div", { className: "map-layout" }, h(WorldMap, { requests }), h(LiveLogs, { requests }))); }
 
-function EndpointOverview({ metrics }) {
-  const endpoints = (metrics.endpoints || []).slice(0, 12);
-  return h("section", { className: "panel endpoint-overview" },
-    h("div", { className: "panel-heading" }, h("h3", null, "API endpoints"), h("span", null, `${metrics.endpointCount || endpoints.length} rutas · ${metrics.categoryCount || 0} categorías`)),
-    h("div", { className: "endpoint-overview-grid" }, endpoints.map((item) => h("article", { className: "endpoint-summary", key: item.endpoint }, h("strong", null, item.endpoint), h("span", null, `${item.total} solicitudes · ${item.latency}ms · ${item.status}`))))
-  );
-}
-
-function TelemetryStrip({ metrics, requests }) {
-  const trafficBuckets = Array.from({ length: 12 }, (_, index) => {
-    const end = Date.now() - (11 - index) * 300000;
-    const start = end - 300000;
-    return requests.filter((request) => request.timestamp >= start && request.timestamp < end).length;
-  });
-  const maxTraffic = Math.max(...trafficBuckets, 1);
-  const latencyItems = (metrics.endpoints || []).filter((item) => item.total > 0).sort((a, b) => b.latency - a.latency).slice(0, 5);
-  const maxLatency = Math.max(...latencyItems.map((item) => item.latency), 1);
-  const stat = (label, value, detail, tone = "cyan") => h("div", { className: `telemetry-stat telemetry-stat--${tone}` }, h("span", null, label), h("strong", null, value), h("small", null, detail));
-  return h("section", { className: "telemetry-strip" },
-    stat("CPU PROCESS", `${metrics.cpuPercent || 0}%`, "uso medio del proceso", "green"),
-    stat("MEMORIA", `${metrics.memory || 0} MB`, "RSS del servidor", "blue"),
-    stat("UPTIME", `${Math.floor((metrics.uptimeSeconds || 0) / 60)}m`, `${metrics.uptimePercent}% disponible`, "cyan"),
-    stat("ERRORES", `${metrics.errorRate || 0}%`, `${metrics.errors || 0} respuestas fallidas`, metrics.errorRate ? "red" : "green"),
-    h("div", { className: "telemetry-chart" }, h("div", { className: "chart-label" }, "TRÁFICO / 60 MIN"), h("div", { className: "bar-chart" }, trafficBuckets.map((value, index) => h("i", { key: index, style: { height: `${Math.max(8, (value / maxTraffic) * 100)}%` }, title: `${value} solicitudes` })))),
-    h("div", { className: "telemetry-chart latency-chart" }, h("div", { className: "chart-label" }, "LATENCIA POR ENDPOINT"), latencyItems.length ? latencyItems.map((item) => h("div", { className: "latency-row", key: item.endpoint }, h("span", null, item.endpoint), h("i", null, h("b", { style: { width: `${Math.max(4, (item.latency / maxLatency) * 100)}%` } }), h("em", null, `${item.latency}ms`)))) : h("small", { className: "chart-empty" }, "Esperando solicitudes reales..."))
-  );
-}
-
 function App() {
   const { metrics, requests, connected } = useApiMetrics();
   const viewContent = h(motion.div, { key: "map", initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 } }, h(LivePanel, { requests, connected }));
@@ -213,9 +181,7 @@ function App() {
             h("button", { className: "icon-button", onClick: () => window.open("/v1/status/image", "_blank") }, "ESTADO PNG")
           )
         ),
-        viewContent,
-        h(TelemetryStrip, { metrics, requests }),
-        h(EndpointOverview, { metrics })
+        viewContent
       )
     ),
     h("footer", { className: "dashboard-footer" },
