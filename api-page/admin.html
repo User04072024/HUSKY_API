@@ -17,6 +17,12 @@
     .admin-login--github { border-color: #c4b5fd; background: #c4b5fd; }
     .admin-user { display: none; align-items: center; gap: 12px; margin-top: 20px; color: #86efac; font: 12px "JetBrains Mono", monospace; }
     .admin-user img { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #22d3ee; }
+    .admin-editor { display: none; margin-top: 26px; }
+    .admin-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+    .admin-nav a, .admin-tab, .admin-save { border: 1px solid #24506a; background: #101c2b; color: #b9d8e8; padding: 10px 12px; font: 700 10px "JetBrains Mono", monospace; text-decoration: none; cursor: pointer; }
+    .admin-tab.active, .admin-save { border-color: #22d3ee; background: #22d3ee; color: #031018; }
+    .admin-editor textarea { width: 100%; min-height: 360px; box-sizing: border-box; resize: vertical; border: 1px solid #24506a; background: #07101d; color: #d8f3ff; padding: 14px; font: 12px/1.6 "JetBrains Mono", monospace; outline: none; }
+    .admin-status { min-height: 18px; margin-top: 10px; color: #86efac; font: 11px "JetBrains Mono", monospace; }
   </style>
 </head>
 <body>
@@ -30,6 +36,19 @@
           <button class="admin-login admin-login--github" id="githubLogin" type="button">CONTINUAR CON GITHUB</button>
         </div>
       <div class="admin-user" id="adminUser"></div>
+      <div class="admin-editor" id="adminEditor">
+        <nav class="admin-nav" aria-label="Enlaces administrativos">
+          <a href="/dashboard">ABRIR DASHBOARD</a>
+          <a href="/docs">VER DOCUMENTACIÓN</a>
+          <button class="admin-tab active" data-content="openapi" type="button">OPENAPI</button>
+          <button class="admin-tab" data-content="notifications" type="button">NOTIFICACIONES</button>
+        </nav>
+        <textarea id="contentEditor" spellcheck="false" aria-label="Editor JSON"></textarea>
+        <div>
+          <button class="admin-save" id="saveContent" type="button">GUARDAR CAMBIOS</button>
+          <div class="admin-status" id="adminStatus"></div>
+        </div>
+      </div>
     </section>
   </main>
   <script type="module">
@@ -38,6 +57,11 @@
     const loginButton = document.getElementById('googleLogin');
     const githubButton = document.getElementById('githubLogin');
     const userBox = document.getElementById('adminUser');
+    const editorBox = document.getElementById('adminEditor');
+    const contentEditor = document.getElementById('contentEditor');
+    const statusBox = document.getElementById('adminStatus');
+    const tabs = [...document.querySelectorAll('.admin-tab')];
+    let activeContent = 'openapi';
 
     const configResponse = await fetch('/api/auth/config');
     const config = await configResponse.json();
@@ -59,6 +83,26 @@
     loginButton.addEventListener('click', () => signIn('google'));
     githubButton.addEventListener('click', () => signIn('github'));
 
+    const loadContent = async (content, accessToken) => {
+      activeContent = content;
+      statusBox.textContent = 'Cargando...';
+      const response = await fetch(`/api/admin/content/${content}`, { headers: { Authorization: `Bearer ${accessToken}` } });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'No se pudo cargar el contenido.');
+      contentEditor.value = JSON.stringify(result.data, null, 2);
+      statusBox.textContent = `Editando ${content}.`;
+      tabs.forEach((tab) => tab.classList.toggle('active', tab.dataset.content === content));
+    };
+
+    const saveContent = async (accessToken) => {
+      let payload;
+      try { payload = JSON.parse(contentEditor.value); } catch { statusBox.textContent = 'Error: el JSON no es válido.'; return; }
+      statusBox.textContent = 'Guardando...';
+      const response = await fetch(`/api/admin/content/${activeContent}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify(payload) });
+      const result = await response.json();
+      statusBox.textContent = result.message || 'Cambios guardados.';
+    };
+
     const { data } = await supabase.auth.getSession();
     if (data.session) {
       const response = await fetch('/api/admin/session', { headers: { Authorization: `Bearer ${data.session.access_token}` } });
@@ -68,6 +112,10 @@
         githubButton.style.display = 'none';
         userBox.style.display = 'flex';
         userBox.innerHTML = `<img src="${admin.user.avatar || ''}" alt=""><span>Sesión activa: ${admin.user.email}</span>`;
+        editorBox.style.display = 'block';
+        tabs.forEach((tab) => tab.addEventListener('click', () => loadContent(tab.dataset.content, data.session.access_token).catch((error) => { statusBox.textContent = error.message; })));
+        document.getElementById('saveContent').addEventListener('click', () => saveContent(data.session.access_token).catch((error) => { statusBox.textContent = error.message; }));
+        await loadContent(activeContent, data.session.access_token);
       } else {
         await supabase.auth.signOut();
         alert('Esta cuenta de GitHub o Google no tiene permisos de editor.');

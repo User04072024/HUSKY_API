@@ -107,6 +107,40 @@ app.get("/api/admin/session", requireAdmin, (req, res) => {
     res.json({ status: true, user: req.admin, publish: { enabled: false, message: "La publicación requiere configurar GitHub App y aprobación de cambios." } });
 });
 
+const adminContentFiles = {
+    openapi: path.join(__dirname, "src", "openapi.json"),
+    notifications: path.join(__dirname, "src", "data", "notifications.json")
+};
+
+function readAdminContent(content) {
+    const filePath = adminContentFiles[content];
+    if (!filePath) return null;
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+}
+
+app.get("/api/admin/content/:content", requireAdmin, (req, res) => {
+    try {
+        const data = readAdminContent(req.params.content);
+        if (data === null) return res.status(404).json({ status: false, message: "Contenido no encontrado." });
+        res.json({ status: true, content: req.params.content, data });
+    } catch (error) {
+        res.status(500).json({ status: false, message: `No se pudo leer el contenido: ${error.message}` });
+    }
+});
+
+app.put("/api/admin/content/:content", requireAdmin, (req, res) => {
+    try {
+        const filePath = adminContentFiles[req.params.content];
+        if (!filePath) return res.status(404).json({ status: false, message: "Contenido no encontrado." });
+        if (req.body === null || typeof req.body !== "object") return res.status(400).json({ status: false, message: "El contenido debe ser JSON válido." });
+        fs.writeFileSync(filePath, `${JSON.stringify(req.body, null, 2)}\n`, "utf8");
+        if (req.params.content === "openapi") openApi = req.body;
+        res.json({ status: true, message: "Contenido guardado correctamente." });
+    } catch (error) {
+        res.status(500).json({ status: false, message: `No se pudo guardar el contenido: ${error.message}` });
+    }
+});
+
 app.get("/auth/github", (req, res) => {
     const { GITHUB_CLIENT_ID } = process.env;
     if (!GITHUB_CLIENT_ID || !process.env.ADMIN_SESSION_SECRET) {
@@ -428,7 +462,7 @@ if (fs.existsSync(apiFolder)) {
 }
 
 // ========== MAIN ROUTES ==========
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "api-page", "index.html")));
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "api-page", "dashboard.html")));
 app.get("/docs", (req, res) => res.sendFile(path.join(__dirname, "api-page", "docs.html")));
 app.get("/dashboard", (req, res) => res.sendFile(path.join(__dirname, "api-page", "dashboard.html")));
 
