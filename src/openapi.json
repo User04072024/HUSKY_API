@@ -7,88 +7,108 @@
     "description": "API simple y fácil de usar."
   },
   "servers": [
-    { "url": "/" }
+    {
+      "url": "/"
+    }
   ],
   "tags": [
-    { "name": "IA" },
-    { "name": "Anime" },
-    { "name": "Imagen" },
-    { "name": "Descargar" },
-    { "name": "Buscar" }
+    {
+      "name": "IA"
+    },
+    {
+      "name": "Anime"
+    },
+    {
+      "name": "Imagen"
+    },
+    {
+      "name": "Descargar"
+    },
+    {
+      "name": "Buscar"
+    }
   ],
   "paths": {
     "/ai/chatgpt": {
-  "get": {
-    "summary": "ChatGPT",
-    "description": "Chat con ChatGPT envia dudas o texto para obtener respuesta.",
-    "tags": ["IA"],
-    "parameters": [
-      {
-        "name": "text",
-        "in": "query",
-        "required": true,
-        "description": "Texto o pregunta para ChatGPT.",
-        "schema": {
-          "type": "string",
-          "example": "Hola"
+      "get": {
+        "summary": "ChatGPT",
+        "description": "Chat con ChatGPT envia dudas o texto para obtener respuesta.",
+        "tags": [
+          "IA"
+        ],
+        "parameters": [
+          {
+            "name": "text",
+            "in": "query",
+            "required": true,
+            "description": "Texto o pregunta para ChatGPT.",
+            "schema": {
+              "type": "string",
+              "example": "Hola"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta correcta"
+          },
+          "400": {
+            "description": "Falta el parámetro text"
+          },
+          "500": {
+            "description": "Error interno"
+          }
         }
       }
-    ],
-    "responses": {
-      "200": {
-        "description": "Respuesta correcta"
-      },
-      "400": {
-        "description": "Falta el parámetro text"
-      },
-      "500": {
-        "description": "Error interno"
-      }
-    }
-  }
-},
+    },
     "/ai/gemini": {
-  "get": {
-    "summary": "Gemini",
-    "description": "Envía una consulta a Gemini y devuelve la respuesta generada.",
-    "tags": ["IA"],
-    "parameters": [
-      {
-        "name": "text",
-        "in": "query",
-        "required": true,
-        "description": "Texto o pregunta para Gemini.",
-        "schema": {
-          "type": "string",
-          "example": "que ia eres"
+      "get": {
+        "summary": "Gemini",
+        "description": "Envía una consulta a Gemini y devuelve la respuesta generada.",
+        "tags": [
+          "IA"
+        ],
+        "parameters": [
+          {
+            "name": "text",
+            "in": "query",
+            "required": true,
+            "description": "Texto o pregunta para Gemini.",
+            "schema": {
+              "type": "string",
+              "example": "que ia eres"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta correcta"
+          },
+          "400": {
+            "description": "Falta el parámetro text"
+          },
+          "500": {
+            "description": "Error interno"
+          }
         }
       }
-    ],
-    "responses": {
-      "200": {
-        "description": "Respuesta correcta"
-      },
-      "400": {
-        "description": "Falta el parámetro text"
-      },
-      "500": {
-        "description": "Error interno"
-      }
-    }
-  }
     },
     "/ai/copilot": {
       "get": {
         "summary": "Copilot",
         "description": "Envía una consulta a Copilot y devuelve la respuesta con referencias si están disponibles.",
-        "tags": ["IA"],
+        "tags": [
+          "IA"
+        ],
         "parameters": [
           {
             "name": "message",
             "in": "query",
             "required": true,
             "description": "Mensaje o pregunta para Copilot.",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "model",
@@ -97,7 +117,11 @@
             "description": "Modelo a usar. Por defecto: default.",
             "schema": {
               "type": "string",
-              "enum": ["default", "think-deeper", "gpt-5"],
+              "enum": [
+                "default",
+                "think-deeper",
+                "gpt-5"
+              ],
               "default": "default"
             }
           }
@@ -115,19 +139,22 @@
         }
       }
     },
-
     "/ai/venice": {
       "get": {
         "summary": "Venice",
         "description": "Envía una consulta a Venice AI y devuelve la respuesta final.",
-        "tags": ["IA"],
+        "tags": [
+          "IA"
+        ],
         "parameters": [
           {
             "name": "message",
             "in": "query",
             "required": true,
             "description": "Mensaje o pregunta para Venice AI.",
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -143,12 +170,13 @@
         }
       }
     },
-
     "/anime/waifu": {
       "get": {
         "summary": "Waifu",
         "description": "Obtiene una imagen aleatoria de waifu.",
-        "tags": ["Anime"],
+        "tags": [
+          "Anime"
+        ],
         "responses": {
           "200": {
             "description": "Imagen obtenida correctamente"
@@ -159,12 +187,13 @@
         }
       }
     },
-
     "/image/pinterest": {
       "get": {
         "summary": "Pinterest",
         "description": "Obtiene datos y enlaces de medios desde una URL de Pinterest o pin.it.",
-        "tags": ["Imagen"],
+        "tags": [
+          "Imagen"
+        ],
         "parameters": [
           {
             "name": "url",
@@ -190,74 +219,141 @@
         }
       }
     },
-
-"/image/search": {
-  "get": {
-    "summary": "Images Search",
-    "description": "Busca imágenes según el texto enviado y devuelve resultados con metadatos.",
-    "tags": ["Imagen"],
-    "parameters": [
-      {
-        "name": "text",
-        "in": "query",
-        "required": true,
-        "description": "Texto de búsqueda para imágenes.",
-        "schema": {
-          "type": "string",
-          "example": "Gato pixel art"
-        }
-      }
-    ],
-    "responses": {
-      "200": {
-        "description": "Respuesta correcta"
-      },
-      "400": {
-        "description": "Falta el parámetro text"
-      },
-      "500": {
-        "description": "Error interno"
-      }
-    }
-  }
-},
-
-"/download/spotify": {
-  "get": {
-    "summary": "Spotify Download",
-    "description": "Descarga audio desde un enlace de Spotify.",
-    "tags": ["Descargar"],
-    "parameters": [
-      {
-        "name": "url",
-        "in": "query",
-        "required": true,
-        "description": "URL del track de Spotify.",
-        "schema": {
-          "type": "string",
-          "example": "https://open.spotify.com/track/xxxxxxxx"
-        }
-      }
-    ],
-    "responses": {
-      "200": {
-        "description": "Respuesta correcta"
-      },
-      "400": {
-        "description": "Falta el parámetro url o la URL no es válida"
-      },
-      "500": {
-        "description": "Error interno"
-      }
-    }
-  }
-},
-    
-    "/download/tiktok": {
+    "/image/search": {
       "get": {
+        "summary": "Images Search",
+        "description": "Busca imágenes según el texto enviado y devuelve resultados con metadatos.",
+        "tags": [
+          "Imagen"
+        ],
+        "parameters": [
+          {
+            "name": "text",
+            "in": "query",
+            "required": true,
+            "description": "Texto de búsqueda para imágenes.",
+            "schema": {
+              "type": "string",
+              "example": "Gato pixel art"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta correcta"
+          },
+          "400": {
+            "description": "Falta el parámetro text"
+          },
+          "500": {
+            "description": "Error interno"
+          }
+        }
+      }
+    },
+    "/download/spotify": {
+      "get": {
+        "summary": "Spotify Download",
+        "description": "Descarga audio desde un enlace de Spotify.",
+        "tags": [
+          "Descargar"
+        ],
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "description": "URL del track de Spotify.",
+            "schema": {
+              "type": "string",
+              "example": "https://open.spotify.com/track/xxxxxxxx"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta correcta"
+          },
+          "400": {
+            "description": "Falta el parámetro url o la URL no es válida"
+          },
+          "500": {
+            "description": "Error interno"
+          }
+        }
+      }
+    },
+    "/download/mediafire": {
+      "get": {
+        "summary": "MediaFire Download",
+        "description": "Extrae metadatos y enlace de descarga directa desde una URL de MediaFire.",
+        "tags": [
+          "Descargar"
+        ],
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "description": "URL del archivo en MediaFire.",
+            "schema": {
+              "type": "string",
+              "example": "https://www.mediafire.com/file/abc123/archivo.zip/file"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta correcta"
+          },
+          "400": {
+            "description": "Falta el parámetro url o la URL no es válida"
+          },
+          "500": {
+            "description": "Error interno"
+          }
+        }
+      }
+    },
+    "/search/spotify": {
+      "get": {
+        "summary": "Spotify Search",
+        "description": "Busca canciones en Spotify y devuelve links directos.",
+        "tags": [
+          "Buscar"
+        ],
+        "parameters": [
+          {
+            "name": "text",
+            "in": "query",
+            "required": true,
+            "description": "Canción o artista a buscar.",
+            "schema": {
+              "type": "string",
+              "example": "bad bunny"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta correcta"
+          },
+          "400": {
+            "description": "Falta el parámetro text"
+          },
+          "500": {
+            "description": "Error interno"
+          }
+        }
+      }
+    },
+    "/download/tiktok": {
+      "post": {
         "summary": "TikTok",
         "description": "Descarga video o datos de un enlace de TikTok.",
-        "tags": ["Descargar"],
+        "tags": [
+          "Descargar"
+        ],
         "parameters": [
           {
             "name": "url",
@@ -266,7 +362,7 @@
             "description": "URL del video de TikTok.",
             "schema": {
               "type": "string",
-              "format": "uri"
+              "example": "https://vt.tiktok.com/ZSjXNEnbC/"
             }
           }
         ],
@@ -282,60 +378,6 @@
           }
         }
       }
-    },
-    "/download/mediafire": {
-  "get": {
-    "summary": "MediaFire Download",
-    "description": "Extrae metadatos y enlace de descarga directa desde una URL de MediaFire.",
-    "tags": ["Descargar"],
-    "parameters": [
-      {
-        "name": "url",
-        "in": "query",
-        "required": true,
-        "description": "URL del archivo en MediaFire.",
-        "schema": {
-          "type": "string",
-          "example": "https://www.mediafire.com/file/abc123/archivo.zip/file"
-        }
-      }
-    ],
-    "responses": {
-      "200": {
-        "description": "Respuesta correcta"
-      },
-      "400": {
-        "description": "Falta el parámetro url o la URL no es válida"
-      },
-      "500": {
-        "description": "Error interno"
-        }
-      }
-    }
-  },
-  "/search/spotify": {
-  "get": {
-    "summary": "Spotify Search",
-    "description": "Busca canciones en Spotify y devuelve links directos.",
-    "tags": ["Buscar"],
-    "parameters": [
-      {
-        "name": "text",
-        "in": "query",
-        "required": true,
-        "description": "Canción o artista a buscar.",
-        "schema": {
-          "type": "string",
-          "example": "bad bunny"
-        }
-      }
-    ],
-    "responses": {
-      "200": { "description": "Respuesta correcta" },
-      "400": { "description": "Falta el parámetro text" },
-      "500": { "description": "Error interno" }
     }
   }
-  }
-  }
-    }
+}
