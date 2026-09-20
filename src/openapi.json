@@ -378,6 +378,38 @@
           }
         }
       }
+    },
+    "/download/tiktokv2": {
+      "post": {
+        "summary": "TiktokV2",
+        "description": "Descarga videos de tiktok",
+        "tags": [
+          "Download"
+        ],
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "description": "Link de tiktok",
+            "schema": {
+              "type": "string",
+              "example": "https://vt.tiktok.com/ZSjXNEnbC/"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta correcta"
+          },
+          "400": {
+            "description": "Falta la URL"
+          },
+          "500": {
+            "description": "Error interno"
+          }
+        }
+      }
     }
   }
 }
