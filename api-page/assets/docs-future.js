@@ -549,23 +549,18 @@ async function executeEndpoint(event) {
 
   let path = endpoint.path;
   const options = { method };
+  const params = new URLSearchParams();
+  for (const [key, value] of formData.entries()) {
+    if (key === "__raw_json__") continue;
+    if (typeof value === "string" && value) params.append(key, value);
+  }
+  const query = params.toString();
+  if (query) path += (path.includes("?") ? "&" : "?") + query;
 
   if (["POST", "PUT", "PATCH"].includes(method)) {
     if (rawJson) {
       options.headers = { "Content-Type": "application/json" };
       options.body = rawJson;
-    }
-  } else {
-    const params = new URLSearchParams();
-    for (const [key, value] of formData.entries()) {
-      if (key === "__raw_json__") continue;
-      if (typeof value === "string" && value) {
-        params.append(key, value);
-      }
-    }
-    const query = params.toString();
-    if (query) {
-      path += (path.includes("?") ? "&" : "?") + query;
     }
   }
 
