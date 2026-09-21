@@ -166,9 +166,14 @@ app.put("/api/admin/file", requireAdmin, async (req, res) => {
     const content = typeof req.body?.content === "string" ? req.body.content : null;
     if (!filePath || content === null) return res.status(400).json({ status: false, message: "Ruta o contenido inválido." });
     try {
+        let parsedOpenApi = null;
+        if (filePath === "src/openapi.json") {
+            try { parsedOpenApi = JSON.parse(content); } catch { return res.status(400).json({ status: false, message: "El contenido de OpenAPI no es JSON válido." }); }
+        }
         const current = await getGithubFile(filePath);
         const config = githubConfig();
         const result = await githubRequest("PUT", filePath, { message: String(req.body.message || `admin: update ${filePath}`).slice(0, 200), content: Buffer.from(content, "utf8").toString("base64"), sha: current.sha, branch: config.branch });
+        if (parsedOpenApi) openApi = parsedOpenApi;
         res.json({ status: true, message: "Cambios guardados en GitHub.", commit: result.commit?.html_url || null });
     } catch (error) { res.status(502).json({ status: false, message: error.message }); }
 });
@@ -519,6 +524,26 @@ if (fs.existsSync(apiFolder)) {
         }
     });
 }
+
+// ========== DYNAMIC ADMIN ENDPOINTS ==========
+app.use((req, res, next) => {
+    const operation = openApi.paths?.[req.path]?.[req.method.toLowerCase()];
+    if (!operation) return next();
+
+    const successCode = Object.keys(operation.responses || {}).find((code) => /^2\d\d$/.test(code)) || "200";
+    const response = operation.responses?.[successCode] || {};
+    const content = response.content?.["application/json"];
+    const example = content?.example || content?.schema?.example;
+    if (example !== undefined) return res.status(Number(successCode)).json(example);
+
+    res.status(Number(successCode)).json({
+        status: true,
+        endpoint: req.path,
+        method: req.method,
+        message: operation.summary || "Endpoint ejecutado correctamente.",
+        data: req.method === "GET" || req.method === "DELETE" ? req.query : req.body
+    });
+});
 
 // ========== MAIN ROUTES ==========
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "api-page", "dashboard.html")));
