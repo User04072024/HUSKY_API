@@ -14,15 +14,50 @@ async function fetchTikWm(url) {
   const data = payload.data;
   return {
     type: 'video',
+    id: data.id || null,
+    region: data.region || null,
+    title: data.title || '',
+    description: data.content_desc || [],
     desc: data.title || '',
     author: data.author || {},
     cover: data.cover || null,
+    covers: {
+      standard: data.cover || null,
+      dynamic: data.ai_dynamic_cover || null,
+      original: data.origin_cover || null,
+    },
+    duration: data.duration || 0,
+    sizes: {
+      standard: data.size || 0,
+      watermark: data.wm_size || 0,
+      hd: data.hd_size || 0,
+    },
     downloads: [
       data.hdplay && { quality: 'HD', url: data.hdplay },
       data.play && { quality: 'SD', url: data.play },
       data.wmplay && { quality: 'Watermark', url: data.wmplay },
     ].filter(Boolean),
     audio: data.music || null,
+    music: data.music_info || null,
+    statistics: {
+      views: data.play_count || 0,
+      likes: data.digg_count || 0,
+      comments: data.comment_count || 0,
+      shares: data.share_count || 0,
+      downloads: data.download_count || 0,
+      collects: data.collect_count || 0,
+    },
+    createdAt: data.create_time || null,
+    isAd: Boolean(data.is_ad),
+    commerce: data.commerce_info || null,
+    commercialVideo: data.commercial_video_info || null,
+    commentSettings: data.item_comment_settings || null,
+    mentionedUsers: data.mentioned_users || [],
+    anchors: data.anchors || null,
+    anchorsExtras: data.anchors_extras || null,
+    flags: {
+      isNffOrNr: Boolean(data.is_nff_or_nr),
+    },
   };
 }
 
@@ -30,6 +65,12 @@ const CREATOR = 'Husky API';
 const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ';
 
 async function tiktok(url) {
+  try {
+    return await fetchTikWm(url);
+  } catch {
+    // Lovetik remains a secondary provider if TikWM is unavailable.
+  }
+
   const res = await fetch('https://lovetik.com/api/ajax/search', {
     method: 'POST',
     headers: {
