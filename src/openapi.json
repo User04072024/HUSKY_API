@@ -347,38 +347,6 @@
         }
       }
     },
-    "/download/tiktok": {
-      "post": {
-        "summary": "TikTok",
-        "description": "Descarga video o datos de un enlace de TikTok.",
-        "tags": [
-          "Descargar"
-        ],
-        "parameters": [
-          {
-            "name": "url",
-            "in": "query",
-            "required": true,
-            "description": "URL del video de TikTok.",
-            "schema": {
-              "type": "string",
-              "example": "https://vt.tiktok.com/ZSjXNEnbC/"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Respuesta correcta"
-          },
-          "400": {
-            "description": "Falta la URL"
-          },
-          "500": {
-            "description": "Error interno"
-          }
-        }
-      }
-    },
     "/download/tiktokv2": {
       "post": {
         "summary": "TiktokV2",
@@ -424,6 +392,38 @@
             "in": "query",
             "required": true,
             "description": "Link del video",
+            "schema": {
+              "type": "string",
+              "example": "https://vt.tiktok.com/ZSjXNEnbC/"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Respuesta correcta"
+          },
+          "400": {
+            "description": "Falta la URL"
+          },
+          "500": {
+            "description": "Error interno"
+          }
+        }
+      }
+    },
+    "/download/tiktok": {
+      "get": {
+        "summary": "TikTok",
+        "description": "Descarga video o datos de un enlace de TikTok.",
+        "tags": [
+          "Descargar"
+        ],
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "description": "URL del video de TikTok.",
             "schema": {
               "type": "string",
               "example": "https://vt.tiktok.com/ZSjXNEnbC/"
