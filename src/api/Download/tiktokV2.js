@@ -26,6 +26,9 @@ async function fetchTikWm(url) {
   };
 }
 
+const CREATOR = 'Husky API';
+const AUTHOR = 'ﮩ٨ـнυѕĸy_Dєvﮩ٨ـﮩ';
+
 async function tiktok(url) {
   const res = await fetch('https://lovetik.com/api/ajax/search', {
     method: 'POST',
@@ -73,25 +76,25 @@ async function tiktok(url) {
 module.exports = function (app) {
   app.post('/download/tiktokV2', async (req, res) => {
     const url = req.body?.url || req.query.url;
-    if (!url) return res.status(400).json({ status: false, error: 'Url is required' });
+    if (!url) return res.status(400).json({ status: false, creator: CREATOR, author: AUTHOR, error: 'Url is required' });
 
     try {
       const result = await tiktok(url);
-      return res.json({ status: true, result });
+      return res.json({ status: true, creator: CREATOR, author: AUTHOR, result });
     } catch (error) {
-      return res.status(500).json({ status: false, error: error.message || 'Error al obtener TikTok' });
+      return res.status(500).json({ status: false, creator: CREATOR, author: AUTHOR, error: error.message || 'Error al obtener TikTok' });
     }
   });
 
   app.post('/download/tiktokv2', async (req, res) => {
     const url = req.body?.url || req.query.url;
-    if (!url) return res.status(400).json({ status: false, error: 'Url is required' });
+    if (!url) return res.status(400).json({ status: false, creator: CREATOR, author: AUTHOR, error: 'Url is required' });
 
     try {
       const result = await tiktok(url);
-      return res.json({ status: true, result });
+      return res.json({ status: true, creator: CREATOR, author: AUTHOR, result });
     } catch (error) {
-      return res.status(500).json({ status: false, error: error.message || 'Error al obtener TikTok' });
+      return res.status(500).json({ status: false, creator: CREATOR, author: AUTHOR, error: error.message || 'Error al obtener TikTok' });
     }
   });
 };
