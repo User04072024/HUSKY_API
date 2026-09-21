@@ -16,8 +16,9 @@ async function tiktok(url) {
   const isSlide = Array.isArray(data.images) && data.images.length > 0;
   const cleanText = str => str.replace(/<[^>]+>/g, '').replace(/[^\w\s]/g, '').trim();
 
-  const audio = data.links.find(l => l.ft == 3 && l.a);
-  const downloads = data.links
+  const links = Array.isArray(data.links) ? data.links : [];
+  const audio = links.find(l => l.ft == 3 && l.a);
+  const downloads = links
     .filter(l => l.ft != 3 && l.a)
     .map(l => ({
       quality: l.s.replace(/\[.*?\]/g, '').trim() || cleanText(l.t),
@@ -40,17 +41,28 @@ async function tiktok(url) {
   };
 }
 
-/**
- * EXAMPLE USAGE
- * Tested with both Video and Photo Slide URLs
- */
+module.exports = function (app) {
+  app.post('/download/tiktokV2', async (req, res) => {
+    const url = req.body?.url || req.query.url;
+    if (!url) return res.status(400).json({ status: false, error: 'Url is required' });
 
-// Example: TikTok Video
-tiktok('https://vt.tiktok.com/ZSmHysmoe/')
-  .then(data => console.log('Video Data:', data))
-  .catch(err => console.error('Error fetching video:', err));
+    try {
+      const result = await tiktok(url);
+      return res.json({ status: true, result });
+    } catch (error) {
+      return res.status(500).json({ status: false, error: error.message || 'Error al obtener TikTok' });
+    }
+  });
 
-// Example: TikTok Photo Slide
-tiktok('https://vt.tiktok.com/ZSmHfbyTx/')
-  .then(data => console.log('Slide Data:', data))
-  .catch(err => console.error('Error fetching slide:', err));
+  app.post('/download/tiktokv2', async (req, res) => {
+    const url = req.body?.url || req.query.url;
+    if (!url) return res.status(400).json({ status: false, error: 'Url is required' });
+
+    try {
+      const result = await tiktok(url);
+      return res.json({ status: true, result });
+    } catch (error) {
+      return res.status(500).json({ status: false, error: error.message || 'Error al obtener TikTok' });
+    }
+  });
+};

@@ -24,8 +24,8 @@ async function tiktokTikWM(url) {
 }
 
 module.exports = function (app) {
-  app.get("/download/tiktok", async (req, res) => {
-    const { url } = req.query;
+  const handleTikTokDownload = async (req, res) => {
+    const url = req.body?.url || req.query.url;
 
     if (!url)
       return res.status(400).json({ status: false, error: "Url is required" });
@@ -40,5 +40,7 @@ module.exports = function (app) {
     } catch (err) {
       res.status(500).json({ status: false, error: err.message });
     }
-  });
+  };
+
+  app.get("/download/tiktok", handleTikTokDownload);
 };
